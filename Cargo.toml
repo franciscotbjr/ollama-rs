@@ -1,5 +1,5 @@
 [workspace]
-members = [".", "conveniences", "primitives", "http"]
+members = [".", "conveniences", "primitives", "http-core"]
 resolver = "3"
 
 [package]
