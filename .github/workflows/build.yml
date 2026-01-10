@@ -17,24 +17,18 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - os: macOS-latest
-            target: x86_64-apple-darwin
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc        
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        rust: [stable, nightly] 
 
     steps:
       - uses: hecrj/setup-rust-action@v2
         with:
-          rust-version: stable
+          rust-version: ${{ matrix.rust }}
 
       - uses: actions/checkout@v6
 
       - name: Run tests with all features
-        run: cargo test --target ${{ matrix.target }} --verbose --all-features
+        run: cargo test --target ${{ matrix.os }} --verbose --all-features
 
   build:
   
@@ -44,13 +38,6 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
-        include:
-          - os: ubuntu-latest
-            target: x86_64-unknown-linux-gnu
-          - os: macOS-latest
-            target: x86_64-apple-darwin
-          - os: windows-latest
-            target: x86_64-pc-windows-msvc
 
     steps:
       - uses: hecrj/setup-rust-action@v2
@@ -60,4 +47,4 @@ jobs:
       - uses: actions/checkout@v6
 
       - name: Build with all features
-        run: cargo build --target ${{ matrix.target }} --verbose --all-features
+        run: cargo build --target ${{ matrix.os }} --verbose --all-features
