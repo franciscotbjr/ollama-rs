@@ -26,7 +26,7 @@ jobs:
         with:
           rust-version: stable
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Setup target
         run: rustup target add ${{ matrix.target }}
