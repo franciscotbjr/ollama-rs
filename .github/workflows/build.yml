@@ -25,12 +25,11 @@ jobs:
             target: x86_64-apple-darwin
           - os: windows-latest
             target: x86_64-pc-windows-msvc        
-        rust: [stable, nightly]
 
     steps:
       - uses: hecrj/setup-rust-action@v2
         with:
-          rust-version: ${{ matrix.rust }}
+          rust-version: stable
 
       - uses: actions/checkout@v6
 
