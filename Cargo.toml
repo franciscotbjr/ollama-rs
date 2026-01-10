@@ -1,6 +1,31 @@
+[workspace]
+members = [".", "conveniences", "primitives", "http"]
+resolver = "3"
+
 [package]
 name = "ollama-rs"
 version = "0.1.0"
 edition = "2024"
+description = "This crate provides low-level primitives for Ollama's native API, along with higher-level conveniences for common use cases."
+keywords = [""]
+categories = [""]
+license = "MIT"
+readme = "README.md"
+repository = "https://github.com/franciscotbjr/ollama-rs"
+exclude = [
+    ".github/*",
+    "assets/*",
+    "examples/*",
+]
+
+[workspace.dependencies]
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1.0.149"
+reqwest = { version = "0.13.1", default-features = false, features = ["blocking", "cookies", "http2", "json", "native-tls"] }
 
 [dependencies]
+async-trait = "0.1.89"
+tokio = { version = "1.49.0", features = ["rt"] }
+serde = {workspace = true, features = ["derive"]}
+serde_json = {workspace = true}
+reqwest = { workspace = true, default-features = false, features = ["blocking", "cookies", "http2", "json", "native-tls"] }

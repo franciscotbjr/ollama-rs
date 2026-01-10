@@ -1,0 +1,47 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore: [ '*.md', 'assets/**', 'LICENSE', README.md, CHANGELOG.md ]
+    branches: [ 'feature/**', "bug/**", "issue/**" ]
+  pull_request:
+    paths-ignore: [ '*.md', 'assets/**', 'LICENSE', README.md, CHANGELOG.md ]
+    branches: [ "main", "release/**" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macOS-latest]
+        rust: [stable, nightly]
+
+    steps:
+      - uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: ${{ matrix.rust }}
+
+      - uses: actions/checkout@v6
+
+      - name: Run tests with all features
+        run: cargo test --verbose --all-features
+
+  build:
+  
+    needs: test
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: ${{ matrix.rust }}
+
+      - uses: actions/checkout@v6
+
+      - name: Build with all features
+        run: cargo build --target ${{ matrix.target }} --verbose --all-features
