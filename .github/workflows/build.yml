@@ -21,9 +21,7 @@ jobs:
         rust: [stable, nightly] 
 
     steps:
-      - uses: hecrj/setup-rust-action@v2
-        with:
-          rust-version: ${{ matrix.rust }}
+      - uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/checkout@v6
 
@@ -40,9 +38,7 @@ jobs:
         os: [ubuntu-latest, macOS-latest, windows-latest]
 
     steps:
-      - uses: hecrj/setup-rust-action@v2
-        with:
-          rust-version: stable
+      - uses: dtolnay/rust-toolchain@stable
 
       - uses: actions/checkout@v6
 
