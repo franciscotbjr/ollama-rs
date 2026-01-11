@@ -1,0 +1,727 @@
+# ollama-rs Project Definition
+
+**Document Version:** 1.0
+**Last Updated:** 2025-01-11
+**Project Version:** 0.1.0
+
+## Executive Summary
+
+**ollama-rs** is a Rust library that provides comprehensive integration with Ollama's native API through a layered architecture. The library offers both low-level primitives for direct API control and high-level conveniences for common use cases, enabling Rust developers to seamlessly integrate Ollama's AI capabilities into their applications.
+
+## Project Identity
+
+### Basic Information
+
+- **Project Name:** ollama-rs
+- **Repository:** https://github.com/franciscotbjr/ollama-rs
+- **License:** MIT
+- **Current Version:** 0.1.0
+- **Status:** Early Development / Foundation Phase
+- **Primary Language:** Rust (Edition 2024)
+- **Author:** Francisco
+
+### Project Purpose
+
+To provide the easiest and most idiomatic way for Rust developers to integrate with Ollama, offering:
+- Type-safe API bindings
+- Ergonomic async/await interfaces
+- Clear separation between low-level and high-level abstractions
+- Production-ready error handling
+- Comprehensive documentation
+
+## Technical Architecture
+
+### Workspace Structure
+
+The project employs a Cargo workspace architecture with five distinct features:
+
+```
+ollama-rs/
+├── ollama-rs/          # Root crate - main library integration
+├── primitives/         # Low-level API primitives and data structures
+├── http-core/          # HTTP client and communication layer
+├── conveniences/       # High-level convenience APIs
+└── samples/            # Usage examples and integration patterns
+```
+
+### Crate Responsibilities
+
+#### 1. ollama-rs (Root Crate)
+**Purpose:** Main integration point that re-exports and combines functionality from all workspace crates.
+
+**Key Responsibilities:**
+- Public API surface
+- Feature flag management
+- Cross-crate integration
+- Top-level documentation
+
+**Dependencies:**
+- async-trait 0.1.89
+- tokio 1.49.0 (features: rt)
+- serde 1.0.228 (features: derive)
+- serde_json 1.0.149
+- reqwest 0.13.1 (features: blocking, cookies, http2, json, native-tls)
+
+#### 2. primitives
+**Purpose:** Low-level data structures matching Ollama's API specification.
+
+**Key Responsibilities:**
+- Request/response type definitions
+- Serialization/deserialization implementations
+- API model validation
+- Type-safe enum representations
+
+**Status:** Skeleton created, implementation pending
+
+#### 3. http-core
+**Purpose:** HTTP client layer for API communication.
+
+**Key Responsibilities:**
+- Connection management
+- Request/response handling
+- Error mapping and propagation
+- Retry logic (if applicable)
+- Stream handling
+
+**Status:** Skeleton created, implementation pending
+
+#### 4. conveniences
+**Purpose:** High-level, ergonomic APIs for common workflows.
+
+**Key Responsibilities:**
+- Simplified method signatures
+- Builder patterns
+- Common operation helpers
+- Streaming abstractions
+- Response post-processing
+
+**Status:** Skeleton created, implementation pending
+
+#### 5. samples
+**Purpose:** Practical examples demonstrating library usage.
+
+**Key Responsibilities:**
+- Usage examples
+- Integration patterns
+- Best practices demonstration
+- Testing reference implementations
+
+**Status:** Skeleton created, examples pending
+
+## Technical Stack
+
+### Core Dependencies
+
+| Dependency | Version | Purpose | Features |
+|------------|---------|---------|----------|
+| tokio | 1.49.0 | Async runtime | rt |
+| reqwest | 0.13.1 | HTTP client | blocking, cookies, http2, json, native-tls |
+| serde | 1.0.228 | Serialization | derive |
+| serde_json | 1.0.149 | JSON handling | - |
+| async-trait | 0.1.89 | Trait async methods | - |
+
+### Dependency Rationale
+
+**Tokio:**
+- Industry-standard async runtime
+- Excellent ecosystem support
+- High performance
+- Well-documented
+
+**reqwest:**
+- Mature HTTP client with tokio integration
+- Built-in JSON support via serde
+- HTTP/2 capability
+- Cookie and TLS handling
+
+**serde/serde_json:**
+- De facto Rust serialization standard
+- Excellent derive macro support
+- Comprehensive JSON handling
+- Zero-cost abstractions
+
+**async-trait:**
+- Enables async methods in traits
+- Simplifies trait-based design
+- Required for extensible async APIs
+
+## API Specification
+
+### OpenAPI Integration
+
+**Location:** [spec/alloma_api.yaml](alloma_api.yaml)
+**Version:** 0.1.0
+**Format:** OpenAPI 3.1.0
+
+The library's implementation is driven by Ollama's official OpenAPI specification, ensuring accuracy and compatibility.
+
+### Supported Endpoints (Planned)
+
+**Complete API Analysis:** See [api-analysis.md](api-analysis.md) for comprehensive endpoint documentation.
+
+**Total Endpoints:** 12 (across all phases)
+
+#### Phase 1 (v0.1.0): Foundation + HTTP Core
+**Focus:** Primitives structure and HTTP client implementation
+
+**Scope:**
+- Set up primitives crate with shared types (ModelOptions, Logprob, etc.)
+- Implement http-core with connection management
+- Build error handling infrastructure
+- Create serialization/deserialization framework
+- Establish testing foundation
+
+**Deliverables:**
+- `GET /api/version` - Get Ollama version
+- Functional HTTP client in http-core
+- Error types and handling
+- Basic integration test framework
+
+#### Phase 2 (v0.1.1): All Primitives Implementation
+**Focus:** Complete implementation of all 12 API endpoints in primitives crate
+
+**Endpoints by Complexity:**
+
+**Simple Endpoints (4):**
+1. `GET /api/tags` - List available models
+2. `GET /api/ps` - List running models
+3. `POST /api/copy` - Copy a model
+4. `DELETE /api/delete` - Delete a model
+
+**Medium Complexity (2):**
+5. `POST /api/show` - Show detailed model information
+6. `POST /api/embed` - Generate text embeddings
+
+**High Complexity with Streaming (5):**
+7. `POST /api/generate` - Generate text completions (streaming/non-streaming)
+8. `POST /api/chat` - Chat completions with conversation history (streaming/non-streaming)
+9. `POST /api/create` - Create custom models (streaming progress)
+10. `POST /api/pull` - Download models from registry (streaming progress)
+11. `POST /api/push` - Upload models to registry (streaming progress)
+
+**Deliverables:**
+- All 11 remaining endpoints fully implemented in primitives
+- Request/response types for each endpoint
+- Streaming support for applicable endpoints
+- Comprehensive unit tests
+- Integration tests for all endpoints
+
+#### Phase 3 (v0.2.0): Conveniences Layer
+**Focus:** High-level ergonomic APIs built on primitives
+
+**Scope:**
+- Client builder pattern for easy initialization
+- Simplified method signatures for common operations
+- Stream helper utilities and iterators
+- Response post-processing and formatting
+- Error recovery patterns
+- Convenience methods for chaining operations
+
+**Deliverables:**
+- Complete conveniences crate implementation
+- Builder patterns for complex requests
+- Stream abstraction utilities
+- High-level client interface
+- Comprehensive documentation
+
+#### Phase 4 (v0.3.0): Samples & Production Readiness
+**Focus:** Examples, documentation, and polish
+
+**Scope:**
+- Comprehensive usage examples in samples crate
+- Real-world integration patterns
+- Performance benchmarking
+- API stability review
+- Production deployment guides
+- Migration documentation
+
+**Sample Examples:**
+- Basic text generation
+- Chat conversation with history
+- Model management (pull, create, delete)
+- Embedding generation and similarity search
+- Streaming responses with progress
+- Error handling patterns
+- Batch processing
+- Custom tool/function calling
+
+**Deliverables:**
+- Complete samples crate with 10+ examples
+- Performance benchmarks and optimization
+- Production-ready documentation
+- Stable v1.0.0 API
+- Migration guide from primitives to conveniences
+
+## Design Philosophy
+
+### Core Principles
+
+1. **Layered Architecture**
+   - Clear separation between primitives and conveniences
+   - Users can choose their abstraction level
+   - Internal flexibility for future changes
+
+2. **Type Safety**
+   - Leverage Rust's type system for correctness
+   - Compile-time guarantees where possible
+   - Minimize runtime errors
+
+3. **Async First**
+   - Built on tokio for non-blocking I/O
+   - Native async/await support
+   - Optional sync wrapper (future consideration)
+
+4. **Minimal Dependencies**
+   - Keep dependency tree lean
+   - Avoid unnecessary transitive dependencies
+   - Prefer well-maintained, stable crates
+
+5. **OpenAPI Driven**
+   - Follow Ollama's official specification
+   - Maintain API compatibility
+   - Automated validation against spec (future)
+
+### API Design Guidelines
+
+**Consistency:**
+- Follow Rust API guidelines
+- Maintain naming conventions
+- Consistent error handling patterns
+
+**Ergonomics:**
+- Make common tasks easy
+- Provide sensible defaults
+- Use builder patterns for complex types
+
+**Safety:**
+- Prevent invalid states at compile time
+- Clear error messages
+- No unsafe code unless absolutely necessary
+
+**Performance:**
+- Avoid unnecessary allocations
+- Efficient serialization
+- Connection reuse
+- Streaming where appropriate
+
+**Clarity:**
+- Explicit over implicit
+- Self-documenting code
+- Comprehensive documentation
+
+**Success Criteria:**
+- All shared types compile and serialize correctly
+- HTTP client can make basic requests
+- Error handling propagates properly
+- Test infrastructure operational
+
+---
+
+## Testing Strategy
+
+### Unit Tests
+
+**Scope:**
+- Individual function validation
+- Data structure serialization/deserialization
+- Error handling paths
+- Edge cases
+
+**Tools:**
+- Standard Rust test framework
+- serde_json for JSON validation
+
+### Integration Tests
+
+**Scope:**
+- Full API interactions
+- End-to-end workflows
+- Error scenarios
+- Streaming behavior
+
+**Requirements:**
+- Running Ollama instance
+- Network connectivity
+- Sufficient system resources
+
+### Mocking Strategy
+
+**Approach:**
+- Mock HTTP responses for unit tests
+- Real Ollama instance for integration tests
+- Consider wiremock or mockito for HTTP mocking
+
+**Benefits:**
+- Fast unit test execution
+- No external dependencies for unit tests
+- Realistic integration testing
+
+## Quality Standards
+
+### Code Quality
+
+**Formatting:**
+- Use `cargo fmt` (rustfmt)
+- Enforce in CI/CD
+
+**Linting:**
+- Use `cargo clippy`
+- Treat warnings as errors in CI
+- Custom lints for project-specific patterns
+
+**Documentation:**
+- All public APIs must have doc comments
+- Include examples in documentation
+- Generate docs with `cargo doc`
+
+### Testing Coverage
+
+**Targets:**
+- 80%+ code coverage (aspirational)
+- 100% coverage for critical paths
+- All error paths tested
+
+**Tools:**
+- cargo-tarpaulin for coverage reports
+- Integration with CI/CD
+
+### Performance
+
+**Benchmarks:**
+- Establish baseline metrics
+- Regular performance regression testing
+- Profile critical paths
+
+**Tools:**
+- criterion.rs for benchmarking
+- flamegraph for profiling
+
+## Development Workflow
+
+### Version Control
+
+**Branch Strategy:**
+- `main` - stable releases
+- `release` - integration branch
+- `feature/*` - new features
+- `fix/*` - bug fixes
+- `docs/*` - documentation
+
+**Commit Convention:**
+- Follow Conventional Commits
+- Clear, descriptive messages
+- Reference issues when applicable
+
+### CI/CD Pipeline
+
+**Automated Checks:**
+- Build verification
+- Test execution
+- Linting and formatting
+- Documentation generation
+- Security audits
+
+**Workflows:**
+- Build on push/PR
+- Release on tag creation
+- Automated binary builds
+
+**Location:** [.github/workflows/](.github/workflows/)
+
+### Release Process
+
+**Versioning:**
+- Follow Semantic Versioning 2.0.0
+- MAJOR: Breaking changes
+- MINOR: New features, backward compatible
+- PATCH: Bug fixes, backward compatible
+
+**Release Checklist:**
+1. Update CHANGELOG.md
+2. Update version in Cargo.toml
+3. Run full test suite
+4. Generate documentation
+5. Create git tag
+6. Publish to crates.io
+7. Create GitHub release
+
+## Documentation Structure
+
+### Project Documentation
+
+1. **[README.md](../README.md)**
+   - Project overview
+   - Quick start guide
+   - Installation instructions
+   - Basic usage examples
+
+2. **[CONTRIBUTING.md](../CONTRIBUTING.md)**
+   - Contribution guidelines
+   - Development setup
+   - Code standards
+   - PR process
+
+3. **[CHANGELOG.md](../CHANGELOG.md)**
+   - Version history
+   - Breaking changes
+   - New features
+   - Bug fixes
+
+4. **[LICENSE](../LICENSE)**
+   - MIT License
+   - Copyright information
+
+5. **[DEV_NOTES.md](../DEV_NOTES.md)**
+   - Internal development notes
+   - Architectural decisions
+   - Implementation details
+   - Technical rationale
+
+6. **[spec/definition.md](definition.md)** (This Document)
+   - Comprehensive project analysis
+   - Architecture documentation
+   - Implementation strategy
+   - Quality standards
+
+### API Documentation
+
+**Generated Documentation:**
+- Rust doc comments (`///`)
+- Generated with `cargo doc`
+- Hosted on docs.rs (future)
+
+**Content Requirements:**
+- Brief description
+- Detailed explanation
+- Usage examples
+- Error conditions
+- Related types/functions
+
+## Known Limitations & Considerations
+
+### Current Limitations
+
+1. **Early Development Stage**
+   - API not yet stable
+   - Breaking changes expected
+   - Limited functionality
+
+2. **Endpoint Coverage**
+   - Only `/api/generate` planned for initial release
+   - Other endpoints coming in future versions
+
+3. **Testing**
+   - Requires running Ollama instance
+   - No comprehensive test suite yet
+   - Integration tests pending
+
+4. **Performance**
+   - No optimization yet
+   - Baseline metrics not established
+   - Profiling needed
+
+### Future Considerations
+
+**Potential Features:**
+- CLI tool for Ollama interaction
+- Server-sent events for streaming
+- Batch processing utilities
+- Model management helpers
+- Custom middleware/interceptors
+- WebAssembly support
+- Sync API wrapper
+
+**Technical Debt:**
+- Consider using `thiserror` for errors
+- Evaluate tracing/logging strategy
+- Connection pooling optimization
+- Request retry logic
+
+## Resource Requirements
+
+### Development Environment
+
+**Minimum Requirements:**
+- Rust 1.75+
+- Ollama installed and running
+- Git
+- 4GB RAM
+- Network connectivity
+
+**Recommended Tools:**
+- rust-analyzer (IDE support)
+- cargo-watch (auto-rebuild)
+- cargo-expand (macro debugging)
+- cargo-audit (security scanning)
+- cargo-outdated (dependency updates)
+
+### Runtime Requirements
+
+**For Library Users:**
+- Rust 1.75+ (edition 2024)
+- Ollama instance (local or remote)
+- Network connectivity to Ollama server
+- Tokio runtime
+
+**System Resources:**
+- Minimal CPU overhead
+- Memory depends on model size
+- Network bandwidth for API calls
+
+## Success Criteria
+
+### Version 0.1.0: Foundation + HTTP Core (Current)
+**Status:** In Progress
+
+**Completed:**
+- [x] Project structure established
+- [x] Documentation foundation (README, CONTRIBUTING, CHANGELOG, DEV_NOTES, definition.md, api-analysis.md)
+- [x] Dependency configuration
+- [x] OpenAPI specifications (12 endpoints documented)
+- [x] Git repository initialized
+- [x] Workspace configuration
+
+**In Progress:**
+- [ ] Simple endpoints (1): version
+- [ ] Primitives crate structure with shared types
+- [ ] HTTP client implementation in http-core
+- [ ] Error type hierarchy
+- [ ] Testing infrastructure
+
+**Definition of Done:**
+- All shared types (ModelOptions, Logprob, enums) compile
+- One (first) Simple endpoints: version
+- HTTP client can make GET/POST requests
+- Error handling system in place
+- Unit test framework operational
+- Integration test setup complete
+
+---
+
+### Version 0.1.1: All Primitives Implementation (Planned)
+**Status:** Not Started
+
+**Checklist:**
+- [ ] Simple endpoints (4): tags, ps, copy, delete
+- [ ] Medium endpoints (2): show, embed
+- [ ] Complex endpoints (5): generate, chat, create, pull, push
+- [ ] Streaming support for 5 endpoints
+- [ ] Request/response types for all 12 endpoints
+- [ ] Unit test coverage >80%
+- [ ] Integration tests for all endpoints
+- [ ] Complete API documentation
+
+**Definition of Done:**
+- All 11 remaining endpoints functional with real Ollama
+- Streaming endpoints handle progress correctly
+- Comprehensive test suite passes
+- API documentation complete
+- Code reviewed and optimized
+
+---
+
+### Version 0.2.0: Conveniences Layer (Planned)
+**Status:** Not Started
+
+**Checklist:**
+- [ ] OllamaClient with builder pattern
+- [ ] Convenience methods for all endpoints
+- [ ] Builder patterns for complex requests
+- [ ] Stream helper utilities
+- [ ] Progress callback system
+- [ ] Response formatters
+- [ ] Retry logic implementation
+- [ ] High-level documentation with examples
+
+**Definition of Done:**
+- All convenience APIs ergonomic and intuitive
+- Complex operations reduced to 3-5 calls
+- Stream utilities work with async iterators
+- Documentation includes real-world examples
+- User feedback incorporated
+
+---
+
+### Version 0.3.0: Samples & Production Readiness (Planned)
+**Status:** Not Started
+
+**Checklist:**
+- [ ] 10+ comprehensive examples in samples crate
+- [ ] Performance benchmarks established
+- [ ] Memory profiling completed
+- [ ] API stability review
+- [ ] Breaking change assessment
+- [ ] Migration guide (primitives → conveniences)
+- [ ] Production deployment guide
+- [ ] Published to crates.io
+- [ ] API declared stable (semver commitment)
+
+**Definition of Done:**
+- All examples run successfully
+- Performance meets benchmarks
+- Documentation covers 95%+ of use cases
+- API frozen and stable
+- Production-ready
+- Community feedback positive
+
+## Risk Analysis
+
+### Technical Risks
+
+1. **API Changes**
+   - **Risk:** Ollama API may change
+   - **Mitigation:** Follow OpenAPI spec, version pinning
+
+2. **Performance**
+   - **Risk:** Inefficient implementation
+   - **Mitigation:** Benchmarking, profiling, optimization
+
+3. **Error Handling**
+   - **Risk:** Incomplete error coverage
+   - **Mitigation:** Comprehensive testing, user feedback
+
+### Project Risks
+
+1. **Maintenance**
+   - **Risk:** Single maintainer
+   - **Mitigation:** Good documentation, community building
+
+2. **Adoption**
+   - **Risk:** Low user adoption
+   - **Mitigation:** Examples, documentation, community engagement
+
+3. **Compatibility**
+   - **Risk:** Breaking changes in dependencies
+   - **Mitigation:** Conservative updates, testing
+
+## Community & Support
+
+### Communication Channels
+
+- **Issues:** GitHub issue tracker
+- **Discussions:** GitHub discussions (future)
+- **Documentation:** docs.rs (future)
+
+## References
+
+### External Resources
+
+- [Ollama GitHub Repository](https://github.com/ollama)
+- [Ollama API Documentation](https://github.com/ollama/ollama/blob/main/docs/api.md)
+- [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
+- [The Async Book](https://rust-lang.github.io/async-book/)
+- [Tokio Documentation](https://tokio.rs/)
+- [reqwest Documentation](https://docs.rs/reqwest/)
+
+### Internal Documents
+
+- [README.md](../README.md) - Project overview
+- [CONTRIBUTING.md](../CONTRIBUTING.md) - Contribution guidelines
+- [CHANGELOG.md](../CHANGELOG.md) - Version history
+- [DEV_NOTES.md](../DEV_NOTES.md) - Development notes
+
+---
+
+**Document Status:** Living document - updated as project evolves
+**Next Review:** After Phase 1 completion
+**Maintainer:** Francisco (@franciscotbjr)

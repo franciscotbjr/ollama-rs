@@ -1,0 +1,75 @@
+name: Release Binaries
+
+on:
+  workflow_dispatch:
+    inputs:
+      release:
+        type: string
+        description: Realease version
+        required: true
+
+jobs:
+  package:
+    runs-on: '${{ matrix.os }}'
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macOS-latest
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+    steps:
+      - uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: stable
+
+      - uses: actions/checkout@v6
+
+      - name: Setup target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install musl
+        run: sudo apt-get install musl-tools
+        if: contains(matrix.target, 'linux-musl')
+
+      - name: Run tests with all features (including chunks)
+        run: cargo test --verbose --all-features
+
+      - name: Build with all features
+        run: cargo build --target ${{ matrix.target }} --release --verbose --all-features
+
+      - name: Strip binary
+        run: strip 'target/${{ matrix.target }}/release/ollama-rs'
+        if: "!contains(matrix.target, 'windows')"
+
+      - name: Build package
+        id: package
+        shell: bash
+        run: |
+          ARCHIVE_NAME="ollama-rs-${{ github.event.inputs.release }}-${{ matrix.target }}"
+          if [[ '${{ matrix.target }}' == *windows* ]]; then
+            ARCHIVE_FILE="./target/${{ matrix.target }}/release/${ARCHIVE_NAME}.zip"
+            mv LICENSE LICENSE.txt
+            7z a "${ARCHIVE_FILE}" "./target/${{ matrix.target }}/release/ollama-rs.exe" ./README.md ./CHANGELOG.md ./LICENSE.txt
+            echo "file=${ARCHIVE_FILE}" >> $GITHUB_OUTPUT
+            echo "name=${ARCHIVE_NAME}.zip" >> $GITHUB_OUTPUT
+          else
+            ARCHIVE_FILE="target/${{ matrix.target }}/release/${ARCHIVE_NAME}.tar.gz"
+            mkdir "tmp"
+            mkdir "tmp/${ARCHIVE_NAME}"
+            cp README.md CHANGELOG.md LICENSE "target/${{ matrix.target }}/release/ollama-rs" "tmp/${ARCHIVE_NAME}"
+            tar -czf "${ARCHIVE_FILE}" -C tmp/ "${ARCHIVE_NAME}"
+            echo "file=${ARCHIVE_FILE}" >> $GITHUB_OUTPUT
+            echo "name=${ARCHIVE_NAME}.tar.gz" >> $GITHUB_OUTPUT
+          fi
+      - name: Upload package
+        uses: svenstaro/upload-release-action@v2
+        with:
+          repo_token: ${{ secrets.GITHUB_TOKEN }}
+          file: ${{ steps.package.outputs.file }}
+          asset_name:  ${{ steps.package.outputs.name }}
+          tag: "${{ github.event.inputs.release }}"
+          overwrite: true
