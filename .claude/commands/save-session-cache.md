@@ -1,17 +1,45 @@
 # Cache Project Context
 
-I'll analyze and remember key information about this Markdown Harvest Rust project to speed up future commands.
+I'll save the current session context for the ollama-rs project by reading critical project files and creating a cache for future session continuity.
 
-I'll detect and remember:
+## What Gets Cached
 
-    Cargo build configuration and dependencies
-    How to run tests (cargo test)
-    What formatter is configured (rustfmt)
-    Project structure and components (ollama-rs, http-core, primitives, conveniences, samples)
-    Key features
-    Test coverage 
-    CLI interactive mode availability 
+The cache script will automatically gather information from:
 
-This helps other commands run faster by not re-analyzing the same information repeatedly.
+### Critical Project Files
+- **spec/definition.md** - Complete project definition and implementation strategy
+- **spec/api-analysis.md** - Detailed analysis of all 12 API endpoints
+- **spec/primitives/*.yaml** - Individual API endpoint specifications (12 files)
+- **DEV_NOTES.md** - Development notes and architectural decisions
+- **CHANGELOG.md** - Version history and changes
+- **README.md** - Project overview and quick start
+- **CONTRIBUTING.md** - Development guidelines and standards
+- **Cargo.toml** - Project configuration and workspace structure
 
+### Extracted Information
+From these files, the script extracts:
+- Project name, version, repository, license (from Cargo.toml)
+- Workspace crates and structure (from Cargo.toml)
+- Build system and tooling information
+- List of all critical documentation files
+- List of all API specification files
+- Build status (basic validation)
+- Session tracking (count, timestamps)
 
+### NOT Duplicated
+The following information is **NOT** cached but read from files when needed:
+- Implementation strategy and phases (read from definition.md)
+- Current phase status and progress (read from definition.md)
+- API endpoint details (read from api-analysis.md)
+- Development notes and decisions (read from DEV_NOTES.md)
+- Task lists and TODOs (read from relevant files)
+
+This ensures the cache stays lean and source files remain the single source of truth.
+
+## Usage
+
+<function_calls>
+<invoke name="Bash">
+<parameter name="command">rust-script .claude/scripts/save_cache.rs</parameter>
+<parameter name="description">Save session context to cache</parameter>
+</invoke>

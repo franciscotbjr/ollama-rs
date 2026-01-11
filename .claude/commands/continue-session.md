@@ -1,79 +1,91 @@
 # Continue Previous Conversation
 
-I'll help you seamlessly continue your previous conversation by restoring all relevant context and progress for this Rust AI agents project.
+I'll help you seamlessly continue your previous conversation by restoring all relevant context and progress for the ollama-rs project.
+
+## Loading Cache
 
 <function_calls>
 <invoke name="Bash">
-<parameter name="command">powershell.exe -Command '
-$CACHE_DIR = "$env:USERPROFILE\.claude\ollama-rs"
-$currentPath = (Get-Location).Path
-$bytes = [System.Text.Encoding]::UTF8.GetBytes($currentPath)
-$hash = [System.Security.Cryptography.MD5]::Create().ComputeHash($bytes)
-$PROJECT_HASH = ($hash | ForEach-Object { $_.ToString("x2") }) -join ""
-$PROJECT_HASH = $PROJECT_HASH.Substring(0,8)
-$CACHE_FILE = "$CACHE_DIR\project_$PROJECT_HASH.cache"
+<parameter name="command">rust-script .claude/scripts/read_cache.rs</parameter>
+<parameter name="description">Load previous session context from cache</parameter>
+</invoke>
 
-Write-Host "Loading previous conversation context..."
-if (Test-Path $CACHE_FILE) {
-    try {
-        $context = Get-Content $CACHE_FILE -Raw | ConvertFrom-Json
-        Write-Host "Context loaded successfully:"
-        Write-Host "  Project: $($context.language)"
-        Write-Host "  Session: #$($context.sessionCount) (Total: $($context.totalSessions))"
-        Write-Host "  Created: $($context.createdAt)"
-        Write-Host "  Last session: $($context.lastSession)"
-        Write-Host "  Build system: $($context.buildSystem)"
-        Write-Host "  Tests: $($context.totalTests)" 
-        Write-Host "  Intents: $($context.intentCount)"
-        Write-Host "  Status: $($context.buildStatus)"
-        Write-Host "Ready to continue where we left off!"
-    } catch {
-        Write-Host "Error loading context: $($_.Exception.Message)"
-    }
-} else {
-    Write-Host "No previous conversation found - starting fresh"
-}
-'
+## What Gets Restored
 
+When continuing, I'll have **MANDATORY** access to all critical project files:
+
+### 📋 **Project Specifications (spec folder)**
+- **spec/definition.md** - Complete project definition and implementation strategy
+- **spec/api-analysis.md** - Detailed analysis of all 12 API endpoints
+- **spec/primitives/*.yaml** - Individual API endpoint specifications (12 files)
+
+### 📝 **Development Documentation**
+- **DEV_NOTES.md** - Development notes and architectural decisions
+- **CHANGELOG.md** - Version history and changes
+- **README.md** - Project overview and quick start
+- **CONTRIBUTING.md** - Development guidelines and standards
+
+### 🔧 **Build Configuration**
+- **Cargo.toml** - Rust workspace configuration and dependencies
+- Workspace crates: ollama-rs, primitives, http-core, conveniences, samples
+
+### 💻 **Source Code Context**
+- **All Rust files** in workspace crates
+- **Current implementation status** from definition.md
+- **Testing framework** configuration (cargo test)
+- **Code formatting** tools (rustfmt, clippy)
+
+### 📊 **Session Context**
+- **Session count** - Track conversation continuity
+- **Last session timestamp** - When you last worked on the project
+- **Build status** - Current compilation state
+- **Phase progress** - Current implementation phase and tasks
+
+## Context Analysis Process
+
+After loading the cache, I will:
+
+1. **🔍 Verify Cache** - Confirm cache exists and is valid
+2. **📊 Display Summary** - Show project info, workspace structure, and files
+3. **📋 Read Current Phase** - Extract current implementation phase from definition.md
+4. **📁 List Critical Files** - Enumerate all tracked documentation and specs
+5. **🎯 Identify Focus** - Determine what's in progress from definition.md
+6. **🚀 Ready State** - Confirm readiness to continue work
 
 ## What I Remember
 
-When continuing, I'll have **MANDATORY** access to all critical project files to read all of them:
+From the cache and critical files, I understand:
 
-### 📋 **Project Specifications (spec folder)**
-- **spec/implement.md** - Implementation requirements and tasks
-- **spec/personal-assistant.md** - Personal assistant specification with Ollama integration
-
-### 📝 **Development Tracking**
-- **DEV_NOTES.md** - Development progress and implementation notes
-
-### 📝 **Change History Tracking**
-- **CHANGELOG.md** - Development progress and implementation notes
-
-### 🔧 **Build System Configuration**
-- **Cargo.toml** - Rust project configuration and dependencies
-- **config.toml** - Application configuration
-
-### 💻 **Source Code Patterns**
-- **All Rust files** in src/ (agents, clients, infrastructure)
-- **Agent implementations** (classifier, email, contact, assistant)
-- **Ollama client integration** (requests, responses, messages)
-- **Test patterns** using Rust's built-in testing framework
-
-### 🎯 **Context Data**
-- **Previous conversation topics** and decisions made
-- **Active tasks** and their current status
-- **Testing framework** configuration (cargo test detection)
-- **Code formatting** rules and tools (rustfmt)
+- **Project Structure**: 5-crate Cargo workspace for Ollama API integration
+- **Implementation Strategy**: 4-phase plan (Foundation → Primitives → Conveniences → Samples)
+- **Current Phase**: Phase 1 (v0.1.0) - Foundation + HTTP Core
+- **API Coverage**: 12 total endpoints (5 simple, 2 medium, 5 complex with streaming)
+- **Build System**: Cargo with Rust 2024 edition
+- **Dependencies**: tokio, reqwest, serde, async-trait
+- **Testing**: Unit and integration test framework
+- **Documentation**: Comprehensive specs and guides
 
 ## User Experience
 
-You'll see clear progress indicators as I:
-- 🔍 Search for your previous context
-- 📝 Load conversation history  
-- 📋 Review development notes
-- 📚 Refresh project specifications
-- 🔄 Assess current state
-- 🚀 Confirm readiness to continue
+You'll see clear progress indicators as the script:
+- 🔍 Searches for your previous context
+- 📝 Loads cache file with project metadata
+- 📋 Displays project information and structure
+- 📚 Lists all critical files being tracked
+- 📄 Shows API specifications by complexity
+- 📈 Reports session count and timestamps
+- 🔨 Confirms build status
+- 📍 Shows current phase and focus areas
+- 🚀 Confirms readiness to continue
 
-The entire process takes just seconds, and you'll know exactly what context I've restored before we proceed with your next request.
+The entire process takes just seconds, and you'll know exactly what context has been restored before we proceed with your next task.
+
+## If Cache Not Found
+
+If no cache exists, you'll see:
+```
+❌ No previous conversation found
+💡 Tip: Run /save-session-cache to create a cache for this project
+```
+
+Then run `/save-session-cache` to create a new cache for future sessions.
