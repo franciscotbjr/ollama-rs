@@ -115,12 +115,11 @@ fn main() {
     println!("  License: {}", context.license);
     println!();
 
-    println!("🏗️  Workspace Structure:");
+    println!("🏗️  Architecture:");
+    println!("  Type: Single crate");
     println!("  Build System: {}", context.build_system);
-    println!("  Total Crates: {}", context.total_crates);
-    for crate_name in &context.workspace_crates {
-        println!("    - {}", crate_name);
-    }
+    println!("  Modules: primitives, http, conveniences");
+    println!("  Features: default (http + primitives), conveniences (optional)");
     println!();
 
     println!("📁 Critical Files ({} tracked):", context.critical_files.len());

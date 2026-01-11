@@ -48,31 +48,38 @@ cargo build
 # Run tests
 cargo test
 
-# Run samples
-cargo run --package samples
+# Run examples
+cargo run --example basic_generation
 ```
 
 ## Project Structure
 
-This is a Cargo workspace with multiple crates:
+This is a single-crate project with modular organization:
 
 ```
 ollama-rs/
-├── src/              # Main library code
-├── primitives/       # Low-level API primitives
-├── http-core/        # HTTP client implementation
-├── conveniences/     # High-level convenience APIs
-├── samples/          # Usage examples
-├── spec/             # OpenAPI specifications
-└── .github/          # CI/CD workflows
+├── src/
+│   ├── lib.rs           # Main library entry point
+│   ├── primitives/      # Low-level API primitives (default)
+│   ├── http/            # HTTP client implementation (default)
+│   └── conveniences/    # High-level APIs (optional feature)
+├── examples/            # Usage examples
+├── spec/                # OpenAPI specifications
+└── .github/             # CI/CD workflows
 ```
 
-### Crate Responsibilities
+### Module Responsibilities
 
-- **primitives**: Contains data structures and types that match Ollama's API specification
-- **http-core**: Handles HTTP communication, request/response handling
-- **conveniences**: Provides ergonomic, high-level APIs built on primitives
-- **ollama-rs**: Main library that integrates all components
+- **primitives** (module): Data structures and types matching Ollama's API specification
+- **http** (module): HTTP communication, request/response handling
+- **conveniences** (module): Ergonomic, high-level APIs built on primitives (optional feature)
+
+### Feature Flags
+
+```toml
+default = ["http", "primitives"]     # Core functionality
+conveniences = ["http", "primitives"] # Optional high-level APIs
+```
 
 ## Development Workflow
 

@@ -10,48 +10,72 @@ This document contains internal development notes, architectural decisions, and 
 
 ## Architecture Overview
 
-### Workspace Structure
+### Single-Crate Structure
 
-The project uses a Cargo workspace to separate concerns and maintain modularity:
+**Decision Date:** 2026-01-11
+
+The project uses a **single-crate architecture** with modular organization:
 
 ```
 ollama-rs/
-├── ollama-rs (root)   # Main integration crate
-├── primitives/        # API data structures
-├── http-core/         # HTTP client layer
-├── conveniences/      # High-level API
-└── samples/           # Examples
+└── src/
+    ├── lib.rs           # Main library entry point
+    ├── primitives/      # API data structures (default feature)
+    ├── http/            # HTTP client layer (default feature)
+    └── conveniences/    # High-level API (optional feature)
 ```
+
+**Rationale:**
+- **Simpler build process**: No workspace complexity
+- **Easier maintenance**: Single version, single release
+- **Clearer dependencies**: Feature flags instead of crate dependencies
+- **Better for library users**: One dependency instead of multiple
+- **Faster compile times**: No cross-crate boundaries
+
+**Changed From:** Previously planned as 5-crate workspace (ollama-rs, primitives, http-core, conveniences, samples)
 
 ### Design Philosophy
 
-1. **Layered Architecture**: Separation between low-level primitives and high-level conveniences
+1. **Modular Design**: Clear separation via modules and feature flags
 2. **Type Safety**: Leverage Rust's type system for API correctness
 3. **Async First**: Built on Tokio for async/await support
 4. **Minimal Dependencies**: Keep dependency tree lean
 5. **OpenAPI Driven**: Follow Ollama's official API specification
+6. **Feature-Based**: Optional functionality via Cargo features
+
+### Feature Flags
+
+```toml
+[features]
+default = ["http", "primitives"]
+conveniences = ["http", "primitives"]
+http = []
+primitives = []
+```
 
 ## Current State
 
 ### Implemented
-- Cargo workspace configuration
-- Basic crate structure
-- Dependency setup (tokio, serde, reqwest)
-- OpenAPI specification integration
-- Documentation foundation
+- Single-crate configuration with feature flags
+- Module structure (primitives, http, conveniences)
+- Dependency setup (tokio, serde, reqwest, async-trait)
+- 12 OpenAPI specifications documented
+- Comprehensive documentation foundation
 
 ### In Progress
-- Core HTTP client implementation
-- API primitive definitions
+- `http` module implementation
+- `primitives` module type definitions
 - Error handling strategy
+- First endpoint: GET /api/version
 
 ### TODO
-- [ ] Implement primitives based on OpenAPI spec
-- [ ] Build HTTP client in http-core
-- [ ] Create convenience layer APIs
+- [ ] Implement shared types in `primitives` module
+- [ ] Build HTTP client in `http` module
+- [ ] Implement GET /api/version endpoint
+- [ ] Create `conveniences` module (Phase 3)
 - [ ] Add comprehensive tests
 - [ ] Implement streaming support
-- [ ] Add usage examples
+- [ ] Add examples in `/examples` directory
 - [ ] Performance benchmarks
 
 ## Technical Decisions
@@ -78,7 +102,7 @@ ollama-rs/
 - Well-documented
 
 **Configuration:**
-- Features: rt (runtime)
+- Features: macros, rt-multi-thread
 - Version: 1.49.0
 
 ### Serialization: Serde
@@ -94,33 +118,35 @@ ollama-rs/
 
 ## API Implementation Strategy
 
-### Phase 1: Primitives (Current)
-Define all data structures matching Ollama API:
-- Request types
-- Response types
-- Configuration options
-- Error types
+### Phase 1 (v0.1.0): Foundation + HTTP Module (Current)
+Set up `primitives` and `http` modules:
+- Define shared types (ModelOptions, Logprob, enums)
+- Implement HTTP client in `http` module
+- Create error type hierarchy
+- First endpoint: GET /api/version
+- Feature flags working
 
-### Phase 2: HTTP Core
-Implement HTTP client layer:
-- Connection management
-- Request/response handling
-- Error mapping
-- Retry logic (if needed)
+### Phase 2 (v0.1.1): All Primitives
+Complete all 12 endpoints in `primitives` module:
+- 5 Simple endpoints
+- 2 Medium complexity endpoints
+- 5 Complex endpoints with streaming
+- Full test coverage
 
-### Phase 3: Conveniences
-Build high-level APIs:
+### Phase 3 (v0.2.0): Conveniences Module
+Build high-level APIs in `conveniences` module:
+- Optional feature flag
 - Simplified method signatures
-- Common workflows
 - Builder patterns
-- Streaming helpers
+- Stream helpers
+- Common workflows
 
-### Phase 4: Examples & Docs
-Complete the developer experience:
-- Comprehensive examples
-- API documentation
-- Integration guides
-- Best practices
+### Phase 4 (v0.3.0): Examples & Production
+Polish and prepare for v1.0.0:
+- Comprehensive examples in `/examples`
+- API documentation complete
+- Performance benchmarks
+- Production guides
 
 ## OpenAPI Specification
 
