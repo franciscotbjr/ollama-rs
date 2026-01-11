@@ -1,0 +1,107 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    paths-ignore: [ '*.md', 'assets/**', 'LICENSE', README.md, CHANGELOG.md ]
+    branches: [ 'feature/**', "bug/**", "issue/**" ]
+  pull_request:
+    paths-ignore: [ '*.md', 'assets/**', 'LICENSE', README.md, CHANGELOG.md ]
+    branches: [ "main", "release/**" ]
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  test-stable-rust:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macOS-latest
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: stable
+
+      - uses: actions/checkout@v6
+
+      - name: Setup target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install musl
+        run: sudo apt-get install musl-tools
+        if: contains(matrix.target, 'linux-musl')
+
+      - name: Run tests with all features
+        run: cargo test --target ${{ matrix.target }} --verbose --all-features
+
+  test-nightly-rust:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macOS-latest
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: nightly
+
+      - uses: actions/checkout@v6
+
+      - name: Setup target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install musl
+        run: sudo apt-get install musl-tools
+        if: contains(matrix.target, 'linux-musl')
+
+      - name: Run tests with all features
+        run: cargo test --target ${{ matrix.target }} --verbose --all-features
+
+  build:
+  
+    needs: test-stable-rust
+
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macOS-latest
+            target: x86_64-apple-darwin
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+
+    steps:
+      - uses: hecrj/setup-rust-action@v2
+        with:
+          rust-version: stable
+
+      - uses: actions/checkout@v6
+
+      - name: Setup target
+        run: rustup target add ${{ matrix.target }}
+
+      - name: Install musl
+        run: sudo apt-get install musl-tools
+        if: contains(matrix.target, 'linux-musl')
+
+      - name: Build with all features
+        run: cargo build --target ${{ matrix.target }} --verbose --all-features
