@@ -31,38 +31,25 @@ To provide the easiest and most idiomatic way for Rust developers to integrate w
 
 ## Technical Architecture
 
-### Workspace Structure
+### Single-Crate Structure
 
-The project employs a Cargo workspace architecture with five distinct features:
+The project is organized as a **single crate** with modular structure and feature flags:
 
 ```
 ollama-rs/
-├── ollama-rs/          # Root crate - main library integration
-├── primitives/         # Low-level API primitives and data structures
-├── http-core/          # HTTP client and communication layer
-├── conveniences/       # High-level convenience APIs
-└── samples/            # Usage examples and integration patterns
+└── src/
+    ├── lib.rs           # Main library entry point
+    ├── primitives/      # Low-level API primitives module
+    │   └── mod.rs
+    ├── http/            # HTTP client module
+    │   └── mod.rs
+    └── conveniences/    # High-level convenience APIs module (optional feature)
+        └── mod.rs
 ```
 
-### Crate Responsibilities
+### Module Organization
 
-#### 1. ollama-rs (Root Crate)
-**Purpose:** Main integration point that re-exports and combines functionality from all workspace crates.
-
-**Key Responsibilities:**
-- Public API surface
-- Feature flag management
-- Cross-crate integration
-- Top-level documentation
-
-**Dependencies:**
-- async-trait 0.1.89
-- tokio 1.49.0 (features: rt)
-- serde 1.0.228 (features: derive)
-- serde_json 1.0.149
-- reqwest 0.13.1 (features: blocking, cookies, http2, json, native-tls)
-
-#### 2. primitives
+#### 1. primitives (Module)
 **Purpose:** Low-level data structures matching Ollama's API specification.
 
 **Key Responsibilities:**
@@ -71,9 +58,10 @@ ollama-rs/
 - API model validation
 - Type-safe enum representations
 
-**Status:** Skeleton created, implementation pending
+**Feature:** `primitives` (default)
+**Status:** Implementation in progress
 
-#### 3. http-core
+#### 2. http (Module)
 **Purpose:** HTTP client layer for API communication.
 
 **Key Responsibilities:**
@@ -83,9 +71,10 @@ ollama-rs/
 - Retry logic (if applicable)
 - Stream handling
 
-**Status:** Skeleton created, implementation pending
+**Feature:** `http` (default)
+**Status:** Implementation in progress
 
-#### 4. conveniences
+#### 3. conveniences (Module)
 **Purpose:** High-level, ergonomic APIs for common workflows.
 
 **Key Responsibilities:**
@@ -95,18 +84,30 @@ ollama-rs/
 - Streaming abstractions
 - Response post-processing
 
-**Status:** Skeleton created, implementation pending
+**Feature:** `conveniences` (optional, requires `http` and `primitives`)
+**Status:** Implementation pending
 
-#### 5. samples
-**Purpose:** Practical examples demonstrating library usage.
+### Feature Flags
 
-**Key Responsibilities:**
-- Usage examples
-- Integration patterns
-- Best practices demonstration
-- Testing reference implementations
+```toml
+[features]
+default = ["http", "primitives"]           # Default features
+conveniences = ["http", "primitives"]      # High-level API (optional)
+http = []                                  # HTTP client layer
+primitives = []                            # Low-level primitives
+```
 
-**Status:** Skeleton created, examples pending
+**Usage Examples:**
+```toml
+# Full featured (default)
+ollama-rs = "0.1.0"
+
+# With conveniences
+ollama-rs = { version = "0.1.0", features = ["conveniences"] }
+
+# Minimal (only primitives and http)
+ollama-rs = { version = "0.1.0", default-features = true }
+```
 
 ## Technical Stack
 
@@ -114,11 +115,17 @@ ollama-rs/
 
 | Dependency | Version | Purpose | Features |
 |------------|---------|---------|----------|
-| tokio | 1.49.0 | Async runtime | rt |
+| tokio | 1.49.0 | Async runtime | macros, rt-multi-thread |
 | reqwest | 0.13.1 | HTTP client | blocking, cookies, http2, json, native-tls |
 | serde | 1.0.228 | Serialization | derive |
 | serde_json | 1.0.149 | JSON handling | - |
 | async-trait | 0.1.89 | Trait async methods | - |
+
+**Build Configuration:**
+- Single crate architecture
+- Feature-based module organization
+- Default features: `http` + `primitives`
+- Optional feature: `conveniences`
 
 ### Dependency Rationale
 
@@ -161,24 +168,25 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Total Endpoints:** 12 (across all phases)
 
-#### Phase 1 (v0.1.0): Foundation + HTTP Core
-**Focus:** Primitives structure and HTTP client implementation
+#### Phase 1 (v0.1.0): Foundation + HTTP Module
+**Focus:** Primitives module structure and HTTP module implementation
 
 **Scope:**
-- Set up primitives crate with shared types (ModelOptions, Logprob, etc.)
-- Implement http-core with connection management
+- Set up `primitives` module with shared types (ModelOptions, Logprob, etc.)
+- Implement `http` module with connection management
 - Build error handling infrastructure
 - Create serialization/deserialization framework
 - Establish testing foundation
 
 **Deliverables:**
-- `GET /api/version` - Get Ollama version
-- Functional HTTP client in http-core
-- Error types and handling
+- `GET /api/version` - First endpoint implementation
+- Functional HTTP client in `http` module
+- Error types and handling in `primitives` module
 - Basic integration test framework
+- Module structure with feature flags working
 
 #### Phase 2 (v0.1.1): All Primitives Implementation
-**Focus:** Complete implementation of all 12 API endpoints in primitives crate
+**Focus:** Complete implementation of all 12 API endpoints in primitives module
 
 **Endpoints by Complexity:**
 
@@ -200,16 +208,17 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 11. `POST /api/push` - Upload models to registry (streaming progress)
 
 **Deliverables:**
-- All 11 remaining endpoints fully implemented in primitives
+- All 11 remaining endpoints fully implemented in `primitives` module
 - Request/response types for each endpoint
 - Streaming support for applicable endpoints
 - Comprehensive unit tests
 - Integration tests for all endpoints
 
-#### Phase 3 (v0.2.0): Conveniences Layer
-**Focus:** High-level ergonomic APIs built on primitives
+#### Phase 3 (v0.2.0): Conveniences Module
+**Focus:** High-level ergonomic APIs built on primitives module
 
 **Scope:**
+- Implement `conveniences` module as optional feature
 - Client builder pattern for easy initialization
 - Simplified method signatures for common operations
 - Stream helper utilities and iterators
@@ -218,24 +227,25 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Convenience methods for chaining operations
 
 **Deliverables:**
-- Complete conveniences crate implementation
+- Complete `conveniences` module implementation
+- `conveniences` feature flag working correctly
 - Builder patterns for complex requests
 - Stream abstraction utilities
 - High-level client interface
 - Comprehensive documentation
 
-#### Phase 4 (v0.3.0): Samples & Production Readiness
+#### Phase 4 (v0.3.0): Examples & Production Readiness
 **Focus:** Examples, documentation, and polish
 
 **Scope:**
-- Comprehensive usage examples in samples crate
+- Comprehensive usage examples in `/examples` directory
 - Real-world integration patterns
 - Performance benchmarking
 - API stability review
 - Production deployment guides
 - Migration documentation
 
-**Sample Examples:**
+**Example Programs:**
 - Basic text generation
 - Chat conversation with history
 - Model management (pull, create, delete)
@@ -246,11 +256,11 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Custom tool/function calling
 
 **Deliverables:**
-- Complete samples crate with 10+ examples
+- 10+ comprehensive examples in `/examples`
 - Performance benchmarks and optimization
 - Production-ready documentation
-- Stable v1.0.0 API
-- Migration guide from primitives to conveniences
+- Stable API (v1.0.0 target)
+- Migration guide (primitives → conveniences)
 
 ## Design Philosophy
 
@@ -582,17 +592,19 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] Workspace configuration
 
 **In Progress:**
-- [ ] Simple endpoints (1): version
-- [ ] Primitives crate structure with shared types
-- [ ] HTTP client implementation in http-core
-- [ ] Error type hierarchy
+- [ ] Simple endpoints (1): GET /api/version
+- [ ] `primitives` module structure with shared types
+- [ ] `http` module implementation
+- [ ] Error type hierarchy in `primitives`
 - [ ] Testing infrastructure
+- [ ] Feature flags configuration
 
 **Definition of Done:**
 - All shared types (ModelOptions, Logprob, enums) compile
-- One (first) Simple endpoints: version
-- HTTP client can make GET/POST requests
+- First simple endpoint: GET /api/version working
+- HTTP client in `http` module can make GET/POST requests
 - Error handling system in place
+- Feature flags (`http`, `primitives`) working correctly
 - Unit test framework operational
 - Integration test setup complete
 

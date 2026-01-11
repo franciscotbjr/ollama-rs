@@ -1,9 +1,0 @@
-[package]
-name = "samples"
-version = "0.1.0"
-edition = "2024"
-description = "Samples"
-license = "MIT"
-repository = "https://github.com/franciscotbjr/ollama-rs"
-
-[dependencies]

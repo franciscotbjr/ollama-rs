@@ -716,16 +716,17 @@ struct ErrorResponse {
 
 ## Recommended Implementation Order
 
-### Phase 1 (v0.1.0): Foundation + HTTP Core
-1. Set up primitives crate structure
+### Phase 1 (v0.1.0): Foundation + HTTP Module
+1. Set up `primitives` module structure
 2. Implement shared types (ModelOptions, Logprob, etc.)
-3. Build HTTP client in http-core
-4. Implement error types
-5. Add basic integration tests
+3. Build HTTP client in `http` module
+4. Implement error types in `primitives`
+5. Configure feature flags (`http`, `primitives`)
+6. Add basic integration tests
 
-**Deliverable:** Working HTTP layer with type definitions
+**Deliverable:** Working HTTP layer with type definitions and feature flags
 
-### Phase 2 (v0.2.0): All Primitives
+### Phase 2 (v0.1.1): All Primitives
 Implement in this order:
 
 **Week 1-2: Simple Endpoints**
@@ -748,22 +749,24 @@ Implement in this order:
 11. POST `/api/push`
 12. POST `/api/create`
 
-**Deliverable:** Complete primitive implementations
+**Deliverable:** Complete primitive implementations in `primitives` module
 
-### Phase 3 (v0.3.0): Conveniences
-Build high-level APIs on top of primitives:
+### Phase 3 (v0.2.0): Conveniences Module
+Build high-level APIs in `conveniences` module:
+- Implement as optional feature
 - Client builder pattern
 - Simplified method signatures
 - Stream helpers
 - Response iterators
 
-**Deliverable:** Ergonomic convenience layer
+**Deliverable:** Ergonomic `conveniences` module with feature flag
 
-### Phase 4 (v1.0.0): Examples & Polish
-- Comprehensive examples
+### Phase 4 (v0.3.0): Examples & Production
+- Comprehensive examples in `/examples` directory
 - Documentation
 - Performance optimization
 - Stability improvements
+- Prepare for v1.0.0
 
 ---
 
@@ -782,9 +785,10 @@ Build high-level APIs on top of primitives:
 
 The Ollama API provides a comprehensive interface for model interaction, management, and deployment. The implementation strategy focuses on:
 
-1. Building a solid foundation (primitives + HTTP core)
+1. Building a solid foundation (`primitives` + `http` modules)
 2. Implementing endpoints in order of complexity
 3. Ensuring streaming support for long-running operations
-4. Providing ergonomic high-level APIs
+4. Providing ergonomic high-level APIs in optional `conveniences` module
+5. Using feature flags for modular, flexible library structure
 
-This structured approach will result in a robust, maintainable Rust library for Ollama integration.
+This structured approach will result in a robust, maintainable, single-crate Rust library for Ollama integration.

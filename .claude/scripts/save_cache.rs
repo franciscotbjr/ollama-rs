@@ -52,7 +52,6 @@ struct ProjectContext {
 #[derive(Deserialize)]
 struct CargoToml {
     package: Option<Package>,
-    workspace: Option<Workspace>,
 }
 
 #[derive(Deserialize)]
@@ -62,11 +61,6 @@ struct Package {
     repository: Option<String>,
     license: Option<String>,
     edition: Option<String>,
-}
-
-#[derive(Deserialize)]
-struct Workspace {
-    members: Option<Vec<String>>,
 }
 
 fn get_cache_dir() -> PathBuf {
@@ -205,11 +199,9 @@ fn main() {
         .and_then(|p| p.edition.clone())
         .unwrap_or_else(|| "2024".to_string());
 
-    let workspace_crates = cargo_toml.workspace
-        .and_then(|w| w.members)
-        .unwrap_or_else(|| vec!["ollama-rs".to_string()]);
-
-    let total_crates = workspace_crates.len() as u32;
+    // Single crate - no workspace
+    let workspace_crates = vec![project_name.clone()];
+    let total_crates = 1;
 
     // Find critical and spec files
     let critical_files = find_critical_files();
@@ -260,7 +252,7 @@ fn main() {
     println!("  Location: {}", cache_file.display());
     println!("  Project: {} v{}", context.project_name, context.version);
     println!("  Session: #{}", context.session_count);
-    println!("  Workspace: {} crates", context.total_crates);
+    println!("  Architecture: Single crate with {} modules", context.total_crates);
     println!("  API Specs: {} endpoints", spec_files.len());
     println!("  Build: {}", context.build_status);
     println!("\n📁 Critical Files Tracked:");
