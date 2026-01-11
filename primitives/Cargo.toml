@@ -3,5 +3,6 @@ name = "primitives"
 version = "0.1.0"
 edition = "2024"
 description = "This package provides low-level primitives for Ollama's native API."
+license = "MIT"
 
 [dependencies]
