@@ -157,18 +157,100 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ### Supported Endpoints (Planned)
 
-#### Phase 1: Core Generation
-- `POST /api/generate` - Text generation (streaming & non-streaming)
+**Complete API Analysis:** See [api-analysis.md](api-analysis.md) for comprehensive endpoint documentation.
 
-#### Phase 2: Model Management
-- Model listing
-- Model information retrieval
-- Model pulling/deletion
+**Total Endpoints:** 12 (across all phases)
 
-#### Phase 3: Advanced Features
-- Embeddings generation
-- Chat completions
-- Additional completion modes
+#### Phase 1 (v0.1.0): Foundation + HTTP Core
+**Focus:** Primitives structure and HTTP client implementation
+
+**Scope:**
+- Set up primitives crate with shared types (ModelOptions, Logprob, etc.)
+- Implement http-core with connection management
+- Build error handling infrastructure
+- Create serialization/deserialization framework
+- Establish testing foundation
+
+**Deliverables:**
+- `GET /api/version` - Get Ollama version
+- Functional HTTP client in http-core
+- Error types and handling
+- Basic integration test framework
+
+#### Phase 2 (v0.1.1): All Primitives Implementation
+**Focus:** Complete implementation of all 12 API endpoints in primitives crate
+
+**Endpoints by Complexity:**
+
+**Simple Endpoints (4):**
+1. `GET /api/tags` - List available models
+2. `GET /api/ps` - List running models
+3. `POST /api/copy` - Copy a model
+4. `DELETE /api/delete` - Delete a model
+
+**Medium Complexity (2):**
+5. `POST /api/show` - Show detailed model information
+6. `POST /api/embed` - Generate text embeddings
+
+**High Complexity with Streaming (5):**
+7. `POST /api/generate` - Generate text completions (streaming/non-streaming)
+8. `POST /api/chat` - Chat completions with conversation history (streaming/non-streaming)
+9. `POST /api/create` - Create custom models (streaming progress)
+10. `POST /api/pull` - Download models from registry (streaming progress)
+11. `POST /api/push` - Upload models to registry (streaming progress)
+
+**Deliverables:**
+- All 11 remaining endpoints fully implemented in primitives
+- Request/response types for each endpoint
+- Streaming support for applicable endpoints
+- Comprehensive unit tests
+- Integration tests for all endpoints
+
+#### Phase 3 (v0.2.0): Conveniences Layer
+**Focus:** High-level ergonomic APIs built on primitives
+
+**Scope:**
+- Client builder pattern for easy initialization
+- Simplified method signatures for common operations
+- Stream helper utilities and iterators
+- Response post-processing and formatting
+- Error recovery patterns
+- Convenience methods for chaining operations
+
+**Deliverables:**
+- Complete conveniences crate implementation
+- Builder patterns for complex requests
+- Stream abstraction utilities
+- High-level client interface
+- Comprehensive documentation
+
+#### Phase 4 (v0.3.0): Samples & Production Readiness
+**Focus:** Examples, documentation, and polish
+
+**Scope:**
+- Comprehensive usage examples in samples crate
+- Real-world integration patterns
+- Performance benchmarking
+- API stability review
+- Production deployment guides
+- Migration documentation
+
+**Sample Examples:**
+- Basic text generation
+- Chat conversation with history
+- Model management (pull, create, delete)
+- Embedding generation and similarity search
+- Streaming responses with progress
+- Error handling patterns
+- Batch processing
+- Custom tool/function calling
+
+**Deliverables:**
+- Complete samples crate with 10+ examples
+- Performance benchmarks and optimization
+- Production-ready documentation
+- Stable v1.0.0 API
+- Migration guide from primitives to conveniences
 
 ## Design Philosophy
 
@@ -227,63 +309,13 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Self-documenting code
 - Comprehensive documentation
 
-## Implementation Strategy
+**Success Criteria:**
+- All shared types compile and serialize correctly
+- HTTP client can make basic requests
+- Error handling propagates properly
+- Test infrastructure operational
 
-### Phase 1: Primitives (Current Phase)
-
-**Objectives:**
-- Define all data structures from OpenAPI spec
-- Implement serialization/deserialization
-- Create error types
-- Set up basic validation
-
-**Deliverables:**
-- Complete type definitions in primitives crate
-- Serde implementations
-- Unit tests for serialization
-- Documentation for all public types
-
-### Phase 2: HTTP Core
-
-**Objectives:**
-- Implement HTTP client wrapper
-- Handle request/response lifecycle
-- Map HTTP errors to domain errors
-- Support streaming responses
-
-**Deliverables:**
-- Functional HTTP client in http-core
-- Error handling implementation
-- Connection management
-- Integration tests with mock server
-
-### Phase 3: Conveniences
-
-**Objectives:**
-- Build high-level APIs
-- Implement common patterns
-- Create builder interfaces
-- Add streaming helpers
-
-**Deliverables:**
-- Convenience APIs in conveniences crate
-- Builder patterns for complex requests
-- Stream abstractions
-- Usage documentation
-
-### Phase 4: Examples & Refinement
-
-**Objectives:**
-- Create comprehensive examples
-- Write integration guides
-- Performance benchmarking
-- API refinement based on usage
-
-**Deliverables:**
-- Multiple working examples
-- Integration guide documentation
-- Performance benchmarks
-- v1.0.0 release candidate
+---
 
 ## Testing Strategy
 
@@ -294,8 +326,6 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Data structure serialization/deserialization
 - Error handling paths
 - Edge cases
-
-**Location:** Within each crate's `tests/` module
 
 **Tools:**
 - Standard Rust test framework
@@ -313,8 +343,6 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Running Ollama instance
 - Network connectivity
 - Sufficient system resources
-
-**Location:** `tests/` directory at workspace root
 
 ### Mocking Strategy
 
@@ -374,7 +402,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Branch Strategy:**
 - `main` - stable releases
-- `develop` - integration branch
+- `release` - integration branch
 - `feature/*` - new features
 - `fix/*` - bug fixes
 - `docs/*` - documentation
@@ -542,29 +570,99 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ## Success Criteria
 
-### Version 0.1.0 (Current)
+### Version 0.1.0: Foundation + HTTP Core (Current)
+**Status:** In Progress
+
+**Completed:**
 - [x] Project structure established
-- [x] Documentation foundation
+- [x] Documentation foundation (README, CONTRIBUTING, CHANGELOG, DEV_NOTES, definition.md, api-analysis.md)
 - [x] Dependency configuration
-- [x] OpenAPI specification
-- [ ] Primitives implementation
-- [ ] Basic HTTP client
+- [x] OpenAPI specifications (12 endpoints documented)
+- [x] Git repository initialized
+- [x] Workspace configuration
 
-### Version 0.2.0 (Planned)
-- [ ] Complete primitives
-- [ ] Functional HTTP core
-- [ ] Basic generation endpoint
-- [ ] Unit test coverage >50%
-- [ ] Working examples
+**In Progress:**
+- [ ] Simple endpoints (1): version
+- [ ] Primitives crate structure with shared types
+- [ ] HTTP client implementation in http-core
+- [ ] Error type hierarchy
+- [ ] Testing infrastructure
 
-### Version 1.0.0 (Stable Release)
-- [ ] All core endpoints implemented
-- [ ] Comprehensive test coverage
-- [ ] Production-ready error handling
-- [ ] Performance benchmarks
-- [ ] Complete documentation
+**Definition of Done:**
+- All shared types (ModelOptions, Logprob, enums) compile
+- One (first) Simple endpoints: version
+- HTTP client can make GET/POST requests
+- Error handling system in place
+- Unit test framework operational
+- Integration test setup complete
+
+---
+
+### Version 0.1.1: All Primitives Implementation (Planned)
+**Status:** Not Started
+
+**Checklist:**
+- [ ] Simple endpoints (4): tags, ps, copy, delete
+- [ ] Medium endpoints (2): show, embed
+- [ ] Complex endpoints (5): generate, chat, create, pull, push
+- [ ] Streaming support for 5 endpoints
+- [ ] Request/response types for all 12 endpoints
+- [ ] Unit test coverage >80%
+- [ ] Integration tests for all endpoints
+- [ ] Complete API documentation
+
+**Definition of Done:**
+- All 11 remaining endpoints functional with real Ollama
+- Streaming endpoints handle progress correctly
+- Comprehensive test suite passes
+- API documentation complete
+- Code reviewed and optimized
+
+---
+
+### Version 0.2.0: Conveniences Layer (Planned)
+**Status:** Not Started
+
+**Checklist:**
+- [ ] OllamaClient with builder pattern
+- [ ] Convenience methods for all endpoints
+- [ ] Builder patterns for complex requests
+- [ ] Stream helper utilities
+- [ ] Progress callback system
+- [ ] Response formatters
+- [ ] Retry logic implementation
+- [ ] High-level documentation with examples
+
+**Definition of Done:**
+- All convenience APIs ergonomic and intuitive
+- Complex operations reduced to 3-5 calls
+- Stream utilities work with async iterators
+- Documentation includes real-world examples
+- User feedback incorporated
+
+---
+
+### Version 0.3.0: Samples & Production Readiness (Planned)
+**Status:** Not Started
+
+**Checklist:**
+- [ ] 10+ comprehensive examples in samples crate
+- [ ] Performance benchmarks established
+- [ ] Memory profiling completed
+- [ ] API stability review
+- [ ] Breaking change assessment
+- [ ] Migration guide (primitives → conveniences)
+- [ ] Production deployment guide
 - [ ] Published to crates.io
-- [ ] Stable API
+- [ ] API declared stable (semver commitment)
+
+**Definition of Done:**
+- All examples run successfully
+- Performance meets benchmarks
+- Documentation covers 95%+ of use cases
+- API frozen and stable
+- Production-ready
+- Community feedback positive
 
 ## Risk Analysis
 
@@ -604,28 +702,6 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - **Discussions:** GitHub discussions (future)
 - **Documentation:** docs.rs (future)
 
-### Contribution Areas
-
-1. **Code Contributions**
-   - Feature implementation
-   - Bug fixes
-   - Performance improvements
-
-2. **Documentation**
-   - API documentation
-   - Usage examples
-   - Tutorials and guides
-
-3. **Testing**
-   - Test case contributions
-   - Bug reports
-   - Integration testing
-
-4. **Community**
-   - Answering questions
-   - Code reviews
-   - Feature discussions
-
 ## References
 
 ### External Resources
@@ -643,7 +719,6 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [CONTRIBUTING.md](../CONTRIBUTING.md) - Contribution guidelines
 - [CHANGELOG.md](../CHANGELOG.md) - Version history
 - [DEV_NOTES.md](../DEV_NOTES.md) - Development notes
-- [spec/alloma_api.yaml](alloma_api.yaml) - OpenAPI specification
 
 ---
 
