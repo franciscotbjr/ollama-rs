@@ -4,7 +4,7 @@ resolver = "3"
 
 [package]
 name = "ollama-rs"
-version = "0.0.1"
+version = "0.1.0"
 edition = "2024"
 description = "This crate provides low-level primitives for Ollama's native API, along with higher-level conveniences for common use cases."
 keywords = [""]
