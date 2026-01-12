@@ -1,6 +1,6 @@
 # Continue Previous Conversation
 
-I'll help you seamlessly continue your previous conversation by restoring all relevant context and progress for the ollama-rs project.
+I'll help you seamlessly continue your previous conversation by restoring all relevant context and progress for the ollama-oxide project.
 
 ## Loading Cache
 
@@ -27,7 +27,7 @@ When continuing, I'll have **MANDATORY** access to all critical project files:
 
 ### 🔧 **Build Configuration**
 - **Cargo.toml** - Rust workspace configuration and dependencies
-- Workspace crates: ollama-rs, primitives, http-core, conveniences, samples
+- Workspace crates: ollama-oxide, primitives, http-core, conveniences, samples
 
 ### 💻 **Source Code Context**
 - **All Rust files** in workspace crates

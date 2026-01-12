@@ -1,5 +1,5 @@
 [package]
-name = "ollama-rs"
+name = "ollama-oxide"
 version = "0.1.0"
 edition = "2024"
 description = "A Rust library for integrating with Ollama's native API, providing low-level primitives and high-level conveniences."
@@ -7,7 +7,7 @@ keywords = ["ollama", "ai", "llm", "api", "client"]
 categories = ["api-bindings", "asynchronous"]
 license = "MIT"
 readme = "README.md"
-repository = "https://github.com/franciscotbjr/ollama-rs"
+repository = "https://github.com/franciscotbjr/ollama-oxide"
 exclude = [
     ".claude/*",
     ".github/*",

@@ -1,7 +1,7 @@
-# ollama-rs
+# ollama-oxide
 
 <div align="center">
-  <img src="assets/logo.svg" alt="ollama-rs Logo" width="1200" height="300">
+  <img src="assets/logo.svg" alt="ollama-oxide Logo" width="1200" height="300">
 </div>
 <br>
 
@@ -26,7 +26,7 @@ A Rust library providing low-level primitives and high-level conveniences for in
 Single-crate design with modular structure:
 
 ```
-ollama-rs/
+ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
     ├── primitives/      # Low-level API primitives (default)
@@ -45,11 +45,11 @@ Add this to your `Cargo.toml`:
 ```toml
 # Default features (primitives + http)
 [dependencies]
-ollama-rs = "0.1.0"
+ollama-oxide = "0.1.0"
 
 # With high-level conveniences
 [dependencies]
-ollama-rs = { version = "0.1.0", features = ["conveniences"] }
+ollama-oxide = { version = "0.1.0", features = ["conveniences"] }
 ```
 
 ## Quick Start
@@ -111,7 +111,7 @@ Based on [Ollama's](https://github.com/ollama) official libraries and API specif
 
 ## Links
 
-- [Repository](https://github.com/franciscotbjr/ollama-rs)
+- [Repository](https://github.com/franciscotbjr/ollama-oxide)
 - [Ollama Documentation](https://github.com/ollama)
-- [Issue Tracker](https://github.com/franciscotbjr/ollama-rs/issues)
+- [Issue Tracker](https://github.com/franciscotbjr/ollama-oxide/issues)
 

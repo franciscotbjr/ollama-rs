@@ -1,6 +1,6 @@
 # Development Notes
 
-This document contains internal development notes, architectural decisions, and implementation details for ollama-rs.
+This document contains internal development notes, architectural decisions, and implementation details for ollama-oxide.
 
 ## Project Status
 
@@ -17,7 +17,7 @@ This document contains internal development notes, architectural decisions, and 
 The project uses a **single-crate architecture** with modular organization:
 
 ```
-ollama-rs/
+ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
     ├── primitives/      # API data structures (default feature)
@@ -32,7 +32,7 @@ ollama-rs/
 - **Better for library users**: One dependency instead of multiple
 - **Faster compile times**: No cross-crate boundaries
 
-**Changed From:** Previously planned as 5-crate workspace (ollama-rs, primitives, http-core, conveniences, samples)
+**Changed From:** Previously planned as 5-crate workspace (ollama-oxide, primitives, http-core, conveniences, samples)
 
 ### Design Philosophy
 
