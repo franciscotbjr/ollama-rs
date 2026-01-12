@@ -1,14 +1,10 @@
 # ollama-oxide
-
 <div align="center">
   <img src="assets/logo.svg" alt="ollama-oxide Logo" width="1200" height="300">
 </div>
-<br>
-
-A Rust library providing low-level primitives and high-level conveniences for integrating with [Ollama](https://github.com/ollama)'s native API.
-
+The Llama in the Crate is a Rust library providing low-level primitives and high-level conveniences for integrating with [Ollama](https://github.com/ollama)'s native API.
 <div align="center">
-  <img src="assets/llama-in-the-crate.png" alt="Llama in the crate" width="300" height="300">
+  <img src="assets/llama-in-the-crate.png" alt="Llama in the crate" width="256" height="256">
 </div>
 
 ## Features
