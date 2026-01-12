@@ -67,7 +67,7 @@ fn get_cache_dir() -> PathBuf {
     let home = env::var("USERPROFILE")
         .or_else(|_| env::var("HOME"))
         .expect("Could not find home directory");
-    PathBuf::from(home).join(".claude").join("ollama-rs")
+    PathBuf::from(home).join(".claude").join("ollama-oxide")
 }
 
 fn get_project_hash() -> String {
@@ -181,7 +181,7 @@ fn main() {
 
     let project_name = cargo_toml.package.as_ref()
         .and_then(|p| p.name.clone())
-        .unwrap_or_else(|| "ollama-rs".to_string());
+        .unwrap_or_else(|| "ollama-oxide".to_string());
 
     let version = cargo_toml.package.as_ref()
         .and_then(|p| p.version.clone())
@@ -189,7 +189,7 @@ fn main() {
 
     let repository = cargo_toml.package.as_ref()
         .and_then(|p| p.repository.clone())
-        .unwrap_or_else(|| "https://github.com/franciscotbjr/ollama-rs".to_string());
+        .unwrap_or_else(|| "https://github.com/franciscotbjr/ollama-oxide".to_string());
 
     let license = cargo_toml.package.as_ref()
         .and_then(|p| p.license.clone())

@@ -1,7 +1,0 @@
-[package]
-name = "conveniences"
-version = "0.1.0"
-edition = "2024"
-description = "This package provides higher-level conveniences for common use cases."
-
-[dependencies]

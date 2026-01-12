@@ -1,6 +1,6 @@
-# Contributing to ollama-rs
+# Contributing to ollama-oxide
 
-Thank you for your interest in contributing to ollama-rs! This document provides guidelines and instructions for contributing to the project.
+Thank you for your interest in contributing to ollama-oxide! This document provides guidelines and instructions for contributing to the project.
 
 ## Table of Contents
 
@@ -39,8 +39,8 @@ We are committed to providing a welcoming and inclusive environment. Please be r
 
 ```bash
 # Clone the repository
-git clone https://github.com/YOUR_USERNAME/ollama-rs.git
-cd ollama-rs
+git clone https://github.com/YOUR_USERNAME/ollama-oxide.git
+cd ollama-oxide
 
 # Build the project
 cargo build
@@ -57,7 +57,7 @@ cargo run --example basic_generation
 This is a single-crate project with modular organization:
 
 ```
-ollama-rs/
+ollama-oxide/
 ├── src/
 │   ├── lib.rs           # Main library entry point
 │   ├── primitives/      # Low-level API primitives (default)
@@ -292,4 +292,4 @@ If you have questions:
 - Open a new issue with the "question" label
 - Reach out to maintainers
 
-Thank you for contributing to ollama-rs!
+Thank you for contributing to ollama-oxide!

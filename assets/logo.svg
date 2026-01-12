@@ -88,10 +88,10 @@
         <text x="0" y="12" font-family="'Arial Black', 'Arial', sans-serif" font-size="42" font-weight="bold" fill="url(#rustGradient)" text-anchor="middle">R</text>
     </g>
 
-    <!-- Text: alloma-rs -->
+    <!-- Text: ollama-oxide -->
     <g id="banner-text">
         <text x="300" y="130" font-family="'JetBrains Mono', 'Fira Code', 'Consolas', monospace" font-size="72" font-weight="bold">
-            <tspan fill="white">alloma</tspan><tspan fill="url(#rustGradient)">-rs</tspan>
+            <tspan fill="white">ollama</tspan><tspan fill="url(#rustGradient)">-oxide</tspan>
         </text>
     </g>
 
@@ -124,10 +124,10 @@
 
     <!-- Decorative code symbols -->
     <g opacity="0.15" fill="#f97316" font-family="'JetBrains Mono', monospace" font-size="14">
-        <text x="900" y="60">use alloma::Client;</text>
-        <text x="920" y="85">async fn main() {</text>
-        <text x="940" y="110">let client = Client::new();</text>
-        <text x="920" y="135">}</text>
+        <text x="880" y="60">use ollama_oxide::Client;</text>
+        <text x="900" y="85">async fn main() {</text>
+        <text x="920" y="110">let client = Client::new();</text>
+        <text x="900" y="135">}</text>
     </g>
 
 

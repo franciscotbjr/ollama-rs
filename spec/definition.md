@@ -1,4 +1,4 @@
-# ollama-rs Project Definition
+# ollama-oxide Project Definition
 
 **Document Version:** 1.0
 **Last Updated:** 2025-01-11
@@ -6,14 +6,14 @@
 
 ## Executive Summary
 
-**ollama-rs** is a Rust library that provides comprehensive integration with Ollama's native API through a layered architecture. The library offers both low-level primitives for direct API control and high-level conveniences for common use cases, enabling Rust developers to seamlessly integrate Ollama's AI capabilities into their applications.
+**ollama-oxide** is a Rust library that provides comprehensive integration with Ollama's native API through a layered architecture. The library offers both low-level primitives for direct API control and high-level conveniences for common use cases, enabling Rust developers to seamlessly integrate Ollama's AI capabilities into their applications.
 
 ## Project Identity
 
 ### Basic Information
 
-- **Project Name:** ollama-rs
-- **Repository:** https://github.com/franciscotbjr/ollama-rs
+- **Project Name:** ollama-oxide
+- **Repository:** https://github.com/franciscotbjr/ollama-oxide
 - **License:** MIT
 - **Current Version:** 0.1.0
 - **Status:** Early Development / Foundation Phase
@@ -36,7 +36,7 @@ To provide the easiest and most idiomatic way for Rust developers to integrate w
 The project is organized as a **single crate** with modular structure and feature flags:
 
 ```
-ollama-rs/
+ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
     ├── primitives/      # Low-level API primitives module
@@ -100,13 +100,13 @@ primitives = []                            # Low-level primitives
 **Usage Examples:**
 ```toml
 # Full featured (default)
-ollama-rs = "0.1.0"
+ollama-oxide = "0.1.0"
 
 # With conveniences
-ollama-rs = { version = "0.1.0", features = ["conveniences"] }
+ollama-oxide = { version = "0.1.0", features = ["conveniences"] }
 
 # Minimal (only primitives and http)
-ollama-rs = { version = "0.1.0", default-features = true }
+ollama-oxide = { version = "0.1.0", default-features = true }
 ```
 
 ## Technical Stack

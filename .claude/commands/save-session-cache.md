@@ -1,6 +1,6 @@
 # Cache Project Context
 
-I'll save the current session context for the ollama-rs project by reading critical project files and creating a cache for future session continuity.
+I'll save the current session context for the ollama-oxide project by reading critical project files and creating a cache for future session continuity.
 
 ## What Gets Cached
 
