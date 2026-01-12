@@ -46,7 +46,7 @@ fn get_cache_dir() -> PathBuf {
     let home = env::var("USERPROFILE")
         .or_else(|_| env::var("HOME"))
         .expect("Could not find home directory");
-    PathBuf::from(home).join(".claude").join("ollama-rs")
+    PathBuf::from(home).join(".claude").join("ollama-oxide")
 }
 
 fn get_project_hash() -> String {

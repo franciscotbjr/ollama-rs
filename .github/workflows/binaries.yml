@@ -42,25 +42,25 @@ jobs:
         run: cargo build --target ${{ matrix.target }} --release --verbose --all-features
 
       - name: Strip binary
-        run: strip 'target/${{ matrix.target }}/release/ollama-rs'
+        run: strip 'target/${{ matrix.target }}/release/ollama-oxide'
         if: "!contains(matrix.target, 'windows')"
 
       - name: Build package
         id: package
         shell: bash
         run: |
-          ARCHIVE_NAME="ollama-rs-${{ github.event.inputs.release }}-${{ matrix.target }}"
+          ARCHIVE_NAME="ollama-oxide-${{ github.event.inputs.release }}-${{ matrix.target }}"
           if [[ '${{ matrix.target }}' == *windows* ]]; then
             ARCHIVE_FILE="./target/${{ matrix.target }}/release/${ARCHIVE_NAME}.zip"
             mv LICENSE LICENSE.txt
-            7z a "${ARCHIVE_FILE}" "./target/${{ matrix.target }}/release/ollama-rs.exe" ./README.md ./CHANGELOG.md ./LICENSE.txt
+            7z a "${ARCHIVE_FILE}" "./target/${{ matrix.target }}/release/ollama-oxide.exe" ./README.md ./CHANGELOG.md ./LICENSE.txt
             echo "file=${ARCHIVE_FILE}" >> $GITHUB_OUTPUT
             echo "name=${ARCHIVE_NAME}.zip" >> $GITHUB_OUTPUT
           else
             ARCHIVE_FILE="target/${{ matrix.target }}/release/${ARCHIVE_NAME}.tar.gz"
             mkdir "tmp"
             mkdir "tmp/${ARCHIVE_NAME}"
-            cp README.md CHANGELOG.md LICENSE "target/${{ matrix.target }}/release/ollama-rs" "tmp/${ARCHIVE_NAME}"
+            cp README.md CHANGELOG.md LICENSE "target/${{ matrix.target }}/release/ollama-oxide" "tmp/${ARCHIVE_NAME}"
             tar -czf "${ARCHIVE_FILE}" -C tmp/ "${ARCHIVE_NAME}"
             echo "file=${ARCHIVE_FILE}" >> $GITHUB_OUTPUT
             echo "name=${ARCHIVE_NAME}.tar.gz" >> $GITHUB_OUTPUT
