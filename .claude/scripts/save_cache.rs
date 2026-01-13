@@ -33,6 +33,7 @@ struct ProjectContext {
     // Critical files inventory
     critical_files: Vec<String>,
     spec_files: Vec<String>,
+    impl_files: Vec<String>,
 
     // Session tracking
     session_count: u32,
@@ -142,6 +143,25 @@ fn find_spec_files() -> Vec<String> {
     files
 }
 
+fn find_impl_files() -> Vec<String> {
+    let mut files = Vec::new();
+    let impl_dir = PathBuf::from("impl");
+
+    if impl_dir.exists() {
+        if let Ok(entries) = fs::read_dir(&impl_dir) {
+            for entry in entries.flatten() {
+                if let Some(name) = entry.file_name().to_str() {
+                    if name.ends_with(".md") {
+                        files.push(format!("impl/{}", name));
+                    }
+                }
+            }
+        }
+    }
+    files.sort();
+    files
+}
+
 fn check_build_status() -> String {
     // Check if we can at least parse Cargo.toml
     if PathBuf::from("Cargo.toml").exists() {
@@ -203,9 +223,10 @@ fn main() {
     let workspace_crates = vec![project_name.clone()];
     let total_crates = 1;
 
-    // Find critical and spec files
+    // Find critical, spec, and impl files
     let critical_files = find_critical_files();
     let spec_files = find_spec_files();
+    let impl_files = find_impl_files();
 
     // Build context object
     let context = ProjectContext {
@@ -227,6 +248,7 @@ fn main() {
         // Critical files inventory
         critical_files,
         spec_files: spec_files.clone(),
+        impl_files: impl_files.clone(),
 
         // Session tracking
         session_count: existing_sessions,
@@ -254,6 +276,7 @@ fn main() {
     println!("  Session: #{}", context.session_count);
     println!("  Architecture: Single crate with {} modules", context.total_crates);
     println!("  API Specs: {} endpoints", spec_files.len());
+    println!("  Impl Plans: {} files", impl_files.len());
     println!("  Build: {}", context.build_status);
     println!("\n📁 Critical Files Tracked:");
     for file in &context.critical_files {

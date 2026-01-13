@@ -13,8 +13,10 @@ exclude = [
     ".github/*",
     "assets/*",
     "spec/*",
+    "impl/*",
     "DEV_NOTES.md",
     "CONTRIBUTING.md",
+    "impl.md",
 ]
 
 [features]
