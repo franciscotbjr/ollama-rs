@@ -3,6 +3,7 @@
 use crate::{Error, Result, VersionResponse};
 use std::time::Duration;
 
+use super::endpoints::Endpoints;
 use super::OllamaClient;
 
 /// Sync API operations trait
@@ -56,7 +57,7 @@ pub trait OllamaApiSync: Send + Sync {
 
 impl OllamaApiSync for OllamaClient {
     fn version_blocking(&self) -> Result<VersionResponse> {
-        let url = format!("{}/api/version", self.config.base_url);
+        let url = self.config.url(Endpoints::VERSION);
 
         // Use reqwest blocking client
         let blocking_client = reqwest::blocking::Client::builder()

@@ -4,6 +4,7 @@ use crate::{Error, Result, VersionResponse};
 use async_trait::async_trait;
 use std::time::Duration;
 
+use super::endpoints::Endpoints;
 use super::OllamaClient;
 
 /// Async API operations trait
@@ -58,7 +59,7 @@ pub trait OllamaApiAsync: Send + Sync {
 #[async_trait]
 impl OllamaApiAsync for OllamaClient {
     async fn version(&self) -> Result<VersionResponse> {
-        let url = format!("{}/api/version", self.config.base_url);
+        let url = self.config.url(Endpoints::VERSION);
 
         for attempt in 0..=self.config.max_retries {
             match self.client.get(&url).send().await {
