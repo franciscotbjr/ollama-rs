@@ -113,6 +113,7 @@ fn find_critical_files() -> Vec<String> {
         "CHANGELOG.md",
         "README.md",
         "CONTRIBUTING.md",
+        "ARCHITECTURE.md",
         "Cargo.toml",
     ];
 

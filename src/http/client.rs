@@ -1,0 +1,138 @@
+//! Ollama HTTP client implementation
+
+use crate::{Error, Result};
+use reqwest::Client;
+use std::sync::Arc;
+use url::Url;
+
+use super::ClientConfig;
+
+/// HTTP client for Ollama API
+///
+/// This client is cloneable and can be safely shared across threads.
+/// The internal HTTP client is wrapped in Arc for efficient cloning.
+///
+/// # Thread Safety
+///
+/// `OllamaClient` implements `Send + Sync` and can be safely shared
+/// across threads or async tasks.
+///
+/// # Examples
+///
+/// ```no_run
+/// use ollama_oxide::{OllamaClient, ClientConfig};
+/// use std::time::Duration;
+///
+/// // Create with default configuration
+/// let client = OllamaClient::default().unwrap();
+///
+/// // Create with custom configuration
+/// let config = ClientConfig {
+///     base_url: "http://localhost:11434".to_string(),
+///     timeout: Duration::from_secs(30),
+///     max_retries: 3,
+/// };
+/// let client = OllamaClient::new(config).unwrap();
+///
+/// // Create with custom base URL
+/// let client = OllamaClient::with_base_url("http://localhost:8080").unwrap();
+/// ```
+#[derive(Clone, Debug)]
+pub struct OllamaClient {
+    pub(super) config: ClientConfig,
+    pub(super) client: Arc<Client>,
+}
+
+impl OllamaClient {
+    /// Create a new Ollama client with custom configuration
+    ///
+    /// # Arguments
+    ///
+    /// * `config` - Client configuration including base URL, timeout, and retry settings
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The base URL is invalid or malformed
+    /// - The URL scheme is not http or https
+    /// - The HTTP client cannot be built
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, ClientConfig};
+    /// use std::time::Duration;
+    ///
+    /// let config = ClientConfig {
+    ///     base_url: "http://localhost:11434".to_string(),
+    ///     timeout: Duration::from_secs(30),
+    ///     max_retries: 3,
+    /// };
+    ///
+    /// let client = OllamaClient::new(config)?;
+    /// # Ok::<(), ollama_oxide::Error>(())
+    /// ```
+    pub fn new(config: ClientConfig) -> Result<Self> {
+        // Validate base URL
+        let url = Url::parse(&config.base_url)?;
+
+        // Ensure URL has a scheme (http or https)
+        if url.scheme() != "http" && url.scheme() != "https" {
+            return Err(Error::InvalidUrlError(
+                url::ParseError::RelativeUrlWithoutBase,
+            ));
+        }
+
+        let client = Client::builder().timeout(config.timeout).build()?;
+
+        Ok(Self {
+            config,
+            client: Arc::new(client),
+        })
+    }
+
+    /// Create client with custom base URL and default timeout/retry
+    ///
+    /// # Arguments
+    ///
+    /// * `base_url` - Base URL for the Ollama API (must include http:// or https://)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if the URL is invalid or has an unsupported scheme
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::OllamaClient;
+    ///
+    /// let client = OllamaClient::with_base_url("http://localhost:8080")?;
+    /// # Ok::<(), ollama_oxide::Error>(())
+    /// ```
+    pub fn with_base_url(base_url: impl Into<String>) -> Result<Self> {
+        let config = ClientConfig {
+            base_url: base_url.into(),
+            ..Default::default()
+        };
+        Self::new(config)
+    }
+
+    /// Create client with default configuration (http://localhost:11434)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if client creation fails (unlikely with default config)
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::OllamaClient;
+    ///
+    /// let client = OllamaClient::default()?;
+    /// # Ok::<(), ollama_oxide::Error>(())
+    /// ```
+    #[allow(clippy::should_implement_trait)]
+    pub fn default() -> Result<Self> {
+        Self::new(ClientConfig::default())
+    }
+}
