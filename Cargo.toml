@@ -14,6 +14,7 @@ exclude = [
     "assets/*",
     "spec/*",
     "impl/*",
+    "tmp/*",
     "DEV_NOTES.md",
     "CONTRIBUTING.md",
     "ARCHITECTURE.md",
