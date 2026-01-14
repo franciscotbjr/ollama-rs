@@ -1,7 +1,6 @@
 //! Sync (blocking) API trait and implementations
 
-use crate::{Error, Result, VersionResponse};
-use std::time::Duration;
+use crate::{Result, VersionResponse};
 
 use super::endpoints::Endpoints;
 use super::OllamaClient;
@@ -58,34 +57,6 @@ pub trait OllamaApiSync: Send + Sync {
 impl OllamaApiSync for OllamaClient {
     fn version_blocking(&self) -> Result<VersionResponse> {
         let url = self.config.url(Endpoints::VERSION);
-
-        // Use reqwest blocking client
-        let blocking_client = reqwest::blocking::Client::builder()
-            .timeout(self.config.timeout)
-            .build()?;
-
-        for attempt in 0..=self.config.max_retries {
-            match blocking_client.get(&url).send() {
-                Ok(response) => {
-                    // Check if response indicates an error (5xx should retry, 4xx should not)
-                    if response.status().is_server_error() && attempt < self.config.max_retries {
-                        // Retry on server errors
-                        std::thread::sleep(Duration::from_millis(100 * (attempt as u64 + 1)));
-                        continue;
-                    }
-
-                    let version_response = response.json::<VersionResponse>()?;
-                    return Ok(version_response);
-                }
-                Err(_e) => {
-                    if attempt < self.config.max_retries {
-                        // Blocking sleep
-                        std::thread::sleep(Duration::from_millis(100 * (attempt as u64 + 1)));
-                    }
-                }
-            }
-        }
-
-        Err(Error::MaxRetriesExceededError(self.config.max_retries))
+        self.get_blocking_with_retry(&url)
     }
 }

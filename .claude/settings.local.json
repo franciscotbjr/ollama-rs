@@ -16,7 +16,8 @@
       "Bash(PWD=\"d:\\\\development\\\\public\\\\ollama-oxide\" rust-script:*)",
       "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" status --short)",
       "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" diff --stat)",
-      "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" diff src/http/)"
+      "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" diff src/http/)",
+      "Bash(ls:*)"
     ],
     "deny": []
   }
