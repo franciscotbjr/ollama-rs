@@ -50,3 +50,21 @@ impl Default for ClientConfig {
         }
     }
 }
+
+impl ClientConfig {
+    /// Build full URL from base URL and endpoint path
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use ollama_oxide::ClientConfig;
+    ///
+    /// let config = ClientConfig::default();
+    /// let url = config.url("/api/version");
+    /// assert_eq!(url, "http://localhost:11434/api/version");
+    /// ```
+    #[inline]
+    pub fn url(&self, endpoint: &str) -> String {
+        format!("{}{}", self.base_url, endpoint)
+    }
+}

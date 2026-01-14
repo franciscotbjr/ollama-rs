@@ -3,6 +3,7 @@
 use crate::{Error, Result};
 use reqwest::Client;
 use std::sync::Arc;
+use std::time::Duration;
 use url::Url;
 
 use super::ClientConfig;
@@ -134,5 +135,108 @@ impl OllamaClient {
     #[allow(clippy::should_implement_trait)]
     pub fn default() -> Result<Self> {
         Self::new(ClientConfig::default())
+    }
+
+    /// Execute async HTTP GET request with retry logic
+    ///
+    /// This helper handles exponential backoff and automatic retries for:
+    /// - Network errors
+    /// - Server errors (5xx status codes)
+    ///
+    /// # Type Parameters
+    ///
+    /// * `T` - Response type that implements `DeserializeOwned`
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - Full URL to request
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Maximum retry attempts exceeded
+    /// - Response cannot be deserialized
+    /// - Client errors (4xx) occur (no retry)
+    pub(super) async fn get_with_retry<T>(&self, url: &str) -> Result<T>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        for attempt in 0..=self.config.max_retries {
+            match self.client.get(url).send().await {
+                Ok(response) => {
+                    // Retry on server errors (5xx)
+                    if response.status().is_server_error() && attempt < self.config.max_retries {
+                        tokio::time::sleep(Duration::from_millis(100 * (attempt as u64 + 1))).await;
+                        continue;
+                    }
+
+                    // Deserialize and return
+                    let result = response.json::<T>().await?;
+                    return Ok(result);
+                }
+                Err(_e) => {
+                    // Retry on network errors
+                    if attempt < self.config.max_retries {
+                        tokio::time::sleep(Duration::from_millis(100 * (attempt as u64 + 1))).await;
+                    }
+                }
+            }
+        }
+
+        Err(Error::MaxRetriesExceededError(self.config.max_retries))
+    }
+
+    /// Execute blocking HTTP GET request with retry logic
+    ///
+    /// This helper handles exponential backoff and automatic retries for:
+    /// - Network errors
+    /// - Server errors (5xx status codes)
+    ///
+    /// # Type Parameters
+    ///
+    /// * `T` - Response type that implements `DeserializeOwned`
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - Full URL to request
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Maximum retry attempts exceeded
+    /// - Response cannot be deserialized
+    /// - Client errors (4xx) occur (no retry)
+    pub(super) fn get_blocking_with_retry<T>(&self, url: &str) -> Result<T>
+    where
+        T: serde::de::DeserializeOwned,
+    {
+        // Create blocking client
+        let blocking_client = reqwest::blocking::Client::builder()
+            .timeout(self.config.timeout)
+            .build()?;
+
+        for attempt in 0..=self.config.max_retries {
+            match blocking_client.get(url).send() {
+                Ok(response) => {
+                    // Retry on server errors (5xx)
+                    if response.status().is_server_error() && attempt < self.config.max_retries {
+                        std::thread::sleep(Duration::from_millis(100 * (attempt as u64 + 1)));
+                        continue;
+                    }
+
+                    // Deserialize and return
+                    let result = response.json::<T>()?;
+                    return Ok(result);
+                }
+                Err(_e) => {
+                    // Retry on network errors
+                    if attempt < self.config.max_retries {
+                        std::thread::sleep(Duration::from_millis(100 * (attempt as u64 + 1)));
+                    }
+                }
+            }
+        }
+
+        Err(Error::MaxRetriesExceededError(self.config.max_retries))
     }
 }

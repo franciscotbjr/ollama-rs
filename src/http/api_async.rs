@@ -1,9 +1,9 @@
 //! Async API trait and implementations
 
-use crate::{Error, Result, VersionResponse};
+use crate::{Result, VersionResponse};
 use async_trait::async_trait;
-use std::time::Duration;
 
+use super::endpoints::Endpoints;
 use super::OllamaClient;
 
 /// Async API operations trait
@@ -58,30 +58,7 @@ pub trait OllamaApiAsync: Send + Sync {
 #[async_trait]
 impl OllamaApiAsync for OllamaClient {
     async fn version(&self) -> Result<VersionResponse> {
-        let url = format!("{}/api/version", self.config.base_url);
-
-        for attempt in 0..=self.config.max_retries {
-            match self.client.get(&url).send().await {
-                Ok(response) => {
-                    // Check if response indicates an error (5xx should retry, 4xx should not)
-                    if response.status().is_server_error() && attempt < self.config.max_retries {
-                        // Retry on server errors
-                        tokio::time::sleep(Duration::from_millis(100 * (attempt as u64 + 1))).await;
-                        continue;
-                    }
-
-                    let version_response = response.json::<VersionResponse>().await?;
-                    return Ok(version_response);
-                }
-                Err(_e) => {
-                    if attempt < self.config.max_retries {
-                        // Exponential backoff
-                        tokio::time::sleep(Duration::from_millis(100 * (attempt as u64 + 1))).await;
-                    }
-                }
-            }
-        }
-
-        Err(Error::MaxRetriesExceededError(self.config.max_retries))
+        let url = self.config.url(Endpoints::VERSION);
+        self.get_with_retry(&url).await
     }
 }
