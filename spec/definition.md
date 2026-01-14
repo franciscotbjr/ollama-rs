@@ -49,6 +49,11 @@ ollama-oxide/
 
 ### Module Organization
 
+Each module follows single-concern file structure:
+- One primary type per file with its implementations
+- `mod.rs` serves as re-export facade
+- Example: `error.rs` contains Error enum + implementations; `lib.rs` imports from error module
+
 #### 1. primitives (Module)
 **Purpose:** Low-level data structures matching Ollama's API specification.
 
@@ -68,8 +73,14 @@ ollama-oxide/
 - Connection management
 - Request/response handling
 - Error mapping and propagation
-- Retry logic (if applicable)
+- Generic retry helpers (`get_with_retry`, `get_blocking_with_retry`)
 - Stream handling
+
+**HTTP Client Design:**
+- Type-safe generic methods with `serde::de::DeserializeOwned` bounds
+- Automatic retry logic with exponential backoff
+- Separate async (`tokio::time::sleep`) and sync (`std::thread::sleep`) helpers
+- Marked `pub(super)` for module-internal use
 
 **Feature:** `http` (default)
 **Status:** Implementation in progress

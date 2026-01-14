@@ -42,6 +42,8 @@ ollama-oxide/
 4. **Minimal Dependencies**: Keep dependency tree lean
 5. **OpenAPI Driven**: Follow Ollama's official API specification
 6. **Feature-Based**: Optional functionality via Cargo features
+7. **Single-Concern Files**: One primary type per file with implementations
+8. **Generic Abstractions**: Reusable helpers with trait bounds
 
 ### Feature Flags
 
@@ -79,6 +81,41 @@ primitives = []
 - [ ] Performance benchmarks
 
 ## Technical Decisions
+
+### Single-Concern File Structure
+
+**Decision Date:** 2026-01-14
+
+**Implementation:**
+- Each type defined in its own file with implementations
+- `mod.rs` files serve as re-export facades
+- Example: `src/error.rs` contains Error enum and Result type; `lib.rs` imports from error module
+
+**Benefits:**
+- Clear file boundaries matching type boundaries
+- Easy navigation and maintenance
+- Consistent pattern across codebase
+
+### HTTP Retry Abstraction
+
+**Decision Date:** 2026-01-14
+
+**Implementation:**
+- Added `get_with_retry<T>()` and `get_blocking_with_retry<T>()` to OllamaClient
+- Generic over response type with `serde::de::DeserializeOwned` bound
+- Automatic retry on network errors and 5xx server errors
+- Exponential backoff: 100ms × (attempt + 1)
+- Marked `pub(super)` for http module internal use
+
+**Code Reduction:**
+- Endpoint implementations: 60 lines → 6 lines (90% reduction)
+- Projected for 12 endpoints: 720 lines → 168 lines (78% reduction)
+
+**Benefits:**
+- Single source of truth for retry logic
+- Type-safe with compiler guarantees
+- Easy to extend for POST/streaming
+- Consistent behavior across endpoints
 
 ### HTTP Client: reqwest
 
@@ -221,14 +258,31 @@ Default endpoint: `http://localhost:11434`
 - Modules: `snake_case`
 
 ### Module Organization
-```rust
-// Public API at module root
-pub use self::client::Client;
-pub use self::error::Error;
 
-// Private implementation details in submodules
+**File Structure Pattern:**
+- One primary type per file with implementations
+- `mod.rs` as pure re-export facade
+- Single-concern principle throughout
+
+**Example:**
+```rust
+// src/http/mod.rs - Re-export facade
+mod config;
 mod client;
-mod error;
+mod api_async;
+mod api_sync;
+
+pub use config::ClientConfig;
+pub use client::OllamaClient;
+pub use api_async::OllamaApiAsync;
+pub use api_sync::OllamaApiSync;
+
+// src/http/client.rs - Implementation
+pub struct OllamaClient { ... }
+impl OllamaClient {
+    pub(super) async fn get_with_retry<T>(&self, url: &str) -> Result<T>
+    where T: serde::de::DeserializeOwned { ... }
+}
 ```
 
 ### Error Handling
