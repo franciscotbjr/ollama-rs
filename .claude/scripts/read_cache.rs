@@ -32,6 +32,8 @@ struct ProjectContext {
     total_crates: u32,
     critical_files: Vec<String>,
     spec_files: Vec<String>,
+    #[serde(default)]
+    impl_files: Vec<String>,
     session_count: u32,
     total_sessions: u32,
     created_at: String,
@@ -168,6 +170,16 @@ fn main() {
         }
     }
     println!();
+
+    if !context.impl_files.is_empty() {
+        println!("📝 Implementation Plans ({} files):", context.impl_files.len());
+        for impl_file in &context.impl_files {
+            let filename = impl_file.split('/').last().unwrap_or(impl_file);
+            let summary = read_file_summary(impl_file);
+            println!("  ✓ {} ({})", filename, summary);
+        }
+        println!();
+    }
 
     println!("📈 Session Information:");
     println!("  Session: #{}", context.session_count);
