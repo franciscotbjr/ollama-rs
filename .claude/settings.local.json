@@ -11,7 +11,8 @@
       "Bash(dir:*)",
       "Bash(test:*)",
       "Bash(rust-script:*)",
-      "Bash(if not exist impl mkdir impl)"
+      "Bash(if not exist impl mkdir impl)",
+      "Bash(PWD=\"d:\\\\development\\\\public\\\\ollama-oxide\" rust-script \"d:\\\\development\\\\public\\\\ollama-oxide\\\\.claude\\\\scripts\\\\save_cache.rs\")"
     ],
     "deny": []
   }
