@@ -1,0 +1,32 @@
+//! Example: Get Ollama server version with custom configuration
+//!
+//! This example demonstrates how to configure the client with custom
+//! timeout, retry settings, and base URL.
+//!
+//! # Usage
+//!
+//! ```bash
+//! cargo run --example get_version_custom
+//! ```
+
+use ollama_oxide::{ClientConfig, OllamaApiAsync, OllamaClient, Result};
+use std::time::Duration;
+
+#[tokio::main]
+async fn main() -> Result<()> {
+    // Create client with custom configuration
+    let config = ClientConfig {
+        base_url: "http://localhost:11434".to_string(),
+        timeout: Duration::from_secs(10),
+        max_retries: 5,
+    };
+
+    let client = OllamaClient::new(config)?;
+
+    // Get Ollama server version
+    let response = client.version().await?;
+
+    println!("Ollama version: {}", response.version);
+
+    Ok(())
+}
