@@ -65,20 +65,21 @@ primitives = []
 - Comprehensive documentation foundation
 - **GET /api/version endpoint** (async + sync)
 - **GET /api/tags endpoint** (async + sync)
+- **GET /api/ps endpoint** (async + sync)
+- **POST /api/copy endpoint** (async + sync)
 - Error handling with `thiserror`
 - HTTP client with retry logic and exponential backoff
-- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`
-- 113+ unit and integration tests
-- Examples for version and list_models endpoints
+- POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`)
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`
+- 157+ unit and integration tests
+- Examples for version, list_models, list_running_models, and copy_model endpoints
 
 ### In Progress
-- Remaining simple endpoints (copy, delete, ps)
+- Remaining simple endpoint (delete)
 - Medium complexity endpoints (show, embed)
 
 ### TODO
-- [ ] Implement POST /api/copy endpoint
 - [ ] Implement DELETE /api/delete endpoint
-- [ ] Implement GET /api/ps endpoint
 - [ ] Implement POST /api/show endpoint
 - [ ] Implement POST /api/embed endpoint
 - [ ] Implement complex streaming endpoints (generate, chat, create, pull, push)
@@ -107,8 +108,11 @@ primitives = []
 
 **Implementation:**
 - Added `get_with_retry<T>()` and `get_blocking_with_retry<T>()` to OllamaClient
-- Generic over response type with `serde::de::DeserializeOwned` bound
+- Added `post_empty_with_retry<R>()` and `post_empty_blocking_with_retry<R>()` for POST with empty response
+- Generic over response type with `serde::de::DeserializeOwned` bound (GET)
+- Generic over request type with `serde::Serialize` bound (POST)
 - Automatic retry on network errors and 5xx server errors
+- No retry on 4xx client errors (e.g., 404 model not found)
 - Exponential backoff: 100ms × (attempt + 1)
 - Marked `pub(super)` for http module internal use
 
@@ -354,6 +358,7 @@ pub enum Error {
 
 Error variants:
 - `HttpError` - HTTP request/response errors
+- `HttpStatusError` - HTTP status code errors (e.g., 404, 400)
 - `SerializationError` - JSON serialization/deserialization errors
 - `ApiError` - Ollama API-specific errors
 - `ConnectionError` - Connection/network errors

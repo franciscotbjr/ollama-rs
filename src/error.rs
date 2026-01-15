@@ -11,6 +11,9 @@ pub enum Error {
     #[error("HTTP request failed: {0}")]
     HttpError(String),
 
+    #[error("HTTP status error: {0}")]
+    HttpStatusError(u16),
+
     #[error("Serialization error: {0}")]
     SerializationError(String),
 

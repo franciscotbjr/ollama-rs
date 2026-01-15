@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **POST /api/copy endpoint**: Copy/duplicate a model
+  - `CopyRequest` primitive type with `source` and `destination` fields
+  - `copy_model()` async method
+  - `copy_model_blocking()` sync method
+  - `HttpStatusError(u16)` error variant for HTTP status code errors
+  - POST helper methods: `post_empty_with_retry()`, `post_empty_blocking_with_retry()`
+  - 16 new unit tests with mocking
+  - Examples: `copy_model_async.rs`, `copy_model_sync.rs`
+- **GET /api/ps endpoint**: List currently running models
+  - `PsResponse`, `RunningModel` primitive types
+  - `list_running_models()` async method
+  - `list_running_models_blocking()` sync method
+  - 13 new unit tests with mocking
+  - Examples: `list_running_models_async.rs`, `list_running_models_sync.rs`
 - **GET /api/tags endpoint**: List locally available models
   - `ListResponse`, `ModelSummary`, `ModelDetails` primitive types
   - `list_models()` async method

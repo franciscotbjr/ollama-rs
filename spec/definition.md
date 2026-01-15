@@ -630,10 +630,10 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 **GET Endpoints (3):**
 - [x] `GET /api/version` - Get Ollama version
 - [x] `GET /api/tags` - List available models
-- [ ] `GET /api/ps` - List running models
+- [x] `GET /api/ps` - List running models
 
 **Simple POST/DELETE Endpoints (2):**
-- [ ] `POST /api/copy` - Copy a model
+- [x] `POST /api/copy` - Copy a model
 - [ ] `DELETE /api/delete` - Delete a model
 
 **Medium Complexity POST Endpoints (2):**
@@ -644,7 +644,8 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - All shared types (ModelOptions, Logprob, enums) compile
 - All 7 non-streaming endpoints working
 - HTTP client in `http` module can make GET, POST, DELETE requests
-- Error handling system in place
+- POST helper methods with retry logic implemented
+- Error handling system in place (including HttpStatusError)
 - Feature flags (`http`, `primitives`) working correctly
 - Unit test framework operational
 - Integration test setup complete
