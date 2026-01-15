@@ -342,42 +342,60 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ## Testing Strategy
 
-### Unit Tests
+### Unit Tests (`tests/` folder)
+
+**Location:** `tests/*.rs`
 
 **Scope:**
 - Individual function validation
 - Data structure serialization/deserialization
 - Error handling paths
 - Edge cases
+- HTTP interactions via mocking
+
+**Requirements:**
+- Must NOT require external services (Ollama server)
+- Use `mockito` crate for HTTP mocking
+- Must pass with `cargo test` without additional setup
 
 **Tools:**
 - Standard Rust test framework
 - serde_json for JSON validation
+- mockito for HTTP mocking
 
-### Integration Tests
+### Integration Tests (`examples/` folder)
+
+**Location:** `examples/*.rs`
 
 **Scope:**
-- Full API interactions
+- Full API interactions with real Ollama server
 - End-to-end workflows
 - Error scenarios
 - Streaming behavior
+- Serve as usage documentation
 
 **Requirements:**
 - Running Ollama instance
 - Network connectivity
-- Sufficient system resources
+- Run manually: `cargo run --example <name>`
+
+**Rationale:**
+- `cargo test` always succeeds without external dependencies
+- Examples serve dual purpose: documentation + integration testing
+- CI/CD pipelines run reliably
 
 ### Mocking Strategy
 
 **Approach:**
-- Mock HTTP responses for unit tests
-- Real Ollama instance for integration tests
-- Consider wiremock or mockito for HTTP mocking
+- All tests in `tests/` folder use HTTP mocking
+- `mockito` crate for simulating Ollama API responses
+- Real Ollama instance only used via examples
 
 **Benefits:**
 - Fast unit test execution
-- No external dependencies for unit tests
-- Realistic integration testing
+- No external dependencies for `cargo test`
+- CI/CD always passes
+- Integration testing available when needed via examples
 
 ## Quality Standards
 
