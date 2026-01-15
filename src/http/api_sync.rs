@@ -1,6 +1,6 @@
 //! Sync (blocking) API trait and implementations
 
-use crate::{Result, VersionResponse};
+use crate::{ListResponse, Result, VersionResponse};
 
 use super::endpoints::Endpoints;
 use super::OllamaClient;
@@ -52,11 +52,44 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn version_blocking(&self) -> Result<VersionResponse>;
+
+    /// List locally available models (blocking)
+    ///
+    /// Returns a list of models installed on the Ollama server with their details.
+    /// This method blocks the current thread until the request completes.
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    /// - Response cannot be deserialized
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let response = client.list_models_blocking()?;
+    /// for model in &response.models {
+    ///     println!("Model: {}", model.name);
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn list_models_blocking(&self) -> Result<ListResponse>;
 }
 
 impl OllamaApiSync for OllamaClient {
     fn version_blocking(&self) -> Result<VersionResponse> {
         let url = self.config.url(Endpoints::VERSION);
+        self.get_blocking_with_retry(&url)
+    }
+
+    fn list_models_blocking(&self) -> Result<ListResponse> {
+        let url = self.config.url(Endpoints::TAGS);
         self.get_blocking_with_retry(&url)
     }
 }

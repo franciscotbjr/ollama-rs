@@ -603,12 +603,13 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] Workspace configuration
 
 **In Progress:**
-- [ ] Simple endpoints (1): GET /api/version
-- [ ] `primitives` module structure with shared types
-- [ ] `http` module implementation
-- [ ] Error type hierarchy in `primitives`
-- [ ] Testing infrastructure
-- [ ] Feature flags configuration
+- [x] Simple endpoints (1): GET /api/version
+- [ ] Simple endpoints (2): GET /api/tags
+- [x] `primitives` module structure with shared types
+- [x] `http` module implementation
+- [x] Error type hierarchy in `primitives`
+- [x] Testing infrastructure
+- [x] Feature flags configuration
 
 **Definition of Done:**
 - All shared types (ModelOptions, Logprob, enums) compile
@@ -625,11 +626,11 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 **Status:** Not Started
 
 **Checklist:**
-- [ ] Simple endpoints (4): tags, ps, copy, delete
+- [ ] Simple endpoints (3): ps, copy, delete
 - [ ] Medium endpoints (2): show, embed
 - [ ] Complex endpoints (5): generate, chat, create, pull, push
 - [ ] Streaming support for 5 endpoints
-- [ ] Request/response types for all 12 endpoints
+- [ ] Request/response types for all 10 remaining endpoints
 - [ ] Unit test coverage >80%
 - [ ] Integration tests for all endpoints
 - [ ] Complete API documentation
