@@ -1,6 +1,6 @@
 //! Sync (blocking) API trait and implementations
 
-use crate::{ListResponse, Result, VersionResponse};
+use crate::{CopyRequest, ListResponse, Result, VersionResponse};
 
 use super::endpoints::Endpoints;
 use super::OllamaClient;
@@ -80,6 +80,38 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn list_models_blocking(&self) -> Result<ListResponse>;
+
+    /// Copy a model (blocking)
+    ///
+    /// Creates a copy of an existing model with a new name.
+    /// This method blocks the current thread until the request completes.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Copy request containing source and destination model names
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Source model doesn't exist
+    /// - Destination model name is invalid
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, CopyRequest};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = CopyRequest::new("llama3.1", "llama3.1-backup");
+    /// client.copy_model_blocking(&request)?;
+    /// println!("Model copied successfully!");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn copy_model_blocking(&self, request: &CopyRequest) -> Result<()>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -91,5 +123,10 @@ impl OllamaApiSync for OllamaClient {
     fn list_models_blocking(&self) -> Result<ListResponse> {
         let url = self.config.url(Endpoints::TAGS);
         self.get_blocking_with_retry(&url)
+    }
+
+    fn copy_model_blocking(&self, request: &CopyRequest) -> Result<()> {
+        let url = self.config.url(Endpoints::COPY);
+        self.post_empty_blocking_with_retry(&url, request)
     }
 }

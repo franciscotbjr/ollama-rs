@@ -1,6 +1,6 @@
 //! Async API trait and implementations
 
-use crate::{ListResponse, Result, VersionResponse};
+use crate::{CopyRequest, ListResponse, Result, VersionResponse};
 use async_trait::async_trait;
 
 use super::endpoints::Endpoints;
@@ -80,6 +80,37 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     async fn list_models(&self) -> Result<ListResponse>;
+
+    /// Copy a model (async)
+    ///
+    /// Creates a copy of an existing model with a new name.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Copy request containing source and destination model names
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Source model doesn't exist
+    /// - Destination model name is invalid
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, CopyRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = CopyRequest::new("llama3.1", "llama3.1-backup");
+    /// client.copy_model(&request).await?;
+    /// println!("Model copied successfully!");
+    /// # Ok(())
+    /// # }
+    /// ```
+    async fn copy_model(&self, request: &CopyRequest) -> Result<()>;
 }
 
 #[async_trait]
@@ -92,5 +123,10 @@ impl OllamaApiAsync for OllamaClient {
     async fn list_models(&self) -> Result<ListResponse> {
         let url = self.config.url(Endpoints::TAGS);
         self.get_with_retry(&url).await
+    }
+
+    async fn copy_model(&self, request: &CopyRequest) -> Result<()> {
+        let url = self.config.url(Endpoints::COPY);
+        self.post_empty_with_retry(&url, request).await
     }
 }

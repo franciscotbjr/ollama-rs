@@ -45,7 +45,7 @@ pub use error::{Error, Result};
 pub mod primitives;
 
 #[cfg(feature = "primitives")]
-pub use primitives::{ListResponse, ModelDetails, ModelSummary, VersionResponse};
+pub use primitives::{CopyRequest, ListResponse, ModelDetails, ModelSummary, VersionResponse};
 
 // ============================================================================
 // HTTP Client Module
@@ -68,5 +68,5 @@ pub mod prelude {
     pub use crate::{ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
 
     #[cfg(feature = "primitives")]
-    pub use crate::{ListResponse, ModelDetails, ModelSummary, VersionResponse};
+    pub use crate::{CopyRequest, ListResponse, ModelDetails, ModelSummary, VersionResponse};
 }
