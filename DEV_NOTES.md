@@ -204,20 +204,34 @@ Future endpoints:
 
 ## Testing Strategy
 
-### Unit Tests
-- Individual function validation
-- Data structure serialization
-- Error handling paths
+### Unit Tests (`tests/` folder)
+**Location:** `tests/*.rs`
+**Purpose:** All tests in the `tests/` folder must be unit tests that:
+- Do NOT require external services (Ollama server)
+- Use mocking (mockito) for HTTP interactions
+- Can run in CI/CD without additional setup
+- Test individual functions and data structures
+- Validate serialization/deserialization
+- Cover error handling paths
 
-### Integration Tests
-- Full API interactions (requires Ollama running)
-- End-to-end workflows
-- Error scenarios
+### Integration Tests (`examples/` folder)
+**Location:** `examples/*.rs`
+**Purpose:** Integration tests are implemented as examples that:
+- Require a running Ollama server
+- Demonstrate real API interactions
+- Serve as usage documentation
+- Can be run manually: `cargo run --example <name>`
+
+**Rationale:** This separation ensures:
+- `cargo test` always succeeds without external dependencies
+- Examples serve dual purpose: documentation + integration testing
+- CI/CD pipelines run reliably
+- Developers can test against real Ollama when needed
 
 ### Mocking Strategy
-- Mock HTTP responses for unit tests
-- Real Ollama instance for integration tests
-- Consider wiremock or similar for HTTP mocking
+- Use `mockito` crate for HTTP mocking in unit tests
+- All HTTP interactions in `tests/` folder are mocked
+- Real Ollama instance used only via examples
 
 ## Performance Considerations
 

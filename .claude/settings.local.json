@@ -17,7 +17,8 @@
       "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" status --short)",
       "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" diff --stat)",
       "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" diff src/http/)",
-      "Bash(ls:*)"
+      "Bash(ls:*)",
+      "Bash(git mv:*)"
     ],
     "deny": []
   }
