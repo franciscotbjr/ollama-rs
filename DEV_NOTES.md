@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2025-01-10
+**Last Updated:** 2026-01-14
 
 ## Architecture Overview
 
@@ -63,21 +63,26 @@ primitives = []
 - Dependency setup (tokio, serde, reqwest, async-trait)
 - 12 OpenAPI specifications documented
 - Comprehensive documentation foundation
+- **GET /api/version endpoint** (async + sync)
+- **GET /api/tags endpoint** (async + sync)
+- Error handling with `thiserror`
+- HTTP client with retry logic and exponential backoff
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`
+- 113+ unit and integration tests
+- Examples for version and list_models endpoints
 
 ### In Progress
-- `http` module implementation
-- `primitives` module type definitions
-- Error handling strategy
-- First endpoint: GET /api/version
+- Remaining simple endpoints (copy, delete, ps)
+- Medium complexity endpoints (show, embed)
 
 ### TODO
-- [ ] Implement shared types in `primitives` module
-- [ ] Build HTTP client in `http` module
-- [ ] Implement GET /api/version endpoint
+- [ ] Implement POST /api/copy endpoint
+- [ ] Implement DELETE /api/delete endpoint
+- [ ] Implement GET /api/ps endpoint
+- [ ] Implement POST /api/show endpoint
+- [ ] Implement POST /api/embed endpoint
+- [ ] Implement complex streaming endpoints (generate, chat, create, pull, push)
 - [ ] Create `conveniences` module (Phase 3)
-- [ ] Add comprehensive tests
-- [ ] Implement streaming support
-- [ ] Add examples in `/examples` directory
 - [ ] Performance benchmarks
 
 ## Technical Decisions
@@ -330,8 +335,17 @@ pub enum Error {
 **Status:** Under investigation
 
 ### Q: Error handling strategy?
-**Decision:** Use Result with custom Error enum
-**Status:** To be implemented
+**Decision:** Use Result with custom Error enum using `thiserror`
+**Status:** ✅ Implemented
+
+Error variants:
+- `HttpError` - HTTP request/response errors
+- `SerializationError` - JSON serialization/deserialization errors
+- `ApiError` - Ollama API-specific errors
+- `ConnectionError` - Connection/network errors
+- `InvalidUrlError` - URL parsing errors
+- `TimeoutError` - Request timeout errors
+- `MaxRetriesExceededError` - Maximum retry attempts exceeded
 
 ---
 

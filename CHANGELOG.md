@@ -7,11 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- **GET /api/tags endpoint**: List locally available models
+  - `ListResponse`, `ModelSummary`, `ModelDetails` primitive types
+  - `list_models()` async method
+  - `list_models_blocking()` sync method
+  - Comprehensive test coverage (33 new tests)
+- **Examples for GET /api/version**:
+  - `get_version_async.rs` - Async usage example
+  - `get_version_sync.rs` - Sync/blocking usage example
+  - `get_version_custom.rs` - Custom configuration example
+- **Examples for GET /api/tags**:
+  - `list_models_async.rs` - Async list models example
+  - `list_models_sync.rs` - Sync list models example
+
 ### Planned
-- Complete implementation of core API endpoints
-- Add comprehensive test coverage
+- Complete implementation of remaining API endpoints
 - Implement streaming support for generation endpoints
-- Add examples for common use cases
 
 ## [0.1.0] - 2025-01-10
 
