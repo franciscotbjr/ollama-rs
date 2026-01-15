@@ -120,6 +120,25 @@ Separate async and sync traits for clear separation of concerns.
 
 ---
 
+## Testing Architecture
+
+### Unit Tests (`tests/` folder)
+All files in `tests/*.rs` must be **unit tests only**:
+- Use `mockito` for HTTP mocking
+- No external service dependencies
+- Must pass without Ollama running
+- Run with `cargo test`
+
+### Integration Tests (`examples/` folder)
+Integration tests are implemented as **examples**:
+- Require running Ollama server
+- Demonstrate real API usage
+- Run with `cargo run --example <name>`
+
+**Rule:** Never add tests to `tests/` folder that require external services.
+
+---
+
 ## Migration Checklist
 
 - [ ] Identify distinct components/types

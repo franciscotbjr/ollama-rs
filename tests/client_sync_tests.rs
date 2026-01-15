@@ -214,10 +214,7 @@ fn test_version_sync_concurrent_calls_from_threads() {
 fn test_version_sync_404_error() {
     let mut server = mockito::Server::new();
 
-    let mock = server
-        .mock("GET", "/api/version")
-        .with_status(404)
-        .create();
+    let mock = server.mock("GET", "/api/version").with_status(404).create();
 
     let config = ClientConfig {
         base_url: server.url(),

@@ -7,10 +7,14 @@ mod copy_request;
 mod list_response;
 mod model_details;
 mod model_summary;
+mod ps_response;
+mod running_model;
 mod version;
 
 pub use copy_request::CopyRequest;
 pub use list_response::ListResponse;
 pub use model_details::ModelDetails;
 pub use model_summary::ModelSummary;
+pub use ps_response::PsResponse;
+pub use running_model::RunningModel;
 pub use version::VersionResponse;

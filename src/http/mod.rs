@@ -39,13 +39,13 @@
 //! }
 //! ```
 
-mod config;
-mod client;
 mod api_async;
 mod api_sync;
+mod client;
+mod config;
 pub(crate) mod endpoints;
 
-pub use config::ClientConfig;
-pub use client::OllamaClient;
 pub use api_async::OllamaApiAsync;
 pub use api_sync::OllamaApiSync;
+pub use client::OllamaClient;
+pub use config::ClientConfig;
