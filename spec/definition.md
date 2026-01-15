@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.0
-**Last Updated:** 2025-01-11
+**Document Version:** 1.1
+**Last Updated:** 2026-01-15
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -179,8 +179,8 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Total Endpoints:** 12 (across all phases)
 
-#### Phase 1 (v0.1.0): Foundation + HTTP Module
-**Focus:** Primitives module structure and HTTP module implementation
+#### Phase 1 (v0.1.0): Foundation + Non-Streaming Endpoints
+**Focus:** Primitives module structure, HTTP module implementation, and all non-streaming endpoints
 
 **Scope:**
 - Set up `primitives` module with shared types (ModelOptions, Logprob, etc.)
@@ -188,40 +188,42 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Build error handling infrastructure
 - Create serialization/deserialization framework
 - Establish testing foundation
+- Implement all non-streaming endpoints
+
+**GET Endpoints (3):**
+1. `GET /api/version` - Get Ollama version
+2. `GET /api/tags` - List available models
+3. `GET /api/ps` - List running models
+
+**Simple POST/DELETE Endpoints (2):**
+4. `POST /api/copy` - Copy a model
+5. `DELETE /api/delete` - Delete a model
+
+**Medium Complexity POST Endpoints (2):**
+6. `POST /api/show` - Show detailed model information
+7. `POST /api/embed` - Generate text embeddings
 
 **Deliverables:**
-- `GET /api/version` - First endpoint implementation
-- Functional HTTP client in `http` module
+- All 7 non-streaming endpoints fully implemented
+- Functional HTTP client in `http` module (GET, POST, DELETE)
 - Error types and handling in `primitives` module
 - Basic integration test framework
 - Module structure with feature flags working
 
-#### Phase 2 (v0.1.1): All Primitives Implementation
-**Focus:** Complete implementation of all 12 API endpoints in primitives module
-
-**Endpoints by Complexity:**
-
-**Simple Endpoints (4):**
-1. `GET /api/tags` - List available models
-2. `GET /api/ps` - List running models
-3. `POST /api/copy` - Copy a model
-4. `DELETE /api/delete` - Delete a model
-
-**Medium Complexity (2):**
-5. `POST /api/show` - Show detailed model information
-6. `POST /api/embed` - Generate text embeddings
+#### Phase 2 (v0.1.1): Streaming Endpoints Implementation
+**Focus:** Complete implementation of remaining 5 streaming endpoints
 
 **High Complexity with Streaming (5):**
-7. `POST /api/generate` - Generate text completions (streaming/non-streaming)
-8. `POST /api/chat` - Chat completions with conversation history (streaming/non-streaming)
-9. `POST /api/create` - Create custom models (streaming progress)
-10. `POST /api/pull` - Download models from registry (streaming progress)
-11. `POST /api/push` - Upload models to registry (streaming progress)
+1. `POST /api/generate` - Generate text completions (streaming/non-streaming)
+2. `POST /api/chat` - Chat completions with conversation history (streaming/non-streaming)
+3. `POST /api/create` - Create custom models (streaming progress)
+4. `POST /api/pull` - Download models from registry (streaming progress)
+5. `POST /api/push` - Upload models to registry (streaming progress)
 
 **Deliverables:**
-- All 11 remaining endpoints fully implemented in `primitives` module
+- All 5 streaming endpoints fully implemented in `primitives` module
 - Request/response types for each endpoint
-- Streaming support for applicable endpoints
+- Streaming support with progress callbacks
 - Comprehensive unit tests
 - Integration tests for all endpoints
 
@@ -591,7 +593,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ## Success Criteria
 
-### Version 0.1.0: Foundation + HTTP Core (Current)
+### Version 0.1.0: Foundation + Non-Streaming Endpoints (Current)
 **Status:** In Progress
 
 **Completed:**
@@ -601,20 +603,29 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] OpenAPI specifications (12 endpoints documented)
 - [x] Git repository initialized
 - [x] Workspace configuration
-
-**In Progress:**
-- [x] Simple endpoints (1): GET /api/version
-- [ ] Simple endpoints (2): GET /api/tags
 - [x] `primitives` module structure with shared types
 - [x] `http` module implementation
 - [x] Error type hierarchy in `primitives`
 - [x] Testing infrastructure
 - [x] Feature flags configuration
 
+**GET Endpoints (3):**
+- [x] `GET /api/version` - Get Ollama version
+- [x] `GET /api/tags` - List available models
+- [ ] `GET /api/ps` - List running models
+
+**Simple POST/DELETE Endpoints (2):**
+- [ ] `POST /api/copy` - Copy a model
+- [ ] `DELETE /api/delete` - Delete a model
+
+**Medium Complexity POST Endpoints (2):**
+- [ ] `POST /api/show` - Show detailed model information
+- [ ] `POST /api/embed` - Generate text embeddings
+
 **Definition of Done:**
 - All shared types (ModelOptions, Logprob, enums) compile
-- First simple endpoint: GET /api/version working
-- HTTP client in `http` module can make GET/POST requests
+- All 7 non-streaming endpoints working
+- HTTP client in `http` module can make GET, POST, DELETE requests
 - Error handling system in place
 - Feature flags (`http`, `primitives`) working correctly
 - Unit test framework operational
@@ -622,21 +633,23 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ---
 
-### Version 0.1.1: All Primitives Implementation (Planned)
+### Version 0.1.1: Streaming Endpoints Implementation (Planned)
 **Status:** Not Started
 
 **Checklist:**
-- [ ] Simple endpoints (3): ps, copy, delete
-- [ ] Medium endpoints (2): show, embed
-- [ ] Complex endpoints (5): generate, chat, create, pull, push
-- [ ] Streaming support for 5 endpoints
-- [ ] Request/response types for all 10 remaining endpoints
+- [ ] `POST /api/generate` - Text generation with streaming
+- [ ] `POST /api/chat` - Chat completions with streaming
+- [ ] `POST /api/create` - Model creation with progress streaming
+- [ ] `POST /api/pull` - Model download with progress streaming
+- [ ] `POST /api/push` - Model upload with progress streaming
+- [ ] Streaming infrastructure and abstractions
+- [ ] Request/response types for all 5 streaming endpoints
 - [ ] Unit test coverage >80%
 - [ ] Integration tests for all endpoints
 - [ ] Complete API documentation
 
 **Definition of Done:**
-- All 11 remaining endpoints functional with real Ollama
+- All 5 streaming endpoints functional with real Ollama
 - Streaming endpoints handle progress correctly
 - Comprehensive test suite passes
 - API documentation complete
