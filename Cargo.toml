@@ -12,6 +12,7 @@ exclude = [
     ".claude/*",
     ".github/*",
     "assets/*",
+    "examples/*",
     "spec/*",
     "impl/*",
     "tmp/*",

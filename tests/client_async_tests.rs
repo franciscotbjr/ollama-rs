@@ -1,7 +1,7 @@
 // Client Async API Tests - Phase 0 TDD
 // These tests validate the async API functionality using mocking
 
-use ollama_oxide::{ClientConfig, OllamaApiAsync, OllamaClient, VersionResponse};
+use ollama_oxide::{ClientConfig, OllamaApiAsync, OllamaClient};
 use std::sync::Arc;
 use std::time::Duration;
 
