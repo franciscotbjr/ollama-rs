@@ -634,7 +634,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Simple POST/DELETE Endpoints (2):**
 - [x] `POST /api/copy` - Copy a model
-- [ ] `DELETE /api/delete` - Delete a model
+- [x] `DELETE /api/delete` - Delete a model
 
 **Medium Complexity POST Endpoints (2):**
 - [ ] `POST /api/show` - Show detailed model information
@@ -645,6 +645,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - All 7 non-streaming endpoints working
 - HTTP client in `http` module can make GET, POST, DELETE requests
 - POST helper methods with retry logic implemented
+- DELETE helper methods with retry logic implemented
 - Error handling system in place (including HttpStatusError)
 - Feature flags (`http`, `primitives`) working correctly
 - Unit test framework operational

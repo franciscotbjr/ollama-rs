@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-01-14
+**Last Updated:** 2026-01-16
 
 ## Architecture Overview
 
@@ -67,19 +67,19 @@ primitives = []
 - **GET /api/tags endpoint** (async + sync)
 - **GET /api/ps endpoint** (async + sync)
 - **POST /api/copy endpoint** (async + sync)
+- **DELETE /api/delete endpoint** (async + sync)
 - Error handling with `thiserror`
 - HTTP client with retry logic and exponential backoff
 - POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`)
-- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`
-- 157+ unit and integration tests
-- Examples for version, list_models, list_running_models, and copy_model endpoints
+- DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`
+- 162+ unit and integration tests
+- Examples for version, list_models, list_running_models, copy_model, and delete_model endpoints
 
 ### In Progress
-- Remaining simple endpoint (delete)
 - Medium complexity endpoints (show, embed)
 
 ### TODO
-- [ ] Implement DELETE /api/delete endpoint
 - [ ] Implement POST /api/show endpoint
 - [ ] Implement POST /api/embed endpoint
 - [ ] Implement complex streaming endpoints (generate, chat, create, pull, push)
@@ -109,8 +109,9 @@ primitives = []
 **Implementation:**
 - Added `get_with_retry<T>()` and `get_blocking_with_retry<T>()` to OllamaClient
 - Added `post_empty_with_retry<R>()` and `post_empty_blocking_with_retry<R>()` for POST with empty response
+- Added `delete_empty_with_retry<R>()` and `delete_empty_blocking_with_retry<R>()` for DELETE with empty response
 - Generic over response type with `serde::de::DeserializeOwned` bound (GET)
-- Generic over request type with `serde::Serialize` bound (POST)
+- Generic over request type with `serde::Serialize` bound (POST, DELETE)
 - Automatic retry on network errors and 5xx server errors
 - No retry on 4xx client errors (e.g., 404 model not found)
 - Exponential backoff: 100ms × (attempt + 1)
