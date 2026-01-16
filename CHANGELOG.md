@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **DELETE /api/delete endpoint**: Delete a model from the server
+  - `DeleteRequest` primitive type with `model` field
+  - `delete_model()` async method
+  - `delete_model_blocking()` sync method
+  - DELETE helper methods: `delete_empty_with_retry()`, `delete_empty_blocking_with_retry()`
+  - 10 new unit tests with mocking
+  - Examples: `delete_model_async.rs`, `delete_model_sync.rs`
 - **POST /api/copy endpoint**: Copy/duplicate a model
   - `CopyRequest` primitive type with `source` and `destination` fields
   - `copy_model()` async method

@@ -1,6 +1,6 @@
 //! Async API trait and implementations
 
-use crate::{CopyRequest, ListResponse, PsResponse, Result, VersionResponse};
+use crate::{CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, VersionResponse};
 use async_trait::async_trait;
 
 use super::OllamaClient;
@@ -141,6 +141,37 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     async fn list_running_models(&self) -> Result<PsResponse>;
+
+    /// Delete a model (async)
+    ///
+    /// Permanently removes a model from the Ollama server. This operation
+    /// cannot be undone.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Delete request containing the model name to delete
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, DeleteRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = DeleteRequest::new("llama3.1-backup");
+    /// client.delete_model(&request).await?;
+    /// println!("Model deleted successfully!");
+    /// # Ok(())
+    /// # }
+    /// ```
+    async fn delete_model(&self, request: &DeleteRequest) -> Result<()>;
 }
 
 #[async_trait]
@@ -163,5 +194,10 @@ impl OllamaApiAsync for OllamaClient {
     async fn list_running_models(&self) -> Result<PsResponse> {
         let url = self.config.url(Endpoints::PS);
         self.get_with_retry(&url).await
+    }
+
+    async fn delete_model(&self, request: &DeleteRequest) -> Result<()> {
+        let url = self.config.url(Endpoints::DELETE);
+        self.delete_empty_with_retry(&url, request).await
     }
 }

@@ -1,6 +1,6 @@
 //! Sync (blocking) API trait and implementations
 
-use crate::{CopyRequest, ListResponse, PsResponse, Result, VersionResponse};
+use crate::{CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, VersionResponse};
 
 use super::OllamaClient;
 use super::endpoints::Endpoints;
@@ -143,6 +143,38 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn list_running_models_blocking(&self) -> Result<PsResponse>;
+
+    /// Delete a model (blocking)
+    ///
+    /// Permanently removes a model from the Ollama server. This operation
+    /// cannot be undone.
+    /// This method blocks the current thread until the request completes.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Delete request containing the model name to delete
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, DeleteRequest};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = DeleteRequest::new("llama3.1-backup");
+    /// client.delete_model_blocking(&request)?;
+    /// println!("Model deleted successfully!");
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -164,5 +196,10 @@ impl OllamaApiSync for OllamaClient {
     fn list_running_models_blocking(&self) -> Result<PsResponse> {
         let url = self.config.url(Endpoints::PS);
         self.get_blocking_with_retry(&url)
+    }
+
+    fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()> {
+        let url = self.config.url(Endpoints::DELETE);
+        self.delete_empty_blocking_with_retry(&url, request)
     }
 }
