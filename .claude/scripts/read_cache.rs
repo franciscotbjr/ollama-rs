@@ -87,6 +87,147 @@ fn read_file_summary(file_path: &str) -> String {
     }
 }
 
+/// Displays active blockers from BLOCKERS.md
+fn display_blockers() {
+    let blockers_path = "BLOCKERS.md";
+
+    if let Ok(content) = fs::read_to_string(blockers_path) {
+        let lines: Vec<&str> = content.lines().collect();
+
+        // Find the "## Bloqueios Ativos" section
+        let mut in_active_section = false;
+        let mut active_blockers: Vec<&str> = Vec::new();
+
+        for line in &lines {
+            if line.contains("## Bloqueios Ativos") {
+                in_active_section = true;
+                continue;
+            }
+            if in_active_section && line.starts_with("## ") {
+                // Reached next section, stop
+                break;
+            }
+            if in_active_section && line.starts_with('|') && !line.contains("---") && !line.contains("Date") {
+                active_blockers.push(line);
+            }
+        }
+
+        if !active_blockers.is_empty() {
+            println!("🚧 Active Blockers ({}):", active_blockers.len());
+
+            for row in &active_blockers {
+                // Parse table row: | Date | Type | Blocker | Impact | Reference |
+                let cols: Vec<&str> = row.split('|')
+                    .map(|s| s.trim())
+                    .filter(|s| !s.is_empty())
+                    .collect();
+
+                if cols.len() >= 3 {
+                    let blocker_type = cols.get(1).unwrap_or(&"");
+                    let blocker_desc = cols.get(2).unwrap_or(&"");
+                    println!("  ⚠️  [{}] {}", blocker_type, blocker_desc);
+                }
+            }
+            println!();
+        } else {
+            println!("🚧 Active Blockers: None");
+            println!();
+        }
+    }
+    // If file doesn't exist, silently skip (blockers are optional)
+}
+
+/// Displays next steps (TODO items) from DEV_NOTES.md
+fn display_next_steps() {
+    let dev_notes_path = "DEV_NOTES.md";
+
+    if let Ok(content) = fs::read_to_string(dev_notes_path) {
+        let lines: Vec<&str> = content.lines().collect();
+
+        // Find the "### TODO" section
+        let mut in_todo_section = false;
+        let mut todo_items: Vec<&str> = Vec::new();
+
+        for line in &lines {
+            if line.contains("### TODO") {
+                in_todo_section = true;
+                continue;
+            }
+            if in_todo_section && line.starts_with("##") {
+                // Reached next section, stop
+                break;
+            }
+            if in_todo_section && line.trim().starts_with("- [ ]") {
+                // Extract the task description (remove "- [ ] " prefix)
+                let task = line.trim().trim_start_matches("- [ ]").trim();
+                todo_items.push(task);
+            }
+        }
+
+        if !todo_items.is_empty() {
+            let show_count = std::cmp::min(5, todo_items.len());
+            println!("📌 Next Steps ({} pending, showing first {}):", todo_items.len(), show_count);
+
+            for (i, task) in todo_items.iter().take(show_count).enumerate() {
+                println!("  {}. {}", i + 1, task);
+            }
+            println!();
+        }
+    }
+    // If file doesn't exist or no TODOs, silently skip
+}
+
+/// Displays recent decisions from DECISIONS.md
+fn display_decisions() {
+    let decisions_path = "DECISIONS.md";
+
+    if let Ok(content) = fs::read_to_string(decisions_path) {
+        let lines: Vec<&str> = content.lines().collect();
+
+        // Find table rows (lines starting with |)
+        let table_rows: Vec<&str> = lines.iter()
+            .filter(|line| line.starts_with('|') && !line.contains("---"))
+            .copied()
+            .collect();
+
+        if table_rows.len() > 1 {
+            // Skip header row, get last 5 decisions
+            let decisions: Vec<&str> = table_rows.iter()
+                .skip(1) // Skip header
+                .copied()
+                .collect();
+
+            let recent_count = std::cmp::min(5, decisions.len());
+            let recent_decisions: Vec<&str> = decisions.iter()
+                .rev()
+                .take(recent_count)
+                .rev()
+                .copied()
+                .collect();
+
+            println!("📜 Recent Decisions ({} total, showing last {}):", decisions.len(), recent_count);
+
+            for row in recent_decisions {
+                // Parse table row: | Date | Decision | Rationale | Reference |
+                let cols: Vec<&str> = row.split('|')
+                    .map(|s| s.trim())
+                    .filter(|s| !s.is_empty())
+                    .collect();
+
+                if cols.len() >= 2 {
+                    let date = cols.first().unwrap_or(&"");
+                    let decision = cols.get(1).unwrap_or(&"");
+                    println!("  [{:}] {}", date, decision);
+                }
+            }
+            println!();
+        }
+    } else {
+        println!("📜 Decisions: No DECISIONS.md found (consider creating one)");
+        println!();
+    }
+}
+
 fn main() {
     let cache_dir = get_cache_dir();
     let project_hash = get_project_hash();
@@ -226,9 +367,14 @@ fn main() {
         println!();
     }
 
+    // Read and display decisions from DECISIONS.md
+    display_decisions();
+
+    // Read and display active blockers from BLOCKERS.md
+    display_blockers();
+
+    // Read and display next steps from DEV_NOTES.md TODO section
+    display_next_steps();
+
     println!("🚀 Ready to continue where we left off!");
-    println!("\n💡 Next Steps:");
-    println!("  1. Review critical files (spec/definition.md, spec/api-analysis.md)");
-    println!("  2. Check current implementation status in DEV_NOTES.md");
-    println!("  3. Continue with Phase 1 implementation tasks");
 }
