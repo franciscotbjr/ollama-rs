@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.1
-**Last Updated:** 2026-01-15
+**Document Version:** 1.2
+**Last Updated:** 2026-01-17
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -179,8 +179,8 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Total Endpoints:** 12 (across all phases)
 
-#### Phase 1 (v0.1.0): Foundation + Non-Streaming Endpoints
-**Focus:** Primitives module structure, HTTP module implementation, and all non-streaming endpoints
+#### Phase 1 (v0.1.0): Foundation + All Endpoints (Non-Streaming Mode)
+**Focus:** Primitives module structure, HTTP module implementation, and all 12 endpoints in non-streaming mode
 
 **Scope:**
 - Set up `primitives` module with shared types (ModelOptions, Logprob, etc.)
@@ -188,7 +188,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Build error handling infrastructure
 - Create serialization/deserialization framework
 - Establish testing foundation
-- Implement all non-streaming endpoints
+- Implement all 12 endpoints (streaming endpoints work in non-streaming mode only)
 
 **GET Endpoints (3):**
 1. `GET /api/version` - Get Ollama version
@@ -203,38 +203,50 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 6. `POST /api/show` - Show detailed model information
 7. `POST /api/embed` - Generate text embeddings
 
+**Complex POST Endpoints (5) - Non-Streaming Mode:**
+8. `POST /api/generate` - Generate text completions (non-streaming only)
+9. `POST /api/chat` - Chat completions (non-streaming only)
+10. `POST /api/create` - Create custom models (non-streaming only)
+11. `POST /api/pull` - Download models (non-streaming only)
+12. `POST /api/push` - Upload models (non-streaming only)
+
 **Deliverables:**
-- All 7 non-streaming endpoints fully implemented
+- All 12 endpoints fully implemented (streaming endpoints in non-streaming mode)
 - Functional HTTP client in `http` module (GET, POST, DELETE)
 - Error types and handling in `primitives` module
 - Basic integration test framework
 - Module structure with feature flags working
 
-#### Phase 2 (v0.1.1): Streaming Endpoints Implementation
-**Focus:** Complete implementation of remaining 5 streaming endpoints
+#### Phase 2 (v0.2.0): Streaming Implementation
+**Focus:** Add streaming support to endpoints that support it
 
-**High Complexity with Streaming (5):**
-1. `POST /api/generate` - Generate text completions (streaming/non-streaming)
-2. `POST /api/chat` - Chat completions with conversation history (streaming/non-streaming)
-3. `POST /api/create` - Create custom models (streaming progress)
-4. `POST /api/pull` - Download models from registry (streaming progress)
-5. `POST /api/push` - Upload models to registry (streaming progress)
+**Streaming Endpoints (5):**
+1. `POST /api/generate` - Generate text completions with streaming
+2. `POST /api/chat` - Chat completions with streaming
+3. `POST /api/create` - Create custom models with progress streaming
+4. `POST /api/pull` - Download models with progress streaming
+5. `POST /api/push` - Upload models with progress streaming
+
+**Scope:**
+- Streaming infrastructure and abstractions
+- Stream helper utilities and iterators
+- Progress callback system for model operations
+- Async stream implementations
 
 **Deliverables:**
-- All 5 streaming endpoints fully implemented in `primitives` module
-- Request/response types for each endpoint
-- Streaming support with progress callbacks
-- Comprehensive unit tests
-- Integration tests for all endpoints
+- Streaming support for all 5 streaming-capable endpoints
+- Stream abstraction utilities
+- Progress tracking for long-running operations
+- Comprehensive streaming tests
+- Documentation for streaming usage
 
-#### Phase 3 (v0.2.0): Conveniences Module
+#### Phase 3 (v0.3.0): Conveniences Module
 **Focus:** High-level ergonomic APIs built on primitives module
 
 **Scope:**
 - Implement `conveniences` module as optional feature
 - Client builder pattern for easy initialization
 - Simplified method signatures for common operations
-- Stream helper utilities and iterators
 - Response post-processing and formatting
 - Error recovery patterns
 - Convenience methods for chaining operations
@@ -243,11 +255,10 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Complete `conveniences` module implementation
 - `conveniences` feature flag working correctly
 - Builder patterns for complex requests
-- Stream abstraction utilities
 - High-level client interface
 - Comprehensive documentation
 
-#### Phase 4 (v0.3.0): Examples & Production Readiness
+#### Phase 4 (v0.4.0): Examples & Production Readiness
 **Focus:** Examples, documentation, and polish
 
 **Scope:**
@@ -611,7 +622,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ## Success Criteria
 
-### Version 0.1.0: Foundation + Non-Streaming Endpoints (Current)
+### Version 0.1.0: Foundation + All Endpoints (Non-Streaming Mode) (Current)
 **Status:** In Progress
 
 **Completed:**
@@ -640,9 +651,16 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [ ] `POST /api/show` - Show detailed model information
 - [ ] `POST /api/embed` - Generate text embeddings
 
+**Complex POST Endpoints (5) - Non-Streaming Mode:**
+- [ ] `POST /api/generate` - Text generation (non-streaming only)
+- [ ] `POST /api/chat` - Chat completions (non-streaming only)
+- [ ] `POST /api/create` - Model creation (non-streaming only)
+- [ ] `POST /api/pull` - Model download (non-streaming only)
+- [ ] `POST /api/push` - Model upload (non-streaming only)
+
 **Definition of Done:**
 - All shared types (ModelOptions, Logprob, enums) compile
-- All 7 non-streaming endpoints working
+- All 12 endpoints working (streaming endpoints in non-streaming mode)
 - HTTP client in `http` module can make GET, POST, DELETE requests
 - POST helper methods with retry logic implemented
 - DELETE helper methods with retry logic implemented
@@ -653,53 +671,50 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ---
 
-### Version 0.1.1: Streaming Endpoints Implementation (Planned)
+### Version 0.2.0: Streaming Implementation (Planned)
 **Status:** Not Started
 
 **Checklist:**
-- [ ] `POST /api/generate` - Text generation with streaming
-- [ ] `POST /api/chat` - Chat completions with streaming
-- [ ] `POST /api/create` - Model creation with progress streaming
-- [ ] `POST /api/pull` - Model download with progress streaming
-- [ ] `POST /api/push` - Model upload with progress streaming
+- [ ] `POST /api/generate` - Streaming support
+- [ ] `POST /api/chat` - Streaming support
+- [ ] `POST /api/create` - Progress streaming support
+- [ ] `POST /api/pull` - Progress streaming support
+- [ ] `POST /api/push` - Progress streaming support
 - [ ] Streaming infrastructure and abstractions
-- [ ] Request/response types for all 5 streaming endpoints
-- [ ] Unit test coverage >80%
-- [ ] Integration tests for all endpoints
-- [ ] Complete API documentation
+- [ ] Stream helper utilities and async iterators
+- [ ] Progress callback system
+- [ ] Comprehensive streaming tests
+- [ ] Streaming documentation
 
 **Definition of Done:**
-- All 5 streaming endpoints functional with real Ollama
-- Streaming endpoints handle progress correctly
-- Comprehensive test suite passes
-- API documentation complete
-- Code reviewed and optimized
+- All 5 streaming endpoints support streaming mode
+- Stream utilities work with async iterators
+- Progress tracking functional for long operations
+- Documentation includes streaming examples
+- Tests cover both streaming and non-streaming modes
 
 ---
 
-### Version 0.2.0: Conveniences Layer (Planned)
+### Version 0.3.0: Conveniences Layer (Planned)
 **Status:** Not Started
 
 **Checklist:**
 - [ ] OllamaClient with builder pattern
 - [ ] Convenience methods for all endpoints
 - [ ] Builder patterns for complex requests
-- [ ] Stream helper utilities
-- [ ] Progress callback system
 - [ ] Response formatters
-- [ ] Retry logic implementation
+- [ ] Error recovery patterns
 - [ ] High-level documentation with examples
 
 **Definition of Done:**
 - All convenience APIs ergonomic and intuitive
 - Complex operations reduced to 3-5 calls
-- Stream utilities work with async iterators
 - Documentation includes real-world examples
 - User feedback incorporated
 
 ---
 
-### Version 0.3.0: Samples & Production Readiness (Planned)
+### Version 0.4.0: Samples & Production Readiness (Planned)
 **Status:** Not Started
 
 **Checklist:**

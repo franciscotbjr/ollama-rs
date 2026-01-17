@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-01-16
+**Last Updated:** 2026-01-17
 
 ## Architecture Overview
 
@@ -79,11 +79,20 @@ primitives = []
 ### In Progress
 - Medium complexity endpoints (show, embed)
 
-### TODO
+### TODO (v0.1.0)
 - [ ] Implement POST /api/show endpoint
 - [ ] Implement POST /api/embed endpoint
-- [ ] Implement complex streaming endpoints (generate, chat, create, pull, push)
-- [ ] Create `conveniences` module (Phase 3)
+- [ ] Implement POST /api/generate endpoint (non-streaming only)
+- [ ] Implement POST /api/chat endpoint (non-streaming only)
+- [ ] Implement POST /api/create endpoint (non-streaming only)
+- [ ] Implement POST /api/pull endpoint (non-streaming only)
+- [ ] Implement POST /api/push endpoint (non-streaming only)
+
+### TODO (v0.2.0)
+- [ ] Implement streaming support for generate, chat, create, pull, push endpoints
+
+### TODO (v0.3.0+)
+- [ ] Create `conveniences` module
 - [ ] Performance benchmarks
 
 ## Technical Decisions
@@ -165,30 +174,40 @@ primitives = []
 
 ## API Implementation Strategy
 
-### Phase 1 (v0.1.0): Foundation + HTTP Module (Current)
-Set up `primitives` and `http` modules:
-- Define shared types (ModelOptions, Logprob, enums)
-- Implement HTTP client in `http` module
-- Create error type hierarchy
-- First endpoint: GET /api/version
-- Feature flags working
+### Versioning Strategy Update (2026-01-17)
+**Decision:** All 12 endpoints implemented in v0.1.0 (non-streaming mode), streaming deferred to v0.2.0
 
-### Phase 2 (v0.1.1): All Primitives
-Complete all 12 endpoints in `primitives` module:
-- 5 Simple endpoints
-- 2 Medium complexity endpoints
-- 5 Complex endpoints with streaming
+**Rationale:**
+- Provides complete API coverage sooner
+- Streaming is an enhancement, not a blocker for basic functionality
+- Allows users to use all endpoints immediately with `stream: false`
+- Clear separation between functionality (v0.1.0) and streaming (v0.2.0)
+
+### Phase 1 (v0.1.0): Foundation + All Endpoints (Current)
+Implement all 12 endpoints in non-streaming mode:
+- 3 GET endpoints (version, tags, ps) ✅
+- 2 Simple POST/DELETE endpoints (copy, delete) ✅
+- 2 Medium complexity endpoints (show, embed)
+- 5 Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
 - Full test coverage
 
-### Phase 3 (v0.2.0): Conveniences Module
+### Phase 2 (v0.2.0): Streaming Implementation
+Add streaming support to applicable endpoints:
+- POST /api/generate - streaming responses
+- POST /api/chat - streaming responses
+- POST /api/create - progress streaming
+- POST /api/pull - progress streaming
+- POST /api/push - progress streaming
+- Stream helper utilities
+
+### Phase 3 (v0.3.0): Conveniences Module
 Build high-level APIs in `conveniences` module:
 - Optional feature flag
 - Simplified method signatures
 - Builder patterns
-- Stream helpers
 - Common workflows
 
-### Phase 4 (v0.3.0): Examples & Production
+### Phase 4 (v0.4.0): Examples & Production
 Polish and prepare for v1.0.0:
 - Comprehensive examples in `/examples`
 - API documentation complete
@@ -350,8 +369,8 @@ pub enum Error {
 **Rationale:** Ollama API is inherently I/O bound, async is more natural.
 
 ### Q: How to handle streaming responses?
-**Decision:** TBD - evaluate tokio streams vs custom iterator
-**Status:** Under investigation
+**Decision:** Deferred to v0.2.0. Will evaluate tokio-stream vs async-stream
+**Status:** Deferred - v0.1.0 focuses on non-streaming endpoints only
 
 ### Q: Error handling strategy?
 **Decision:** Use Result with custom Error enum using `thiserror`

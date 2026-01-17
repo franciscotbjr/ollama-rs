@@ -42,9 +42,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `list_models_async.rs` - Async list models example
   - `list_models_sync.rs` - Sync list models example
 
-### Planned
-- Complete implementation of remaining API endpoints
-- Implement streaming support for generation endpoints
+### Changed
+- **Versioning strategy update**: All 12 endpoints will be implemented in v0.1.0 (non-streaming mode)
+  - Streaming features moved to v0.2.0
+  - v0.3.0 will focus on conveniences module
+  - v0.4.0 will focus on examples and production readiness
+
+### Planned for v0.1.0
+- POST /api/show - Show detailed model information
+- POST /api/embed - Generate text embeddings
+- POST /api/generate - Text generation (non-streaming only)
+- POST /api/chat - Chat completions (non-streaming only)
+- POST /api/create - Model creation (non-streaming only)
+- POST /api/pull - Model download (non-streaming only)
+- POST /api/push - Model upload (non-streaming only)
+
+### Planned for v0.2.0
+- Streaming support for generate, chat, create, pull, push endpoints
 
 ## [0.1.0] - 2025-01-10
 
