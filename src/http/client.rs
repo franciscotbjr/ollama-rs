@@ -240,6 +240,120 @@ impl OllamaClient {
         Err(Error::MaxRetriesExceededError(self.config.max_retries))
     }
 
+    /// Execute async HTTP POST request with retry logic (with JSON response)
+    ///
+    /// For endpoints that accept a request body and return a JSON response.
+    ///
+    /// # Type Parameters
+    ///
+    /// * `R` - Request type that implements `Serialize`
+    /// * `T` - Response type that implements `DeserializeOwned`
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - Full URL to request
+    /// * `body` - Request body to serialize as JSON
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Maximum retry attempts exceeded
+    /// - Response cannot be deserialized
+    /// - Client errors (4xx) occur (no retry)
+    pub(super) async fn post_with_retry<R, T>(&self, url: &str, body: &R) -> Result<T>
+    where
+        R: serde::Serialize,
+        T: serde::de::DeserializeOwned,
+    {
+        for attempt in 0..=self.config.max_retries {
+            match self.client.post(url).json(body).send().await {
+                Ok(response) => {
+                    // Retry on server errors (5xx)
+                    if response.status().is_server_error() && attempt < self.config.max_retries {
+                        tokio::time::sleep(Duration::from_millis(100 * (attempt as u64 + 1))).await;
+                        continue;
+                    }
+
+                    // Check for client errors (no retry)
+                    if response.status().is_client_error() {
+                        return Err(Error::HttpStatusError(response.status().as_u16()));
+                    }
+
+                    // Deserialize and return
+                    let result = response.json::<T>().await?;
+                    return Ok(result);
+                }
+                Err(_e) => {
+                    // Retry on network errors
+                    if attempt < self.config.max_retries {
+                        tokio::time::sleep(Duration::from_millis(100 * (attempt as u64 + 1))).await;
+                    }
+                }
+            }
+        }
+
+        Err(Error::MaxRetriesExceededError(self.config.max_retries))
+    }
+
+    /// Execute blocking HTTP POST request with retry logic (with JSON response)
+    ///
+    /// For endpoints that accept a request body and return a JSON response.
+    ///
+    /// # Type Parameters
+    ///
+    /// * `R` - Request type that implements `Serialize`
+    /// * `T` - Response type that implements `DeserializeOwned`
+    ///
+    /// # Arguments
+    ///
+    /// * `url` - Full URL to request
+    /// * `body` - Request body to serialize as JSON
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Maximum retry attempts exceeded
+    /// - Response cannot be deserialized
+    /// - Client errors (4xx) occur (no retry)
+    pub(super) fn post_blocking_with_retry<R, T>(&self, url: &str, body: &R) -> Result<T>
+    where
+        R: serde::Serialize,
+        T: serde::de::DeserializeOwned,
+    {
+        let blocking_client = reqwest::blocking::Client::builder()
+            .timeout(self.config.timeout)
+            .build()?;
+
+        for attempt in 0..=self.config.max_retries {
+            match blocking_client.post(url).json(body).send() {
+                Ok(response) => {
+                    // Retry on server errors (5xx)
+                    if response.status().is_server_error() && attempt < self.config.max_retries {
+                        std::thread::sleep(Duration::from_millis(100 * (attempt as u64 + 1)));
+                        continue;
+                    }
+
+                    // Check for client errors (no retry)
+                    if response.status().is_client_error() {
+                        return Err(Error::HttpStatusError(response.status().as_u16()));
+                    }
+
+                    // Deserialize and return
+                    let result = response.json::<T>()?;
+                    return Ok(result);
+                }
+                Err(_e) => {
+                    // Retry on network errors
+                    if attempt < self.config.max_retries {
+                        std::thread::sleep(Duration::from_millis(100 * (attempt as u64 + 1)));
+                    }
+                }
+            }
+        }
+
+        Err(Error::MaxRetriesExceededError(self.config.max_retries))
+    }
+
     /// Execute async HTTP POST request with retry logic (no response body)
     ///
     /// For endpoints that return 200 OK with empty body.

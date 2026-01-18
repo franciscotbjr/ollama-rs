@@ -1,6 +1,9 @@
 //! Sync (blocking) API trait and implementations
 
-use crate::{CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, VersionResponse};
+use crate::{
+    CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
+    VersionResponse,
+};
 
 use super::OllamaClient;
 use super::endpoints::Endpoints;
@@ -175,6 +178,44 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()>;
+
+    /// Show detailed information about a model (blocking)
+    ///
+    /// Retrieves comprehensive metadata including parameters,
+    /// license, capabilities, and model-specific configuration.
+    /// This method blocks the current thread until the request completes.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - ShowRequest containing the model name
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The model does not exist (404)
+    /// - Network error occurs
+    /// - Response cannot be deserialized
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, ShowRequest};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    ///
+    /// // Basic request
+    /// let request = ShowRequest::new("llama3.1");
+    /// let response = client.show_model_blocking(&request)?;
+    /// println!("Capabilities: {:?}", response.capabilities);
+    ///
+    /// // Verbose request
+    /// let verbose_request = ShowRequest::verbose("llama3.1");
+    /// let verbose_response = client.show_model_blocking(&verbose_request)?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn show_model_blocking(&self, request: &ShowRequest) -> Result<ShowResponse>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -201,5 +242,10 @@ impl OllamaApiSync for OllamaClient {
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_blocking_with_retry(&url, request)
+    }
+
+    fn show_model_blocking(&self, request: &ShowRequest) -> Result<ShowResponse> {
+        let url = self.config.url(Endpoints::SHOW);
+        self.post_blocking_with_retry(&url, request)
     }
 }
