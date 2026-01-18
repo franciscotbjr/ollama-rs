@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **POST /api/show endpoint**: Show detailed model information
+  - `ShowRequest` primitive type with `new()` and `verbose()` constructors
+  - `ShowResponse` primitive type with `has_capability()` helper method
+  - `ShowModelDetails` primitive type for model metadata
+  - `show_model()` async method
+  - `show_model_blocking()` sync method
+  - POST helper methods: `post_with_retry()`, `post_blocking_with_retry()`
+  - 26 new unit tests with mocking
+  - Examples: `show_model_async.rs`, `show_model_sync.rs`
 - **DELETE /api/delete endpoint**: Delete a model from the server
   - `DeleteRequest` primitive type with `model` field
   - `delete_model()` async method
@@ -49,7 +58,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - v0.4.0 will focus on examples and production readiness
 
 ### Planned for v0.1.0
-- POST /api/show - Show detailed model information
 - POST /api/embed - Generate text embeddings
 - POST /api/generate - Text generation (non-streaming only)
 - POST /api/chat - Chat completions (non-streaming only)

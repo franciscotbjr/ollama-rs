@@ -68,19 +68,20 @@ primitives = []
 - **GET /api/ps endpoint** (async + sync)
 - **POST /api/copy endpoint** (async + sync)
 - **DELETE /api/delete endpoint** (async + sync)
+- **POST /api/show endpoint** (async + sync)
 - Error handling with `thiserror`
 - HTTP client with retry logic and exponential backoff
-- POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`)
+- POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`, `post_with_retry`, `post_blocking_with_retry`)
 - DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
-- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`
-- 162+ unit and integration tests
-- Examples for version, list_models, list_running_models, copy_model, and delete_model endpoints
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`
+- 188+ unit and integration tests
+- Examples for version, list_models, list_running_models, copy_model, delete_model, and show_model endpoints
 
 ### In Progress
-- Medium complexity endpoints (show, embed)
+- Medium complexity endpoints (embed)
 
 ### TODO (v0.1.0)
-- [ ] Implement POST /api/show endpoint
+- [x] Implement POST /api/show endpoint
 - [ ] Implement POST /api/embed endpoint
 - [ ] Implement POST /api/generate endpoint (non-streaming only)
 - [ ] Implement POST /api/chat endpoint (non-streaming only)
@@ -118,6 +119,7 @@ primitives = []
 **Implementation:**
 - Added `get_with_retry<T>()` and `get_blocking_with_retry<T>()` to OllamaClient
 - Added `post_empty_with_retry<R>()` and `post_empty_blocking_with_retry<R>()` for POST with empty response
+- Added `post_with_retry<R, T>()` and `post_blocking_with_retry<R, T>()` for POST with JSON response
 - Added `delete_empty_with_retry<R>()` and `delete_empty_blocking_with_retry<R>()` for DELETE with empty response
 - Generic over response type with `serde::de::DeserializeOwned` bound (GET)
 - Generic over request type with `serde::Serialize` bound (POST, DELETE)
@@ -187,7 +189,7 @@ primitives = []
 Implement all 12 endpoints in non-streaming mode:
 - 3 GET endpoints (version, tags, ps) ✅
 - 2 Simple POST/DELETE endpoints (copy, delete) ✅
-- 2 Medium complexity endpoints (show, embed)
+- 2 Medium complexity endpoints (show ✅, embed)
 - 5 Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
 - Full test coverage
 

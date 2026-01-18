@@ -118,6 +118,51 @@ Allows trait implementations in sibling files to access internals while keeping 
 
 Separate async and sync traits for clear separation of concerns.
 
+### Dependency Hierarchy
+
+The crate follows a strict layered architecture where higher-level modules can depend on lower-level modules, but never the reverse.
+
+```
+┌─────────────────────────────────────────┐
+│            lib.rs (re-exports)          │  ← Top: Facade only
+├─────────────────────────────────────────┤
+│    http/ (client, api_async, api_sync)  │  ← High: Can use primitives
+├─────────────────────────────────────────┤
+│    primitives/ (request/response types) │  ← Low: Independent types
+├─────────────────────────────────────────┤
+│    error.rs                             │  ← Base: Used by all
+└─────────────────────────────────────────┘
+```
+
+**Dependency Rules:**
+
+| Module | Can depend on | Cannot depend on |
+|--------|---------------|------------------|
+| `error` | std, external crates | primitives, http |
+| `primitives` | error, serde, std | http |
+| `http` | error, primitives, reqwest | — |
+| `lib.rs` | all (re-exports only) | — |
+
+**Key Principle:** Primitives must remain pure data types with no knowledge of how they are transported. This ensures:
+
+1. **Testability** - Primitives can be tested without HTTP mocking
+2. **Reusability** - Primitives can be used with different transports
+3. **Documentation** - Primitive doc examples use JSON, not client code
+
+**Anti-pattern to avoid:**
+```rust
+// ❌ BAD: Primitive importing from http module
+// src/primitives/show_response.rs
+use crate::http::OllamaApiAsync;  // WRONG!
+```
+
+**Correct pattern:**
+```rust
+// ✅ GOOD: HTTP module importing primitives
+// src/http/api_async.rs
+use crate::{ShowRequest, ShowResponse};  // Correct direction
+```
+
 ---
 
 ## Testing Architecture

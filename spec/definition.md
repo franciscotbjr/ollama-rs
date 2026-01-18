@@ -200,7 +200,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 5. `DELETE /api/delete` - Delete a model
 
 **Medium Complexity POST Endpoints (2):**
-6. `POST /api/show` - Show detailed model information
+6. `POST /api/show` - Show detailed model information ✅
 7. `POST /api/embed` - Generate text embeddings
 
 **Complex POST Endpoints (5) - Non-Streaming Mode:**
@@ -648,7 +648,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] `DELETE /api/delete` - Delete a model
 
 **Medium Complexity POST Endpoints (2):**
-- [ ] `POST /api/show` - Show detailed model information
+- [x] `POST /api/show` - Show detailed model information
 - [ ] `POST /api/embed` - Generate text embeddings
 
 **Complex POST Endpoints (5) - Non-Streaming Mode:**
@@ -662,7 +662,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - All shared types (ModelOptions, Logprob, enums) compile
 - All 12 endpoints working (streaming endpoints in non-streaming mode)
 - HTTP client in `http` module can make GET, POST, DELETE requests
-- POST helper methods with retry logic implemented
+- POST helper methods with retry logic implemented (`post_empty_with_retry`, `post_with_retry`)
 - DELETE helper methods with retry logic implemented
 - Error handling system in place (including HttpStatusError)
 - Feature flags (`http`, `primitives`) working correctly

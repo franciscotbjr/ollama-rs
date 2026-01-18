@@ -1,6 +1,9 @@
 //! Async API trait and implementations
 
-use crate::{CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, VersionResponse};
+use crate::{
+    CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
+    VersionResponse,
+};
 use async_trait::async_trait;
 
 use super::OllamaClient;
@@ -172,6 +175,43 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()>;
+
+    /// Show detailed information about a model (async)
+    ///
+    /// Retrieves comprehensive metadata including parameters,
+    /// license, capabilities, and model-specific configuration.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - ShowRequest containing the model name
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - The model does not exist (404)
+    /// - Network error occurs
+    /// - Response cannot be deserialized
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, ShowRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    ///
+    /// // Basic request
+    /// let request = ShowRequest::new("llama3.1");
+    /// let response = client.show_model(&request).await?;
+    /// println!("Capabilities: {:?}", response.capabilities);
+    ///
+    /// // Verbose request
+    /// let verbose_request = ShowRequest::verbose("llama3.1");
+    /// let verbose_response = client.show_model(&verbose_request).await?;
+    /// # Ok(())
+    /// # }
+    /// ```
+    async fn show_model(&self, request: &ShowRequest) -> Result<ShowResponse>;
 }
 
 #[async_trait]
@@ -199,5 +239,10 @@ impl OllamaApiAsync for OllamaClient {
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_with_retry(&url, request).await
+    }
+
+    async fn show_model(&self, request: &ShowRequest) -> Result<ShowResponse> {
+        let url = self.config.url(Endpoints::SHOW);
+        self.post_with_retry(&url, request).await
     }
 }

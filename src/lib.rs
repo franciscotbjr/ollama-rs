@@ -47,7 +47,7 @@ pub mod primitives;
 #[cfg(feature = "primitives")]
 pub use primitives::{
     CopyRequest, DeleteRequest, ListResponse, ModelDetails, ModelSummary, PsResponse, RunningModel,
-    VersionResponse,
+    ShowModelDetails, ShowRequest, ShowResponse, VersionResponse,
 };
 
 // ============================================================================
@@ -73,6 +73,6 @@ pub mod prelude {
     #[cfg(feature = "primitives")]
     pub use crate::{
         CopyRequest, DeleteRequest, ListResponse, ModelDetails, ModelSummary, PsResponse,
-        RunningModel, VersionResponse,
+        RunningModel, ShowModelDetails, ShowRequest, ShowResponse, VersionResponse,
     };
 }
