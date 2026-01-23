@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-01-17
+**Last Updated:** 2026-01-23
 
 ## Architecture Overview
 
@@ -69,20 +69,21 @@ primitives = []
 - **POST /api/copy endpoint** (async + sync)
 - **DELETE /api/delete endpoint** (async + sync)
 - **POST /api/show endpoint** (async + sync)
+- **POST /api/embed endpoint** (async + sync)
 - Error handling with `thiserror`
 - HTTP client with retry logic and exponential backoff
 - POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`, `post_with_retry`, `post_blocking_with_retry`)
 - DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
-- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`
-- 188+ unit and integration tests
-- Examples for version, list_models, list_running_models, copy_model, delete_model, and show_model endpoints
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`
+- 216+ unit and integration tests
+- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, and embed endpoints
 
 ### In Progress
-- Medium complexity endpoints (embed)
+- Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
 
 ### TODO (v0.1.0)
 - [x] Implement POST /api/show endpoint
-- [ ] Implement POST /api/embed endpoint
+- [x] Implement POST /api/embed endpoint
 - [ ] Implement POST /api/generate endpoint (non-streaming only)
 - [ ] Implement POST /api/chat endpoint (non-streaming only)
 - [ ] Implement POST /api/create endpoint (non-streaming only)
@@ -189,7 +190,7 @@ primitives = []
 Implement all 12 endpoints in non-streaming mode:
 - 3 GET endpoints (version, tags, ps) ✅
 - 2 Simple POST/DELETE endpoints (copy, delete) ✅
-- 2 Medium complexity endpoints (show ✅, embed)
+- 2 Medium complexity endpoints (show ✅, embed ✅)
 - 5 Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
 - Full test coverage
 

@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
 **Document Version:** 1.2
-**Last Updated:** 2026-01-17
+**Last Updated:** 2026-01-23
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -201,7 +201,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Medium Complexity POST Endpoints (2):**
 6. `POST /api/show` - Show detailed model information ✅
-7. `POST /api/embed` - Generate text embeddings
+7. `POST /api/embed` - Generate text embeddings ✅
 
 **Complex POST Endpoints (5) - Non-Streaming Mode:**
 8. `POST /api/generate` - Generate text completions (non-streaming only)
@@ -649,7 +649,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Medium Complexity POST Endpoints (2):**
 - [x] `POST /api/show` - Show detailed model information
-- [ ] `POST /api/embed` - Generate text embeddings
+- [x] `POST /api/embed` - Generate text embeddings
 
 **Complex POST Endpoints (5) - Non-Streaming Mode:**
 - [ ] `POST /api/generate` - Text generation (non-streaming only)

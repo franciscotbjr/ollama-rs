@@ -8,6 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **POST /api/embed endpoint**: Generate text embeddings
+  - `EmbedRequest` primitive type with builder pattern support
+  - `EmbedResponse` primitive type with embeddings vector
+  - `EmbedInput` enum for single text or batch input
+  - `ModelOptions` primitive type for model parameters (temperature, top_k, top_p, etc.)
+  - `embed()` async method
+  - `embed_blocking()` sync method
+  - 28 new unit tests with mocking
+  - Examples: `embed_async.rs`, `embed_sync.rs`
 - **POST /api/show endpoint**: Show detailed model information
   - `ShowRequest` primitive type with `new()` and `verbose()` constructors
   - `ShowResponse` primitive type with `has_capability()` helper method
@@ -58,7 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - v0.4.0 will focus on examples and production readiness
 
 ### Planned for v0.1.0
-- POST /api/embed - Generate text embeddings
 - POST /api/generate - Text generation (non-streaming only)
 - POST /api/chat - Chat completions (non-streaming only)
 - POST /api/create - Model creation (non-streaming only)
