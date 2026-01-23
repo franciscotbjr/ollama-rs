@@ -1,8 +1,8 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
-    VersionResponse,
+    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, ListResponse, PsResponse, Result,
+    ShowRequest, ShowResponse, VersionResponse,
 };
 
 use super::OllamaClient;
@@ -216,6 +216,38 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn show_model_blocking(&self, request: &ShowRequest) -> Result<ShowResponse>;
+
+    /// Generate embeddings for text (blocking)
+    ///
+    /// Creates vector embeddings representing the input text(s).
+    /// This method blocks the current thread until the request completes.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Embed request containing model name and input text(s)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Input exceeds context window and truncate is false
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, EmbedRequest};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = EmbedRequest::new("nomic-embed-text", "Hello, world!");
+    /// let response = client.embed_blocking(&request)?;
+    /// println!("Embedding dimensions: {:?}", response.dimensions());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn embed_blocking(&self, request: &EmbedRequest) -> Result<EmbedResponse>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -246,6 +278,11 @@ impl OllamaApiSync for OllamaClient {
 
     fn show_model_blocking(&self, request: &ShowRequest) -> Result<ShowResponse> {
         let url = self.config.url(Endpoints::SHOW);
+        self.post_blocking_with_retry(&url, request)
+    }
+
+    fn embed_blocking(&self, request: &EmbedRequest) -> Result<EmbedResponse> {
+        let url = self.config.url(Endpoints::EMBED);
         self.post_blocking_with_retry(&url, request)
     }
 }

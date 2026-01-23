@@ -1,8 +1,8 @@
 //! Async API trait and implementations
 
 use crate::{
-    CopyRequest, DeleteRequest, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
-    VersionResponse,
+    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, ListResponse, PsResponse, Result,
+    ShowRequest, ShowResponse, VersionResponse,
 };
 use async_trait::async_trait;
 
@@ -212,6 +212,56 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     async fn show_model(&self, request: &ShowRequest) -> Result<ShowResponse>;
+
+    /// Generate embeddings for text (async)
+    ///
+    /// Creates vector embeddings representing the input text(s).
+    /// Embeddings are useful for semantic search, similarity comparison,
+    /// and machine learning tasks.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Embed request containing model name and input text(s)
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Input exceeds context window and truncate is false
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// Single text embedding:
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, EmbedRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = EmbedRequest::new("nomic-embed-text", "Hello, world!");
+    /// let response = client.embed(&request).await?;
+    /// println!("Embedding dimensions: {:?}", response.dimensions());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Multiple text embeddings:
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, EmbedRequest, EmbedInput};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = EmbedRequest::new(
+    ///     "nomic-embed-text",
+    ///     EmbedInput::multiple(["First text", "Second text"])
+    /// );
+    /// let response = client.embed(&request).await?;
+    /// println!("Got {} embeddings", response.len());
+    /// # Ok(())
+    /// # }
+    /// ```
+    async fn embed(&self, request: &EmbedRequest) -> Result<EmbedResponse>;
 }
 
 #[async_trait]
@@ -243,6 +293,11 @@ impl OllamaApiAsync for OllamaClient {
 
     async fn show_model(&self, request: &ShowRequest) -> Result<ShowResponse> {
         let url = self.config.url(Endpoints::SHOW);
+        self.post_with_retry(&url, request).await
+    }
+
+    async fn embed(&self, request: &EmbedRequest) -> Result<EmbedResponse> {
+        let url = self.config.url(Endpoints::EMBED);
         self.post_with_retry(&url, request).await
     }
 }
