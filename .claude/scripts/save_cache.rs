@@ -13,6 +13,12 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 
+#[derive(Serialize, Deserialize, Debug, Default)]
+struct SessionContext {
+    task: String,
+    summary: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct ProjectContext {
     // Project identification (from Cargo.toml)
@@ -48,6 +54,10 @@ struct ProjectContext {
     // Metadata
     cache_version: String,
     project_hash: String,
+
+    // Session context (what was done)
+    #[serde(default)]
+    session_context: SessionContext,
 }
 
 #[derive(Deserialize)]
@@ -177,6 +187,34 @@ fn check_build_status() -> String {
     }
 }
 
+fn parse_cli_args() -> SessionContext {
+    let args: Vec<String> = env::args().collect();
+    let mut task = String::new();
+    let mut summary = String::new();
+
+    let mut i = 1;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--task" => {
+                if i + 1 < args.len() {
+                    task = args[i + 1].clone();
+                    i += 1;
+                }
+            }
+            "--summary" => {
+                if i + 1 < args.len() {
+                    summary = args[i + 1].clone();
+                    i += 1;
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+
+    SessionContext { task, summary }
+}
+
 fn main() {
     let cache_dir = get_cache_dir();
     let project_hash = get_project_hash();
@@ -231,6 +269,9 @@ fn main() {
     let spec_files = find_spec_files();
     let impl_files = find_impl_files();
 
+    // Parse CLI args for session context
+    let session_context = parse_cli_args();
+
     // Build context object
     let context = ProjectContext {
         // Project identification
@@ -264,8 +305,11 @@ fn main() {
         build_status: check_build_status(),
 
         // Metadata
-        cache_version: "1.0".to_string(),
+        cache_version: "1.1".to_string(),
         project_hash: project_hash.clone(),
+
+        // Session context
+        session_context,
     };
 
     // Save to cache file
@@ -285,5 +329,17 @@ fn main() {
     for file in &context.critical_files {
         println!("  ✓ {}", file);
     }
+
+    // Display session context if provided
+    if !context.session_context.task.is_empty() || !context.session_context.summary.is_empty() {
+        println!("\n📝 Session Context Saved:");
+        if !context.session_context.task.is_empty() {
+            println!("  Task: {}", context.session_context.task);
+        }
+        if !context.session_context.summary.is_empty() {
+            println!("  Summary: {}", context.session_context.summary);
+        }
+    }
+
     println!("\nReady to continue in next session with /continue-session");
 }

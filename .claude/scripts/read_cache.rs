@@ -19,6 +19,12 @@ struct Phase {
     status: String,
 }
 
+#[derive(Serialize, Deserialize, Debug, Default)]
+struct SessionContext {
+    task: String,
+    summary: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct ProjectContext {
     project_name: String,
@@ -42,6 +48,8 @@ struct ProjectContext {
     build_status: String,
     cache_version: String,
     project_hash: String,
+    #[serde(default)]
+    session_context: SessionContext,
 }
 
 fn get_cache_dir() -> PathBuf {
@@ -251,6 +259,19 @@ fn main() {
 
     // Display cache summary
     println!("✅ Context loaded successfully!\n");
+
+    // Display session context if available
+    if !context.session_context.task.is_empty() || !context.session_context.summary.is_empty() {
+        println!("📝 Last Session Context:");
+        if !context.session_context.task.is_empty() {
+            println!("  Task: {}", context.session_context.task);
+        }
+        if !context.session_context.summary.is_empty() {
+            println!("  Summary: {}", context.session_context.summary);
+        }
+        println!();
+    }
+
     println!("📊 Project Information:");
     println!("  Project: {} v{}", context.project_name, context.version);
     println!("  Language: {} (edition {})", context.language, context.edition);
