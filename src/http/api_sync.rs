@@ -1,8 +1,8 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, ListResponse, PsResponse, Result,
-    ShowRequest, ShowResponse, VersionResponse,
+    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse,
+    ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
 };
 
 use super::OllamaClient;
@@ -248,6 +248,37 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn embed_blocking(&self, request: &EmbedRequest) -> Result<EmbedResponse>;
+
+    /// Generate text completion (blocking, non-streaming)
+    ///
+    /// Generates a text completion for the provided prompt.
+    /// This method blocks the current thread until completion.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Generate request containing model, prompt, and options
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, GenerateRequest};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = GenerateRequest::new("qwen3:0.6b", "Tell me a joke.");
+    /// let response = client.generate_blocking(&request)?;
+    /// println!("{}", response.text().unwrap_or("No response"));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn generate_blocking(&self, request: &GenerateRequest) -> Result<GenerateResponse>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -283,6 +314,11 @@ impl OllamaApiSync for OllamaClient {
 
     fn embed_blocking(&self, request: &EmbedRequest) -> Result<EmbedResponse> {
         let url = self.config.url(Endpoints::EMBED);
+        self.post_blocking_with_retry(&url, request)
+    }
+
+    fn generate_blocking(&self, request: &GenerateRequest) -> Result<GenerateResponse> {
+        let url = self.config.url(Endpoints::GENERATE);
         self.post_blocking_with_retry(&url, request)
     }
 }

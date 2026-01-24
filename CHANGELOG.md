@@ -8,6 +8,19 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **POST /api/generate endpoint**: Text generation (non-streaming)
+  - `GenerateRequest` primitive type with full builder pattern
+  - `GenerateResponse` primitive type with helper methods (text(), is_done(), tokens_per_second(), duration conversions)
+  - `ThinkSetting` enum for controlling thinking output (bool or "high"/"medium"/"low")
+  - `FormatSetting` enum for output format (string "json" or JSON schema)
+  - `KeepAliveSetting` enum for model caching duration (string or seconds)
+  - `StopSetting` enum for stop sequences (single or multiple)
+  - `TokenLogprob` and `Logprob` primitive types for log probability support
+  - Updated `ModelOptions` with `stop` field and `with_stop()` builder
+  - `generate()` async method
+  - `generate_blocking()` sync method
+  - 79 new unit tests with mocking
+  - Examples: `generate_async.rs`, `generate_sync.rs`, `generate_concise.rs`
 - **POST /api/embed endpoint**: Generate text embeddings
   - `EmbedRequest` primitive type with builder pattern support
   - `EmbedResponse` primitive type with embeddings vector
@@ -67,7 +80,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - v0.4.0 will focus on examples and production readiness
 
 ### Planned for v0.1.0
-- POST /api/generate - Text generation (non-streaming only)
 - POST /api/chat - Chat completions (non-streaming only)
 - POST /api/create - Model creation (non-streaming only)
 - POST /api/pull - Model download (non-streaming only)

@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-01-23
+**Last Updated:** 2026-01-24
 
 ## Architecture Overview
 
@@ -70,13 +70,14 @@ primitives = []
 - **DELETE /api/delete endpoint** (async + sync)
 - **POST /api/show endpoint** (async + sync)
 - **POST /api/embed endpoint** (async + sync)
+- **POST /api/generate endpoint** (async + sync, non-streaming)
 - Error handling with `thiserror`
 - HTTP client with retry logic and exponential backoff
 - POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`, `post_with_retry`, `post_blocking_with_retry`)
 - DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
-- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`
-- 216+ unit and integration tests
-- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, and embed endpoints
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`, `GenerateRequest`, `GenerateResponse`, `ThinkSetting`, `FormatSetting`, `KeepAliveSetting`, `StopSetting`, `TokenLogprob`, `Logprob`
+- 316+ unit and integration tests
+- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, and generate endpoints
 
 ### In Progress
 - Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
@@ -84,7 +85,7 @@ primitives = []
 ### TODO (v0.1.0)
 - [x] Implement POST /api/show endpoint
 - [x] Implement POST /api/embed endpoint
-- [ ] Implement POST /api/generate endpoint (non-streaming only)
+- [x] Implement POST /api/generate endpoint (non-streaming only)
 - [ ] Implement POST /api/chat endpoint (non-streaming only)
 - [ ] Implement POST /api/create endpoint (non-streaming only)
 - [ ] Implement POST /api/pull endpoint (non-streaming only)
@@ -191,7 +192,7 @@ Implement all 12 endpoints in non-streaming mode:
 - 3 GET endpoints (version, tags, ps) ✅
 - 2 Simple POST/DELETE endpoints (copy, delete) ✅
 - 2 Medium complexity endpoints (show ✅, embed ✅)
-- 5 Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
+- 5 Complex endpoints in non-streaming mode (generate ✅, chat, create, pull, push)
 - Full test coverage
 
 ### Phase 2 (v0.2.0): Streaming Implementation
