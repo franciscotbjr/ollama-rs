@@ -2,7 +2,6 @@
 // These tests validate the VersionResponse type
 
 use ollama_oxide::VersionResponse;
-use serde_json;
 
 #[test]
 fn test_version_response_is_send_sync() {

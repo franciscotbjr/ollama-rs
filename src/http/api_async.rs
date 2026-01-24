@@ -1,8 +1,8 @@
 //! Async API trait and implementations
 
 use crate::{
-    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, ListResponse, PsResponse, Result,
-    ShowRequest, ShowResponse, VersionResponse,
+    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse,
+    ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
 };
 use async_trait::async_trait;
 
@@ -262,6 +262,37 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     async fn embed(&self, request: &EmbedRequest) -> Result<EmbedResponse>;
+
+    /// Generate text completion (async, non-streaming)
+    ///
+    /// Generates a text completion for the provided prompt.
+    /// This method uses non-streaming mode.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Generate request containing model, prompt, and options
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, GenerateRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = GenerateRequest::new("qwen3:0.6b", "Why is the sky blue?");
+    /// let response = client.generate(&request).await?;
+    /// println!("Response: {:?}", response.text());
+    /// # Ok(())
+    /// # }
+    /// ```
+    async fn generate(&self, request: &GenerateRequest) -> Result<GenerateResponse>;
 }
 
 #[async_trait]
@@ -298,6 +329,11 @@ impl OllamaApiAsync for OllamaClient {
 
     async fn embed(&self, request: &EmbedRequest) -> Result<EmbedResponse> {
         let url = self.config.url(Endpoints::EMBED);
+        self.post_with_retry(&url, request).await
+    }
+
+    async fn generate(&self, request: &GenerateRequest) -> Result<GenerateResponse> {
+        let url = self.config.url(Endpoints::GENERATE);
         self.post_with_retry(&url, request).await
     }
 }

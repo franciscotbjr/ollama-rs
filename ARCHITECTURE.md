@@ -165,6 +165,160 @@ use crate::{ShowRequest, ShowResponse};  // Correct direction
 
 ---
 
+## Architecture Diagrams
+
+### Module and Component Relations
+
+This diagram shows how components interact in the ollama-oxide library.
+
+```mermaid
+classDiagram
+    direction LR
+
+    %% HTTP Module
+    class OllamaClient {
+        +ClientConfig config
+        +Arc~Client~ client
+        +default() Result~Self~
+        +new(config) Result~Self~
+    }
+
+    class OllamaApiAsync {
+        <<trait>>
+        +version()* Result~VersionResponse~
+        +list_models()* Result~ListResponse~
+        +list_running_models()* Result~PsResponse~
+        +copy_model(request)* Result~unit~
+        +delete_model(request)* Result~unit~
+        +show_model(request)* Result~ShowResponse~
+        +embed(request)* Result~EmbedResponse~
+        +generate(request)* Result~GenerateResponse~
+    }
+
+    class OllamaApiSync {
+        <<trait>>
+        +version_blocking()* Result~VersionResponse~
+        +list_models_blocking()* Result~ListResponse~
+        +copy_model_blocking(request)* Result~unit~
+        +delete_model_blocking(request)* Result~unit~
+        +show_model_blocking(request)* Result~ShowResponse~
+        +embed_blocking(request)* Result~EmbedResponse~
+        +generate_blocking(request)* Result~GenerateResponse~
+    }
+
+    %% Internal Helpers
+    class ClientHelpers {
+        <<internal>>
+        +get_with_retry~T~(url) Result~T~
+        +post_with_retry~R,T~(url, request) Result~T~
+        +post_empty_with_retry~R~(url, request) Result~unit~
+        +delete_empty_with_retry~R~(url, request) Result~unit~
+    }
+
+    %% Primitives Module
+    class Primitives {
+        <<module>>
+        Request types
+        Response types
+        Setting enums
+    }
+
+    class Endpoints {
+        <<constants>>
+        +VERSION: /api/version
+        +TAGS: /api/tags
+        +PS: /api/ps
+        +COPY: /api/copy
+        +DELETE: /api/delete
+        +SHOW: /api/show
+        +EMBED: /api/embed
+        +GENERATE: /api/generate
+    }
+
+    %% Relationships
+    OllamaClient ..|> OllamaApiAsync : implements
+    OllamaClient ..|> OllamaApiSync : implements
+    OllamaClient --> ClientHelpers : uses internally
+
+    OllamaApiAsync --> Primitives : uses request/response types
+    OllamaApiSync --> Primitives : uses request/response types
+
+    ClientHelpers --> Endpoints : builds URLs from
+
+    note for OllamaClient "Thread-safe client with Arc~Client~"
+    note for ClientHelpers "Handles retry logic, backoff, and error mapping"
+    note for Primitives "Pure data types with serde derive"
+```
+
+### API Call Flow
+
+This diagram shows the lifecycle of any API call through the library.
+
+```mermaid
+stateDiagram-v2
+    direction TB
+
+    [*] --> Idle
+
+    Idle --> CreateRequest : Build request type
+    CreateRequest --> ConfigureRequest : Apply builder methods
+    ConfigureRequest --> RequestReady : Request configured
+
+    RequestReady --> CallAPI : Call async or sync method
+
+    CallAPI --> BuildURL : Build endpoint URL
+    BuildURL --> Serialize : Serialize request to JSON
+    Serialize --> SendHTTP : Send HTTP request
+    SendHTTP --> WaitResponse : Await server response
+
+    WaitResponse --> CheckStatus : Response received
+
+    state CheckStatus <<choice>>
+    CheckStatus --> Success : 2xx Status
+    CheckStatus --> ClientError : 4xx Status
+    CheckStatus --> ServerError : 5xx Status
+
+    ServerError --> CheckRetries : Check retry count
+    state CheckRetries <<choice>>
+    CheckRetries --> Backoff : Can retry
+    CheckRetries --> MaxRetriesExceeded : Max retries reached
+    Backoff --> SendHTTP : Exponential backoff then retry
+
+    Success --> Deserialize : Parse JSON response
+    Deserialize --> ResponseReady : Response type created
+
+    ClientError --> HttpStatusError : Create HttpStatusError
+    MaxRetriesExceeded --> MaxRetriesError : Create MaxRetriesExceededError
+
+    ResponseReady --> [*] : Return Ok with response
+    HttpStatusError --> [*] : Return Err
+    MaxRetriesError --> [*] : Return Err
+```
+
+### Request Type Patterns
+
+All request types follow these patterns:
+
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| `RequestType::new()` | Constructor with required fields | `GenerateRequest::new("model", "prompt")` |
+| `.with_*()` builder | Optional field setter, returns Self | `.with_system("You are helpful")` |
+| `#[serde(skip_serializing_if)]` | Omit None fields from JSON | Optional fields not sent |
+| `impl From<T>` | Ergonomic conversions | `"text".into()` for string fields |
+
+### Response Type Patterns
+
+All response types follow these patterns:
+
+| Pattern | Description | Example |
+|---------|-------------|---------|
+| `#[serde(default)]` | Handle missing JSON fields | Fields default to None |
+| Helper methods | Convenient accessors | `response.text()` |
+| Duration conversions | Nanoseconds to milliseconds | `response.total_duration_ms()` |
+| Metric calculations | Derived values | `response.tokens_per_second()` |
+
+---
+
 ## Testing Architecture
 
 ### Unit Tests (`tests/` folder)

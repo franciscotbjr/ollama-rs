@@ -2,6 +2,8 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::StopSetting;
+
 /// Runtime options that control model behavior
 ///
 /// These options can be used to customize embedding generation.
@@ -45,6 +47,10 @@ pub struct ModelOptions {
     /// Maximum number of tokens to generate
     #[serde(skip_serializing_if = "Option::is_none")]
     pub num_predict: Option<i32>,
+
+    /// Stop sequences that will halt generation
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub stop: Option<StopSetting>,
 }
 
 impl ModelOptions {
@@ -95,6 +101,12 @@ impl ModelOptions {
         self
     }
 
+    /// Set stop sequences
+    pub fn with_stop(mut self, stop: impl Into<StopSetting>) -> Self {
+        self.stop = Some(stop.into());
+        self
+    }
+
     /// Check if any options are set
     pub fn is_empty(&self) -> bool {
         self.seed.is_none()
@@ -104,5 +116,6 @@ impl ModelOptions {
             && self.min_p.is_none()
             && self.num_ctx.is_none()
             && self.num_predict.is_none()
+            && self.stop.is_none()
     }
 }

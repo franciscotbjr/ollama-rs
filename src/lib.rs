@@ -46,9 +46,10 @@ pub mod primitives;
 
 #[cfg(feature = "primitives")]
 pub use primitives::{
-    CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, ListResponse,
-    ModelDetails, ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails,
-    ShowRequest, ShowResponse, VersionResponse,
+    CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
+    GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
+    ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
+    ShowResponse, StopSetting, ThinkSetting, TokenLogprob, VersionResponse,
 };
 
 // ============================================================================
@@ -73,8 +74,9 @@ pub mod prelude {
 
     #[cfg(feature = "primitives")]
     pub use crate::{
-        CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, ListResponse,
-        ModelDetails, ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails,
-        ShowRequest, ShowResponse, VersionResponse,
+        CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
+        GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
+        ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
+        ShowResponse, StopSetting, ThinkSetting, TokenLogprob, VersionResponse,
     };
 }

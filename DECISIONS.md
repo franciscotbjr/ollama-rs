@@ -16,3 +16,7 @@ This document tracks architectural and design decisions made during development.
 | 2026-01-14 | Unit tests in `tests/`, integration in `examples/` | `cargo test` always succeeds without external dependencies | ARCHITECTURE.md |
 | 2026-01-15 | No retry on 4xx errors | Client errors should fail immediately | DEV_NOTES.md |
 | 2026-01-16 | Exponential backoff: 100ms × (attempt + 1) | Balance between retry speed and server load | DEV_NOTES.md |
+| 2026-01-24 | Use `#[serde(untagged)]` for oneOf types | ThinkSetting, FormatSetting, KeepAliveSetting, StopSetting need flexible JSON representation | impl/10-post-generate-implementation-plan.md |
+| 2026-01-24 | StopSetting integrated into ModelOptions | Stop sequences are model options, not request-level settings; consistent with Ollama API | impl/10-post-generate-implementation-plan.md |
+| 2026-01-24 | GenerateRequest always sets `stream: false` | v0.1.0 is non-streaming only; streaming deferred to v0.2.0 | impl/10-post-generate-implementation-plan.md |
+| 2026-01-24 | Helper methods on GenerateResponse | `text()`, `is_done()`, `tokens_per_second()` provide ergonomic access to common data | impl/10-post-generate-implementation-plan.md |
