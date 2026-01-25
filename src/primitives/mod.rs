@@ -3,6 +3,18 @@
 //! This module contains all primitive data types used in the Ollama API,
 //! including request and response structures.
 
+// Chat types
+mod chat_message;
+mod chat_request;
+mod chat_response;
+mod chat_role;
+mod response_message;
+mod tool_call;
+mod tool_call_function;
+mod tool_definition;
+mod tool_function;
+
+// Other primitives
 mod copy_request;
 mod delete_request;
 mod embed_input;
@@ -27,6 +39,18 @@ mod think_setting;
 mod token_logprob;
 mod version;
 
+// Chat types re-exports
+pub use chat_message::ChatMessage;
+pub use chat_request::ChatRequest;
+pub use chat_response::ChatResponse;
+pub use chat_role::ChatRole;
+pub use response_message::ResponseMessage;
+pub use tool_call::ToolCall;
+pub use tool_call_function::ToolCallFunction;
+pub use tool_definition::ToolDefinition;
+pub use tool_function::ToolFunction;
+
+// Other primitives re-exports
 pub use copy_request::CopyRequest;
 pub use delete_request::DeleteRequest;
 pub use embed_input::EmbedInput;

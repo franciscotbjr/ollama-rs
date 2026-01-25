@@ -1,8 +1,9 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse,
-    ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
+    ChatRequest, ChatResponse, CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse,
+    GenerateRequest, GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
+    VersionResponse,
 };
 
 use super::OllamaClient;
@@ -279,6 +280,39 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn generate_blocking(&self, request: &GenerateRequest) -> Result<GenerateResponse>;
+
+    /// Chat completion (blocking, non-streaming)
+    ///
+    /// Generates the next message in a chat conversation.
+    /// This method blocks the current thread until completion.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Chat request containing model, messages, and options
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, ChatRequest, ChatMessage};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = ChatRequest::new("qwen3:0.6b", [
+    ///     ChatMessage::user("Tell me a short joke.")
+    /// ]);
+    /// let response = client.chat_blocking(&request)?;
+    /// println!("{}", response.content().unwrap_or("No response"));
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn chat_blocking(&self, request: &ChatRequest) -> Result<ChatResponse>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -319,6 +353,11 @@ impl OllamaApiSync for OllamaClient {
 
     fn generate_blocking(&self, request: &GenerateRequest) -> Result<GenerateResponse> {
         let url = self.config.url(Endpoints::GENERATE);
+        self.post_blocking_with_retry(&url, request)
+    }
+
+    fn chat_blocking(&self, request: &ChatRequest) -> Result<ChatResponse> {
+        let url = self.config.url(Endpoints::CHAT);
         self.post_blocking_with_retry(&url, request)
     }
 }

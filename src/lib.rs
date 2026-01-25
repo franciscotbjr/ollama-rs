@@ -46,6 +46,10 @@ pub mod primitives;
 
 #[cfg(feature = "primitives")]
 pub use primitives::{
+    // Chat types
+    ChatMessage, ChatRequest, ChatResponse, ChatRole, ResponseMessage, ToolCall, ToolCallFunction,
+    ToolDefinition, ToolFunction,
+    // Other primitives
     CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
     GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
     ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
@@ -74,6 +78,10 @@ pub mod prelude {
 
     #[cfg(feature = "primitives")]
     pub use crate::{
+        // Chat types
+        ChatMessage, ChatRequest, ChatResponse, ChatRole, ResponseMessage, ToolCall,
+        ToolCallFunction, ToolDefinition, ToolFunction,
+        // Other primitives
         CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
         GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
         ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
