@@ -20,3 +20,6 @@ This document tracks architectural and design decisions made during development.
 | 2026-01-24 | StopSetting integrated into ModelOptions | Stop sequences are model options, not request-level settings; consistent with Ollama API | impl/10-post-generate-implementation-plan.md |
 | 2026-01-24 | GenerateRequest always sets `stream: false` | v0.1.0 is non-streaming only; streaming deferred to v0.2.0 | impl/10-post-generate-implementation-plan.md |
 | 2026-01-24 | Helper methods on GenerateResponse | `text()`, `is_done()`, `tokens_per_second()` provide ergonomic access to common data | impl/10-post-generate-implementation-plan.md |
+| 2026-01-24 | Ergonomic tools API behind `tools` feature flag | Keeps core library lightweight; `schemars`/`futures` deps are optional | impl/12-ergonomic-tools-api-proposal.md |
+| 2026-01-25 | No `Chat` struct - use `Vec<ChatMessage>` | Library provides primitives, not app-level abstractions; users define their own entities | impl/11-post-chat-implementation-plan.md |
+| 2026-01-25 | `ChatRequest::new()` accepts `IntoIterator<Item=ChatMessage>` | More flexible than `Into<Vec<...>>`; enables custom types via `IntoIterator` impl | impl/11-post-chat-implementation-plan.md |

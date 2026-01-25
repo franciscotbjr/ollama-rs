@@ -366,6 +366,125 @@ pub enum Error {
 - [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - [Async Book](https://rust-lang.github.io/async-book/)
 
+## POST /api/chat Implementation
+
+### Messages API
+
+`ChatRequest::new()` accepts `IntoIterator<Item = ChatMessage>`:
+
+```rust
+pub fn new<M, I>(model: M, messages: I) -> Self
+where
+    M: Into<String>,
+    I: IntoIterator<Item = ChatMessage>,
+```
+
+### Custom Conversation Type
+
+```rust
+use ollama_oxide::{ChatMessage, ChatRequest};
+use chrono::{DateTime, Utc};
+
+struct TimestampedMessage {
+    message: ChatMessage,
+    created_at: DateTime<Utc>,
+}
+
+struct Conversation {
+    id: uuid::Uuid,
+    messages: Vec<TimestampedMessage>,
+}
+
+impl IntoIterator for Conversation {
+    type Item = ChatMessage;
+    type IntoIter = std::vec::IntoIter<ChatMessage>;
+
+    fn into_iter(mut self) -> Self::IntoIter {
+        self.messages.sort_by_key(|m| m.created_at);
+        self.messages.into_iter().map(|m| m.message).collect::<Vec<_>>().into_iter()
+    }
+}
+
+// Usage:
+let conversation = load_from_database(id)?;
+let request = ChatRequest::new(model, conversation);
+```
+
+### API Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client as OllamaClient
+    participant Server as Ollama Server
+
+    User->>Client: ChatRequest::new(model, messages)
+    User->>Client: .with_tools(tools)
+    User->>Client: client.chat(&request)
+    Client->>Server: POST /api/chat
+    Server-->>Client: ChatResponse
+    Client-->>User: Result<ChatResponse>
+```
+
+### Tool Execution Flow (Client-Side)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as Your Rust App
+    participant Server as Ollama Server
+
+    App->>Server: ChatRequest { messages, tools }
+    Server-->>App: ChatResponse { tool_calls: [...] }
+
+    rect rgb(255, 240, 220)
+        Note over App: EXECUTION HAPPENS HERE
+        App->>App: Parse tool_call.function_name()
+        App->>App: Execute real Rust function
+        App->>App: Get actual result
+    end
+
+    App->>Server: ChatRequest { messages: [..., tool_result] }
+    Server-->>App: ChatResponse { content: "..." }
+```
+
+### Multi-turn Conversation Flow
+
+```mermaid
+stateDiagram-v2
+    [*] --> AddUserMessage
+    AddUserMessage --> SendRequest
+    SendRequest --> ReceiveResponse
+
+    state CheckToolCalls <<choice>>
+    ReceiveResponse --> CheckToolCalls
+
+    CheckToolCalls --> HasToolCalls : tool_calls present
+    CheckToolCalls --> NoToolCalls : no tool_calls
+
+    state HasToolCalls {
+        [*] --> ExecuteLocally
+        ExecuteLocally --> BuildToolMessage
+        BuildToolMessage --> [*]
+    }
+
+    HasToolCalls --> SendRequest
+    NoToolCalls --> Done
+    Done --> [*]
+```
+
+### Response Helper Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `content()` | `Option<&str>` | Assistant's text response |
+| `tool_calls()` | `Option<&[ToolCall]>` | Tool calls array if present |
+| `has_tool_calls()` | `bool` | Check if any tool calls exist |
+| `thinking()` | `Option<&str>` | Thinking output if enabled |
+| `is_done()` | `bool` | Check if generation completed |
+
+---
+
 ## Questions & Decisions Log
 
 ### Q: Should we support sync and async APIs?
