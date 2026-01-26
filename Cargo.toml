@@ -35,11 +35,11 @@ serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 reqwest = { version = "0.13.1", default-features = false, features = ["blocking", "cookies", "http2", "json", "native-tls"] }
 async-trait = "0.1.89"
-thiserror = "2.0.17"
+thiserror = "2.0.18"
 url = "2.5.8"
 
 # Optional dependencies for ergonomic tools API (Phase B)
-schemars = { version = "0.8.8", optional = true }
+schemars = { version = "1.2.0", optional = true }
 futures = { version = "0.3.31", optional = true }
 
 [dev-dependencies]
