@@ -46,11 +46,18 @@ pub mod primitives;
 
 #[cfg(feature = "primitives")]
 pub use primitives::{
+    // Chat types
+    ChatMessage, ChatRequest, ChatResponse, ChatRole, ResponseMessage,
+    // Other primitives
     CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
     GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
     ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
     ShowResponse, StopSetting, ThinkSetting, TokenLogprob, VersionResponse,
 };
+
+// Tool types re-exports (requires both "primitives" and "tools" features)
+#[cfg(all(feature = "primitives", feature = "tools"))]
+pub use primitives::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 
 // ============================================================================
 // HTTP Client Module
@@ -61,6 +68,13 @@ pub mod http;
 
 #[cfg(feature = "http")]
 pub use http::{ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
+
+// ============================================================================
+// Ergonomic Tools Module (requires "tools" feature)
+// ============================================================================
+
+#[cfg(feature = "tools")]
+pub mod tools;
 
 // ============================================================================
 // Prelude
@@ -74,9 +88,16 @@ pub mod prelude {
 
     #[cfg(feature = "primitives")]
     pub use crate::{
+        // Chat types
+        ChatMessage, ChatRequest, ChatResponse, ChatRole, ResponseMessage,
+        // Other primitives
         CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
         GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
         ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
         ShowResponse, StopSetting, ThinkSetting, TokenLogprob, VersionResponse,
     };
+
+    // Tool types (requires both "primitives" and "tools" features)
+    #[cfg(all(feature = "primitives", feature = "tools"))]
+    pub use crate::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 }

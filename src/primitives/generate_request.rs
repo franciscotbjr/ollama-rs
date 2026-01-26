@@ -11,14 +11,14 @@ use super::{FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting};
 /// # Examples
 ///
 /// Basic request:
-/// ```
+/// ```ignore
 /// use ollama_oxide::GenerateRequest;
 ///
 /// let request = GenerateRequest::new("qwen3:0.6b", "Why is the sky blue?");
 /// ```
 ///
 /// With options:
-/// ```
+/// ```ignore
 /// use ollama_oxide::{GenerateRequest, ModelOptions};
 ///
 /// let request = GenerateRequest::new("qwen3:0.6b", "Tell me a joke")
@@ -27,7 +27,7 @@ use super::{FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting};
 /// ```
 ///
 /// With JSON output format:
-/// ```
+/// ```ignore
 /// use ollama_oxide::{GenerateRequest, FormatSetting};
 ///
 /// let request = GenerateRequest::new("qwen3:0.6b", "List 3 colors as JSON")

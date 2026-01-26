@@ -317,11 +317,145 @@ All response types follow these patterns:
 | Duration conversions | Nanoseconds to milliseconds | `response.total_duration_ms()` |
 | Metric calculations | Derived values | `response.tokens_per_second()` |
 
+
+### Tools Module Components
+
+This diagram shows the tools module class hierarchy and dependencies (requires `tools` feature).
+
+```mermaid
+classDiagram
+    direction TB
+
+    %% Core Traits
+    class Tool {
+        <<trait>>
+        +type Params
+        +type Output
+        +name() &str
+        +description() &str
+        +execute(params) Future~ToolResult~Output~~
+        +parameters_schema() Value
+        +to_definition() ToolDefinition
+    }
+
+    class ErasedTool {
+        <<trait>>
+        +name() &str
+        +definition() ToolDefinition
+        +execute_erased(args: Value) Future~ToolResult~Value~~
+        +execute_erased_blocking(args: Value) ToolResult~Value~
+    }
+
+    %% Bridge
+    class ToolWrapper~T~ {
+        -tool: T
+        +new(tool: T) Self
+    }
+
+    %% Registry
+    class ToolRegistry {
+        -tools: Arc~RwLock~HashMap~~
+        +new() Self
+        +register~T: Tool~(tool: T)
+        +definitions() Vec~ToolDefinition~
+        +execute(call: &ToolCall) ToolResult~Value~
+        +execute_all(response: &ChatResponse) Vec~ToolResult~
+    }
+
+    %% Error Handling
+    class ToolError {
+        <<enum>>
+        NotFound(String)
+        DeserializationError(String)
+        SerializationError(String)
+        ExecutionError(String)
+        InvalidToolCall
+        Custom(String)
+    }
+
+    %% Primitives (from primitives module)
+    class ToolDefinition {
+        <<primitives>>
+        +name: String
+        +parameters: Value
+        +description: Option~String~
+    }
+
+    class ToolCall {
+        <<primitives>>
+        +function: ToolCallFunction
+        +function_name() Option~&str~
+        +arguments() Option~&Value~
+    }
+
+    %% Relationships
+    Tool <|.. ToolWrapper~T~ : T implements
+    ErasedTool <|.. ToolWrapper~T~ : implements
+    ToolRegistry o-- ErasedTool : stores Arc~dyn ErasedTool~
+    ToolRegistry ..> ToolDefinition : generates
+    ToolRegistry ..> ToolCall : dispatches
+    ToolWrapper~T~ ..> ToolError : returns
+    Tool ..> ToolDefinition : to_definition()
+
+    note for Tool "NOT object-safe\n(has associated types)"
+    note for ErasedTool "Object-safe\n(types erased to JSON)"
+    note for ToolWrapper~T~ "Bridges typed Tool\nto type-erased ErasedTool"
+```
+
+### Tool Execution Flow
+
+This sequence diagram shows how tool calls are dispatched from a ChatResponse.
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as Application
+    participant Registry as ToolRegistry
+    participant Wrapper as ToolWrapper~T~
+    participant Tool as Tool impl
+
+    App->>Registry: execute_all(&response)
+    Registry->>Registry: response.tool_calls()
+
+    loop For each ToolCall
+        Registry->>Registry: call.function_name()
+        Registry->>Registry: tools.get(name)
+        Registry->>Wrapper: execute_erased(args: Value)
+
+        rect rgb(240, 248, 255)
+            Note over Wrapper,Tool: Type Erasure Boundary
+            Wrapper->>Wrapper: serde_json::from_value(args)
+            Wrapper->>Tool: execute(params: T::Params)
+            Tool-->>Wrapper: ToolResult~T::Output~
+            Wrapper->>Wrapper: serde_json::to_value(output)
+        end
+
+        Wrapper-->>Registry: ToolResult~Value~
+    end
+
+    Registry-->>App: Vec~ToolResult~Value~~
+```
+
 ---
 
 ## Testing Architecture
 
-### Unit Tests (`tests/` folder)
+### No Doc Tests
+
+This project does **not use doc tests**. All documentation code examples use ```` ```ignore ```` or are plain text. See DEV_NOTES.md for rationale.
+
+**Test locations:**
+1. **Unit tests in source files**: `src/**/*.rs` (in `#[cfg(test)] mod tests` blocks) - test internal behavior
+2. **Public interface tests**: `tests/*.rs` - test public API contracts with mocking
+3. **Integration tests**: `examples/*.rs` - test against real Ollama server
+
+### Unit Tests (inside source files)
+Component-level tests live alongside the code:
+- Located in `#[cfg(test)] mod tests` blocks
+- Test internal/private behavior
+- Feature-gated tests use `#[cfg(feature = "...")]`
+
+### Public Interface Tests (`tests/` folder)
 All files in `tests/*.rs` must be **unit tests only**:
 - Use `mockito` for HTTP mocking
 - No external service dependencies

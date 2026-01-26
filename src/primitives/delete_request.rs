@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Example
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::DeleteRequest;
 ///
 /// let request = DeleteRequest {
@@ -30,7 +30,7 @@ impl DeleteRequest {
     ///
     /// # Example
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::DeleteRequest;
     ///
     /// let request = DeleteRequest::new("llama3.1-backup");

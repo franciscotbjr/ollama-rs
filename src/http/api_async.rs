@@ -1,8 +1,9 @@
 //! Async API trait and implementations
 
 use crate::{
-    CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse,
-    ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
+    ChatRequest, ChatResponse, CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse,
+    GenerateRequest, GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
+    VersionResponse,
 };
 use async_trait::async_trait;
 
@@ -293,6 +294,85 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     async fn generate(&self, request: &GenerateRequest) -> Result<GenerateResponse>;
+
+    /// Chat completion (async, non-streaming)
+    ///
+    /// Generates the next message in a chat conversation.
+    /// This method uses non-streaming mode.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Chat request containing model, messages, and options
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Model doesn't exist (404)
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// Basic chat:
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, ChatRequest, ChatMessage};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = ChatRequest::new("qwen3:0.6b", [
+    ///     ChatMessage::user("Hello!")
+    /// ]);
+    /// let response = client.chat(&request).await?;
+    /// println!("Response: {:?}", response.content());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// Multi-turn conversation:
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, ChatRequest, ChatMessage};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = ChatRequest::new("qwen3:0.6b", [
+    ///     ChatMessage::system("You are a helpful assistant."),
+    ///     ChatMessage::user("What is Rust?"),
+    ///     ChatMessage::assistant("Rust is a systems programming language."),
+    ///     ChatMessage::user("What are its main features?"),
+    /// ]);
+    /// let response = client.chat(&request).await?;
+    /// println!("Response: {:?}", response.content());
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// With tools (function calling) - requires `tools` feature:
+    /// ```ignore
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, ChatRequest, ChatMessage, ToolDefinition};
+    /// use serde_json::json;
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = ChatRequest::new("qwen3:0.6b", [
+    ///     ChatMessage::user("What's the weather in Paris?")
+    /// ]).with_tools(vec![
+    ///     ToolDefinition::function("get_weather", json!({
+    ///         "type": "object",
+    ///         "properties": {"location": {"type": "string"}},
+    ///         "required": ["location"]
+    ///     })).with_description("Get current weather")
+    /// ]);
+    ///
+    /// let response = client.chat(&request).await?;
+    /// if response.has_tool_calls() {
+    ///     for call in response.tool_calls().unwrap() {
+    ///         println!("Tool call: {:?}", call.function_name());
+    ///     }
+    /// }
+    /// # Ok(())
+    /// # }
+    /// ```
+    async fn chat(&self, request: &ChatRequest) -> Result<ChatResponse>;
 }
 
 #[async_trait]
@@ -334,6 +414,11 @@ impl OllamaApiAsync for OllamaClient {
 
     async fn generate(&self, request: &GenerateRequest) -> Result<GenerateResponse> {
         let url = self.config.url(Endpoints::GENERATE);
+        self.post_with_retry(&url, request).await
+    }
+
+    async fn chat(&self, request: &ChatRequest) -> Result<ChatResponse> {
+        let url = self.config.url(Endpoints::CHAT);
         self.post_with_retry(&url, request).await
     }
 }

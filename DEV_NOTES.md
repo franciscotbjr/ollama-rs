@@ -77,7 +77,8 @@ primitives = []
 - DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
 - Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`, `GenerateRequest`, `GenerateResponse`, `ThinkSetting`, `FormatSetting`, `KeepAliveSetting`, `StopSetting`, `TokenLogprob`, `Logprob`
 - 316+ unit and integration tests
-- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, and generate endpoints
+- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, generate, chat, and tools endpoints
+- `chat_with_tools_async` example: Complete tool calling flow with mock weather service
 
 ### In Progress
 - Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
@@ -139,6 +140,55 @@ primitives = []
 - Type-safe with compiler guarantees
 - Easy to extend for POST/streaming
 - Consistent behavior across endpoints
+
+### Type Erasure Pattern (ErasedTool)
+
+**Decision Date:** 2026-01-26
+
+The `ErasedTool` trait uses **type erasure** to enable storing heterogeneous tools in a single `ToolRegistry`.
+
+**Problem:**
+```rust
+// Tool trait is NOT object-safe (has associated types)
+trait Tool {
+    type Params;   // Concrete type known at compile time
+    type Output;   // Concrete type known at compile time
+}
+// Cannot create: Vec<Box<dyn Tool>>
+```
+
+**Solution:**
+```rust
+// ErasedTool is object-safe (types "erased" to JSON)
+trait ErasedTool {
+    fn execute_erased(&self, args: Value) -> ToolResult<Value>;
+}
+// Can create: Vec<Box<dyn ErasedTool>>
+```
+
+**Naming Convention:**
+- "Erased" indicates type information is removed at compile time
+- Common in Rust ecosystem (e.g., `erased-serde`, `type-erased` crates)
+- `ToolWrapper<T>` bridges typed `Tool` → type-erased `ErasedTool`
+
+**Location:** `src/tools/erased_tool.rs`
+
+### Example Naming Convention
+
+**Decision Date:** 2026-01-26
+
+**Pattern:** `<feature>_<variant>_<mode>.rs`
+
+**Examples:**
+- `chat_with_tools_async.rs` - Chat with tool calling (weather example)
+- `chat_with_tools_registry_async.rs` - Chat with ToolRegistry pattern
+- `tools_async.rs` - Basic tool definition examples
+- `chat_async.rs` - Basic chat without tools
+
+**Rationale:**
+- Clear feature identification in filename
+- Consistent `_async` / `_sync` suffix for execution mode
+- Grouped related examples by prefix
 
 ### HTTP Client: reqwest
 
@@ -232,14 +282,38 @@ Future endpoints:
 
 ## Testing Strategy
 
-### Unit Tests (`tests/` folder)
+### No Doc Tests Policy
+**Decision Date:** 2026-01-26
+
+This project does **not use doc tests**. All documentation examples use ```` ```ignore ```` or are plain text.
+
+**Rationale:**
+- **Feature flag complexity**: Many types are gated behind feature flags (`tools`, `primitives`, `http`), making doc tests hard to maintain
+- **Maintenance burden**: Doc tests require keeping code in sync across documentation and actual tests
+- **Coverage duplication**: All public interfaces are already covered by tests in `tests/` folder
+- **Simpler workflow**: Run `cargo test` without doc test failures due to feature mismatches
+
+**Testing locations:**
+- **Unit tests**: Inside each component file (e.g., `src/primitives/chat_request.rs` has `#[cfg(test)] mod tests`)
+- **Public interface tests**: `tests/` folder for integration-style unit tests
+- **Integration tests**: `examples/` folder for real Ollama server tests
+
+### Unit Tests (inside source files)
+**Location:** `src/**/*.rs` (in `#[cfg(test)] mod tests` blocks)
+**Purpose:** Test internal/non-public behavior:
+- Private helper functions
+- Edge cases specific to the implementation
+- Serialization/deserialization details
+- Feature-gated code paths
+
+### Public Interface Tests (`tests/` folder)
 **Location:** `tests/*.rs`
 **Purpose:** All tests in the `tests/` folder must be unit tests that:
 - Do NOT require external services (Ollama server)
 - Use mocking (mockito) for HTTP interactions
 - Can run in CI/CD without additional setup
-- Test individual functions and data structures
-- Validate serialization/deserialization
+- Test public API contracts
+- Validate request/response round-trips
 - Cover error handling paths
 
 ### Integration Tests (`examples/` folder)
@@ -365,6 +439,125 @@ pub enum Error {
 - [Ollama API Docs](https://github.com/ollama/ollama/blob/main/docs/api.md)
 - [Rust API Guidelines](https://rust-lang.github.io/api-guidelines/)
 - [Async Book](https://rust-lang.github.io/async-book/)
+
+## POST /api/chat Implementation
+
+### Messages API
+
+`ChatRequest::new()` accepts `IntoIterator<Item = ChatMessage>`:
+
+```rust
+pub fn new<M, I>(model: M, messages: I) -> Self
+where
+    M: Into<String>,
+    I: IntoIterator<Item = ChatMessage>,
+```
+
+### Custom Conversation Type
+
+```rust
+use ollama_oxide::{ChatMessage, ChatRequest};
+use chrono::{DateTime, Utc};
+
+struct TimestampedMessage {
+    message: ChatMessage,
+    created_at: DateTime<Utc>,
+}
+
+struct Conversation {
+    id: uuid::Uuid,
+    messages: Vec<TimestampedMessage>,
+}
+
+impl IntoIterator for Conversation {
+    type Item = ChatMessage;
+    type IntoIter = std::vec::IntoIter<ChatMessage>;
+
+    fn into_iter(mut self) -> Self::IntoIter {
+        self.messages.sort_by_key(|m| m.created_at);
+        self.messages.into_iter().map(|m| m.message).collect::<Vec<_>>().into_iter()
+    }
+}
+
+// Usage:
+let conversation = load_from_database(id)?;
+let request = ChatRequest::new(model, conversation);
+```
+
+### API Flow
+
+```mermaid
+sequenceDiagram
+    participant User
+    participant Client as OllamaClient
+    participant Server as Ollama Server
+
+    User->>Client: ChatRequest::new(model, messages)
+    User->>Client: .with_tools(tools)
+    User->>Client: client.chat(&request)
+    Client->>Server: POST /api/chat
+    Server-->>Client: ChatResponse
+    Client-->>User: Result<ChatResponse>
+```
+
+### Tool Execution Flow (Client-Side)
+
+```mermaid
+sequenceDiagram
+    autonumber
+    participant App as Your Rust App
+    participant Server as Ollama Server
+
+    App->>Server: ChatRequest { messages, tools }
+    Server-->>App: ChatResponse { tool_calls: [...] }
+
+    rect rgb(255, 240, 220)
+        Note over App: EXECUTION HAPPENS HERE
+        App->>App: Parse tool_call.function_name()
+        App->>App: Execute real Rust function
+        App->>App: Get actual result
+    end
+
+    App->>Server: ChatRequest { messages: [..., tool_result] }
+    Server-->>App: ChatResponse { content: "..." }
+```
+
+### Multi-turn Conversation Flow
+
+```mermaid
+stateDiagram-v2
+    [*] --> AddUserMessage
+    AddUserMessage --> SendRequest
+    SendRequest --> ReceiveResponse
+
+    state CheckToolCalls <<choice>>
+    ReceiveResponse --> CheckToolCalls
+
+    CheckToolCalls --> HasToolCalls : tool_calls present
+    CheckToolCalls --> NoToolCalls : no tool_calls
+
+    state HasToolCalls {
+        [*] --> ExecuteLocally
+        ExecuteLocally --> BuildToolMessage
+        BuildToolMessage --> [*]
+    }
+
+    HasToolCalls --> SendRequest
+    NoToolCalls --> Done
+    Done --> [*]
+```
+
+### Response Helper Methods
+
+| Method | Return Type | Description |
+|--------|-------------|-------------|
+| `content()` | `Option<&str>` | Assistant's text response |
+| `tool_calls()` | `Option<&[ToolCall]>` | Tool calls array if present |
+| `has_tool_calls()` | `bool` | Check if any tool calls exist |
+| `thinking()` | `Option<&str>` | Thinking output if enabled |
+| `is_done()` | `bool` | Check if generation completed |
+
+---
 
 ## Questions & Decisions Log
 

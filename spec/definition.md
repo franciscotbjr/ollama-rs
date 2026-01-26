@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.2
-**Last Updated:** 2026-01-23
+**Document Version:** 1.3
+**Last Updated:** 2026-01-26
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -277,7 +277,8 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Streaming responses with progress
 - Error handling patterns
 - Batch processing
-- Custom tool/function calling
+- Custom tool/function calling (✅ `chat_with_tools_async` with mock weather API)
+- Type-safe tool registry (✅ `chat_with_tools_registry_async`)
 
 **Deliverables:**
 - 10+ comprehensive examples in `/examples`
@@ -652,11 +653,15 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] `POST /api/embed` - Generate text embeddings
 
 **Complex POST Endpoints (5) - Non-Streaming Mode:**
-- [ ] `POST /api/generate` - Text generation (non-streaming only)
-- [ ] `POST /api/chat` - Chat completions (non-streaming only)
+- [x] `POST /api/generate` - Text generation (non-streaming only)
+- [x] `POST /api/chat` - Chat completions (non-streaming only)
 - [ ] `POST /api/create` - Model creation (non-streaming only)
 - [ ] `POST /api/pull` - Model download (non-streaming only)
 - [ ] `POST /api/push` - Model upload (non-streaming only)
+
+**Examples:**
+- [x] `chat_with_tools_async` - Complete tool call flow with mock weather service
+- [x] `chat_with_tools_registry_async` - ToolRegistry pattern with type erasure (renamed from `tool_registry_async`)
 
 **Definition of Done:**
 - All shared types (ModelOptions, Logprob, enums) compile
