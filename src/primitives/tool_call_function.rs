@@ -259,6 +259,7 @@ mod tests {
 
         #[derive(Deserialize)]
         struct Args {
+            #[allow(unused)]
             x: i32,
         }
 

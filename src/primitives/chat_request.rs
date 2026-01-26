@@ -434,6 +434,7 @@ impl ChatRequest {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[allow(unused)]
     use serde_json::json;
 
     #[test]

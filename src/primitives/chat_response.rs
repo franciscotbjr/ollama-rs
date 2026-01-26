@@ -283,11 +283,11 @@ impl ChatResponse {
 }
 
 #[cfg(test)]
+#[allow(unused_imports)]
 mod tests {
     use super::*;
     #[cfg(feature = "tools")]
     use crate::ToolCallFunction;
-    #[allow(unused_imports)]
     use serde_json::json;
 
     #[test]
