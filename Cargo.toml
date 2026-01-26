@@ -50,5 +50,9 @@ name = "tools_async"
 required-features = ["tools"]
 
 [[example]]
-name = "tool_registry_async"
+name = "chat_with_tools_registry_async"
+required-features = ["tools"]
+
+[[example]]
+name = "chat_with_tools_async"
 required-features = ["tools"]

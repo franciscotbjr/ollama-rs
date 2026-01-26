@@ -147,8 +147,13 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .with_tools(registry.definitions());
 
+    println!("Request: {:?}", &request);
+
     println!("\nSending request to model...");
     let response = client.chat(&request).await?;
+
+    println!("Model response:");
+    println!("Response: {:?}", &response);
 
     if response.has_tool_calls() {
         println!("Model requested tool calls:");
