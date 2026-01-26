@@ -70,7 +70,10 @@ mod tests {
 
     #[test]
     fn test_chat_role_serialize() {
-        assert_eq!(serde_json::to_string(&ChatRole::System).unwrap(), "\"system\"");
+        assert_eq!(
+            serde_json::to_string(&ChatRole::System).unwrap(),
+            "\"system\""
+        );
         assert_eq!(serde_json::to_string(&ChatRole::User).unwrap(), "\"user\"");
         assert_eq!(
             serde_json::to_string(&ChatRole::Assistant).unwrap(),

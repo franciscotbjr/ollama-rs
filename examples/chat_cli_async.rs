@@ -24,7 +24,9 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = OllamaClient::default()?;
 
     // Get model from command line args or use default
-    let model = std::env::args().nth(1).unwrap_or_else(|| DEFAULT_MODEL.to_string());
+    let model = std::env::args()
+        .nth(1)
+        .unwrap_or_else(|| DEFAULT_MODEL.to_string());
 
     println!("╭─────────────────────────────────────────╮");
     println!("│       ollama-oxide CLI Chat             │");
@@ -38,9 +40,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let mut messages: Vec<ChatMessage> = vec![ChatMessage::system(SYSTEM_PROMPT)];
 
     // Model options for consistent responses
-    let options = ModelOptions::new()
-        .with_temperature(0.1)
-        .with_top_p(0.9);
+    let options = ModelOptions::new().with_temperature(0.1).with_top_p(0.9);
 
     loop {
         // Print prompt and read user input

@@ -319,7 +319,10 @@ mod tests {
         let tool: ToolDefinition = serde_json::from_str(json).unwrap();
         assert_eq!(tool.type_field, "function");
         assert_eq!(tool.function.name, "search");
-        assert_eq!(tool.function.description, Some("Search the web".to_string()));
+        assert_eq!(
+            tool.function.description,
+            Some("Search the web".to_string())
+        );
     }
 
     #[test]

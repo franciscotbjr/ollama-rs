@@ -2,9 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting};
 #[cfg(feature = "tools")]
 use super::ToolDefinition;
+use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting};
 
 /// Request body for POST /api/chat endpoint.
 ///
@@ -482,8 +482,7 @@ mod tests {
     #[test]
     fn test_chat_request_with_tools() {
         let tool = ToolDefinition::function("test", json!({}));
-        let request =
-            ChatRequest::new("model", [ChatMessage::user("Hi")]).with_tools(vec![tool]);
+        let request = ChatRequest::new("model", [ChatMessage::user("Hi")]).with_tools(vec![tool]);
 
         assert!(request.has_tools());
         assert_eq!(request.tools().unwrap().len(), 1);
@@ -502,8 +501,8 @@ mod tests {
 
     #[test]
     fn test_chat_request_with_format() {
-        let request = ChatRequest::new("model", [ChatMessage::user("Hi")])
-            .with_format(FormatSetting::json());
+        let request =
+            ChatRequest::new("model", [ChatMessage::user("Hi")]).with_format(FormatSetting::json());
 
         assert!(request.format.is_some());
     }
@@ -511,8 +510,7 @@ mod tests {
     #[test]
     fn test_chat_request_with_options() {
         let options = ModelOptions::default().with_temperature(0.7);
-        let request =
-            ChatRequest::new("model", [ChatMessage::user("Hi")]).with_options(options);
+        let request = ChatRequest::new("model", [ChatMessage::user("Hi")]).with_options(options);
 
         assert!(request.options.is_some());
         assert_eq!(request.options.unwrap().temperature, Some(0.7));
@@ -688,17 +686,19 @@ mod tests {
                 ChatMessage::user("What's the weather in Paris?"),
             ],
         )
-        .with_tools(vec![ToolDefinition::function(
-            "get_weather",
-            json!({
-                "type": "object",
-                "properties": {
-                    "location": {"type": "string"}
-                },
-                "required": ["location"]
-            }),
-        )
-        .with_description("Get the current weather for a location")]);
+        .with_tools(vec![
+            ToolDefinition::function(
+                "get_weather",
+                json!({
+                    "type": "object",
+                    "properties": {
+                        "location": {"type": "string"}
+                    },
+                    "required": ["location"]
+                }),
+            )
+            .with_description("Get the current weather for a location"),
+        ]);
 
         let json_value = serde_json::to_value(&request).unwrap();
         let json_string = serde_json::to_string_pretty(&json_value).unwrap();

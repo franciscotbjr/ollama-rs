@@ -47,12 +47,39 @@ pub mod primitives;
 #[cfg(feature = "primitives")]
 pub use primitives::{
     // Chat types
-    ChatMessage, ChatRequest, ChatResponse, ChatRole, ResponseMessage,
+    ChatMessage,
+    ChatRequest,
+    ChatResponse,
+    ChatRole,
     // Other primitives
-    CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
-    GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
-    ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
-    ShowResponse, StopSetting, ThinkSetting, TokenLogprob, VersionResponse,
+    CopyRequest,
+    // Create types
+    CreateRequest,
+    CreateResponse,
+    DeleteRequest,
+    EmbedInput,
+    EmbedRequest,
+    EmbedResponse,
+    FormatSetting,
+    GenerateRequest,
+    GenerateResponse,
+    KeepAliveSetting,
+    LicenseSetting,
+    ListResponse,
+    Logprob,
+    ModelDetails,
+    ModelOptions,
+    ModelSummary,
+    PsResponse,
+    ResponseMessage,
+    RunningModel,
+    ShowModelDetails,
+    ShowRequest,
+    ShowResponse,
+    StopSetting,
+    ThinkSetting,
+    TokenLogprob,
+    VersionResponse,
 };
 
 // Tool types re-exports (requires both "primitives" and "tools" features)
@@ -89,12 +116,39 @@ pub mod prelude {
     #[cfg(feature = "primitives")]
     pub use crate::{
         // Chat types
-        ChatMessage, ChatRequest, ChatResponse, ChatRole, ResponseMessage,
+        ChatMessage,
+        ChatRequest,
+        ChatResponse,
+        ChatRole,
         // Other primitives
-        CopyRequest, DeleteRequest, EmbedInput, EmbedRequest, EmbedResponse, FormatSetting,
-        GenerateRequest, GenerateResponse, KeepAliveSetting, ListResponse, Logprob, ModelDetails,
-        ModelOptions, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
-        ShowResponse, StopSetting, ThinkSetting, TokenLogprob, VersionResponse,
+        CopyRequest,
+        // Create types
+        CreateRequest,
+        CreateResponse,
+        DeleteRequest,
+        EmbedInput,
+        EmbedRequest,
+        EmbedResponse,
+        FormatSetting,
+        GenerateRequest,
+        GenerateResponse,
+        KeepAliveSetting,
+        LicenseSetting,
+        ListResponse,
+        Logprob,
+        ModelDetails,
+        ModelOptions,
+        ModelSummary,
+        PsResponse,
+        ResponseMessage,
+        RunningModel,
+        ShowModelDetails,
+        ShowRequest,
+        ShowResponse,
+        StopSetting,
+        ThinkSetting,
+        TokenLogprob,
+        VersionResponse,
     };
 
     // Tool types (requires both "primitives" and "tools" features)

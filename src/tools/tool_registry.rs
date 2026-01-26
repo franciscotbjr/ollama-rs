@@ -130,9 +130,7 @@ impl ToolRegistry {
     /// - The arguments are invalid
     /// - The tool execution fails
     pub async fn execute(&self, call: &ToolCall) -> ToolResult<serde_json::Value> {
-        let func_name = call
-            .function_name()
-            .ok_or(ToolError::InvalidToolCall)?;
+        let func_name = call.function_name().ok_or(ToolError::InvalidToolCall)?;
 
         let args = call
             .arguments()
@@ -176,9 +174,7 @@ impl ToolRegistry {
     ///
     /// This is a convenience method for sync code.
     pub fn execute_blocking(&self, call: &ToolCall) -> ToolResult<serde_json::Value> {
-        let func_name = call
-            .function_name()
-            .ok_or(ToolError::InvalidToolCall)?;
+        let func_name = call.function_name().ok_or(ToolError::InvalidToolCall)?;
 
         let args = call
             .arguments()
@@ -199,12 +195,18 @@ impl ToolRegistry {
     /// Execute all tool calls from a chat response synchronously (blocking)
     ///
     /// This is a convenience method for sync code.
-    pub fn execute_all_blocking(&self, response: &ChatResponse) -> Vec<ToolResult<serde_json::Value>> {
+    pub fn execute_all_blocking(
+        &self,
+        response: &ChatResponse,
+    ) -> Vec<ToolResult<serde_json::Value>> {
         let Some(calls) = response.tool_calls() else {
             return Vec::new();
         };
 
-        calls.iter().map(|call| self.execute_blocking(call)).collect()
+        calls
+            .iter()
+            .map(|call| self.execute_blocking(call))
+            .collect()
     }
 }
 

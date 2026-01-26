@@ -1,9 +1,9 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse,
-    GenerateRequest, GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
-    VersionResponse,
+    ChatRequest, ChatResponse, CopyRequest, CreateRequest, CreateResponse, DeleteRequest,
+    EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
+    Result, ShowRequest, ShowResponse, VersionResponse,
 };
 
 use super::OllamaClient;
@@ -313,6 +313,39 @@ pub trait OllamaApiSync: Send + Sync {
     /// # }
     /// ```
     fn chat_blocking(&self, request: &ChatRequest) -> Result<ChatResponse>;
+
+    /// Create a custom model (blocking, non-streaming)
+    ///
+    /// Creates a new model from an existing model with custom configuration.
+    /// This method blocks the current thread until completion.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Create request containing model name, base model, and options
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Base model doesn't exist (404)
+    /// - Model name is invalid
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, CreateRequest};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = CreateRequest::from_model("mario", "qwen3:0.6b")
+    ///     .with_system("You are Mario from Super Mario Bros.");
+    /// let response = client.create_model_blocking(&request)?;
+    /// println!("Status: {:?}", response.status());
+    /// # Ok(())
+    /// # }
+    /// ```
+    fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -358,6 +391,11 @@ impl OllamaApiSync for OllamaClient {
 
     fn chat_blocking(&self, request: &ChatRequest) -> Result<ChatResponse> {
         let url = self.config.url(Endpoints::CHAT);
+        self.post_blocking_with_retry(&url, request)
+    }
+
+    fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse> {
+        let url = self.config.url(Endpoints::CREATE);
         self.post_blocking_with_retry(&url, request)
     }
 }

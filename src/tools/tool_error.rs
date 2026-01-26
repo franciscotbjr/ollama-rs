@@ -66,7 +66,10 @@ mod tests {
     #[test]
     fn test_tool_error_deserialization() {
         let err = ToolError::DeserializationError("missing field".to_string());
-        assert_eq!(err.to_string(), "failed to deserialize arguments: missing field");
+        assert_eq!(
+            err.to_string(),
+            "failed to deserialize arguments: missing field"
+        );
     }
 
     #[test]

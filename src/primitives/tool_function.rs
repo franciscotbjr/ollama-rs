@@ -197,7 +197,10 @@ mod tests {
         assert_eq!(json["name"], "get_weather");
         assert_eq!(json["description"], "Get weather");
         assert_eq!(json["parameters"]["type"], "object");
-        assert_eq!(json["parameters"]["properties"]["location"]["type"], "string");
+        assert_eq!(
+            json["parameters"]["properties"]["location"]["type"],
+            "string"
+        );
     }
 
     #[test]

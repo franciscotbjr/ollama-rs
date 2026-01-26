@@ -439,8 +439,8 @@ mod tests {
         };
         assert!(!empty_tools.has_tool_calls());
 
-        let with_tools =
-            ChatMessage::assistant("").with_tool_calls(vec![ToolCall::new(ToolCallFunction::new("f"))]);
+        let with_tools = ChatMessage::assistant("")
+            .with_tool_calls(vec![ToolCall::new(ToolCallFunction::new("f"))]);
         assert!(with_tools.has_tool_calls());
     }
 
@@ -514,7 +514,10 @@ mod tests {
         }"#;
 
         let msg: ChatMessage = serde_json::from_str(json).unwrap();
-        assert_eq!(msg.images, Some(vec!["img1".to_string(), "img2".to_string()]));
+        assert_eq!(
+            msg.images,
+            Some(vec!["img1".to_string(), "img2".to_string()])
+        );
     }
 
     #[cfg(feature = "tools")]
@@ -530,7 +533,10 @@ mod tests {
 
         let msg: ChatMessage = serde_json::from_str(json).unwrap();
         assert!(msg.tool_calls.is_some());
-        assert_eq!(msg.tool_calls.as_ref().unwrap()[0].function_name(), Some("test"));
+        assert_eq!(
+            msg.tool_calls.as_ref().unwrap()[0].function_name(),
+            Some("test")
+        );
     }
 
     #[test]

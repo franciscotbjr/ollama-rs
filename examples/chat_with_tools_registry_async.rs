@@ -44,9 +44,12 @@ impl Tool for CalculatorTool {
             "subtract" => params.a - params.b,
             "multiply" => params.a * params.b,
             "divide" => params.a / params.b,
-            _ => return Err(ollama_oxide::tools::ToolError::ExecutionError(
-                format!("Unknown operation: {}", params.operation),
-            )),
+            _ => {
+                return Err(ollama_oxide::tools::ToolError::ExecutionError(format!(
+                    "Unknown operation: {}",
+                    params.operation
+                )));
+            }
         };
         Ok(CalculatorOutput { result })
     }
@@ -119,10 +122,12 @@ impl Tool for RandomTool {
 
     async fn execute(&self, params: Self::Params) -> ToolResult<Self::Output> {
         // Simple pseudo-random for demo (not cryptographically secure)
-        let value = params.min + (std::time::SystemTime::now()
-            .duration_since(std::time::UNIX_EPOCH)
-            .unwrap()
-            .as_nanos() as i32 % (params.max - params.min + 1));
+        let value = params.min
+            + (std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos() as i32
+                % (params.max - params.min + 1));
         Ok(RandomOutput { value })
     }
 }
@@ -141,11 +146,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("Registered {} tools: {:?}", registry.len(), registry);
 
     // Build request with all tool definitions from registry
-    let request = ChatRequest::new(
-        model,
-        [ChatMessage::user("What is 15 multiplied by 7?")],
-    )
-    .with_tools(registry.definitions());
+    let request = ChatRequest::new(model, [ChatMessage::user("What is 15 multiplied by 7?")])
+        .with_tools(registry.definitions());
 
     println!("Request: {:?}", &request);
 

@@ -103,15 +103,15 @@ impl WeatherService {
         // Return (temperature_celsius, weather_code)
         // Weather codes follow WMO standard used by Open-Meteo
         match city {
-            "Paris, France" => (18.5, 2),     // Partly cloudy
-            "London, UK" => (14.0, 61),       // Light rain
-            "New York, USA" => (22.0, 1),     // Mainly clear
-            "Tokyo, Japan" => (26.0, 3),      // Overcast
+            "Paris, France" => (18.5, 2),       // Partly cloudy
+            "London, UK" => (14.0, 61),         // Light rain
+            "New York, USA" => (22.0, 1),       // Mainly clear
+            "Tokyo, Japan" => (26.0, 3),        // Overcast
             "San Francisco, USA" => (16.0, 45), // Fog
-            "Sydney, Australia" => (20.0, 0), // Clear sky
-            "Berlin, Germany" => (15.0, 51),  // Light drizzle
-            "São Paulo, Brazil" => (24.0, 80), // Light showers
-            _ => (20.0, 0),                   // Default: Clear, 20°C
+            "Sydney, Australia" => (20.0, 0),   // Clear sky
+            "Berlin, Germany" => (15.0, 51),    // Light drizzle
+            "São Paulo, Brazil" => (24.0, 80),  // Light showers
+            _ => (20.0, 0),                     // Default: Clear, 20°C
         }
     }
 
@@ -292,7 +292,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         for call in tool_calls {
             println!("Tool requested: {:?}", call.function_name());
-            println!("Arguments: {}", serde_json::to_string_pretty(call.arguments().unwrap_or(&serde_json::json!({})))?);
+            println!(
+                "Arguments: {}",
+                serde_json::to_string_pretty(call.arguments().unwrap_or(&serde_json::json!({})))?
+            );
         }
 
         // Execute all tool calls via the registry
@@ -344,7 +347,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         }
     } else {
         // Model answered directly without using tools
-        println!("\nAssistant (direct response): {}", response.content().unwrap_or("No response"));
+        println!(
+            "\nAssistant (direct response): {}",
+            response.content().unwrap_or("No response")
+        );
     }
 
     println!("\nDone!");

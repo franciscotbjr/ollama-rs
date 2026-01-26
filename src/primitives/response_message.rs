@@ -236,10 +236,7 @@ impl ResponseMessage {
     /// assert!(!msg.has_images());
     /// ```
     pub fn has_images(&self) -> bool {
-        self.images
-            .as_ref()
-            .map(|i| !i.is_empty())
-            .unwrap_or(false)
+        self.images.as_ref().map(|i| !i.is_empty()).unwrap_or(false)
     }
 
     /// Get the images if any.
@@ -426,7 +423,10 @@ mod tests {
 
         let msg: ResponseMessage = serde_json::from_str(json).unwrap();
         assert_eq!(msg.content(), Some("The answer is 42."));
-        assert_eq!(msg.thinking(), Some("Let me calculate this step by step..."));
+        assert_eq!(
+            msg.thinking(),
+            Some("Let me calculate this step by step...")
+        );
     }
 
     #[cfg(feature = "tools")]

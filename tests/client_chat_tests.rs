@@ -16,7 +16,10 @@ use std::time::Duration;
 
 #[test]
 fn test_chat_role_serialization() {
-    assert_eq!(serde_json::to_string(&ChatRole::System).unwrap(), "\"system\"");
+    assert_eq!(
+        serde_json::to_string(&ChatRole::System).unwrap(),
+        "\"system\""
+    );
     assert_eq!(serde_json::to_string(&ChatRole::User).unwrap(), "\"user\"");
     assert_eq!(
         serde_json::to_string(&ChatRole::Assistant).unwrap(),

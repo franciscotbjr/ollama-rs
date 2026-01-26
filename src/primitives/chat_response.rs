@@ -2,9 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::{Logprob, ResponseMessage};
 #[cfg(feature = "tools")]
 use super::ToolCall;
+use super::{Logprob, ResponseMessage};
 
 /// Response from POST /api/chat endpoint.
 ///

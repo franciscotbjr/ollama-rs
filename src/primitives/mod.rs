@@ -20,6 +20,11 @@ mod tool_definition;
 #[cfg(feature = "tools")]
 mod tool_function;
 
+// Create types
+mod create_request;
+mod create_response;
+mod license_setting;
+
 // Other primitives
 mod copy_request;
 mod delete_request;
@@ -61,6 +66,11 @@ pub use tool_call_function::ToolCallFunction;
 pub use tool_definition::ToolDefinition;
 #[cfg(feature = "tools")]
 pub use tool_function::ToolFunction;
+
+// Create types re-exports
+pub use create_request::CreateRequest;
+pub use create_response::CreateResponse;
+pub use license_setting::LicenseSetting;
 
 // Other primitives re-exports
 pub use copy_request::CopyRequest;
