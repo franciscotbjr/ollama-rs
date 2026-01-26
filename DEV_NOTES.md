@@ -77,7 +77,8 @@ primitives = []
 - DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
 - Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`, `GenerateRequest`, `GenerateResponse`, `ThinkSetting`, `FormatSetting`, `KeepAliveSetting`, `StopSetting`, `TokenLogprob`, `Logprob`
 - 316+ unit and integration tests
-- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, and generate endpoints
+- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, generate, chat, and tools endpoints
+- `chat_with_tools_async` example: Complete tool calling flow with mock weather service
 
 ### In Progress
 - Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
@@ -171,6 +172,23 @@ trait ErasedTool {
 - `ToolWrapper<T>` bridges typed `Tool` → type-erased `ErasedTool`
 
 **Location:** `src/tools/erased_tool.rs`
+
+### Example Naming Convention
+
+**Decision Date:** 2026-01-26
+
+**Pattern:** `<feature>_<variant>_<mode>.rs`
+
+**Examples:**
+- `chat_with_tools_async.rs` - Chat with tool calling (weather example)
+- `chat_with_tools_registry_async.rs` - Chat with ToolRegistry pattern
+- `tools_async.rs` - Basic tool definition examples
+- `chat_async.rs` - Basic chat without tools
+
+**Rationale:**
+- Clear feature identification in filename
+- Consistent `_async` / `_sync` suffix for execution mode
+- Grouped related examples by prefix
 
 ### HTTP Client: reqwest
 

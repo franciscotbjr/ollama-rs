@@ -8,6 +8,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **New example: `chat_with_tools_async`**: Complete chat with tools flow using weather API
+  - Demonstrates full tool call cycle (request → tool calls → execution → response)
+  - Mock weather service simulating HTTP calls to Open-Meteo API
+  - Type-safe tool implementation using `Tool` trait
+  - Multi-turn conversation with tool results
+- **Renamed example**: `tool_registry_async` → `chat_with_tools_registry_async` for consistent naming
 - **POST /api/generate endpoint**: Text generation (non-streaming)
   - `GenerateRequest` primitive type with full builder pattern
   - `GenerateResponse` primitive type with helper methods (text(), is_done(), tokens_per_second(), duration conversions)
