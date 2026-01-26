@@ -48,3 +48,7 @@ mockito = "1.7.1"
 [[example]]
 name = "tools_async"
 required-features = ["tools"]
+
+[[example]]
+name = "tool_registry_async"
+required-features = ["tools"]

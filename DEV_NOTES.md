@@ -140,6 +140,38 @@ primitives = []
 - Easy to extend for POST/streaming
 - Consistent behavior across endpoints
 
+### Type Erasure Pattern (ErasedTool)
+
+**Decision Date:** 2026-01-26
+
+The `ErasedTool` trait uses **type erasure** to enable storing heterogeneous tools in a single `ToolRegistry`.
+
+**Problem:**
+```rust
+// Tool trait is NOT object-safe (has associated types)
+trait Tool {
+    type Params;   // Concrete type known at compile time
+    type Output;   // Concrete type known at compile time
+}
+// Cannot create: Vec<Box<dyn Tool>>
+```
+
+**Solution:**
+```rust
+// ErasedTool is object-safe (types "erased" to JSON)
+trait ErasedTool {
+    fn execute_erased(&self, args: Value) -> ToolResult<Value>;
+}
+// Can create: Vec<Box<dyn ErasedTool>>
+```
+
+**Naming Convention:**
+- "Erased" indicates type information is removed at compile time
+- Common in Rust ecosystem (e.g., `erased-serde`, `type-erased` crates)
+- `ToolWrapper<T>` bridges typed `Tool` → type-erased `ErasedTool`
+
+**Location:** `src/tools/erased_tool.rs`
+
 ### HTTP Client: reqwest
 
 **Rationale:**
