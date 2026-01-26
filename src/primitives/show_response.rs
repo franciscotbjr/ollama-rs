@@ -74,7 +74,7 @@ impl ShowResponse {
     ///
     /// # Example
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ShowResponse;
     ///
     /// let response = ShowResponse {

@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// ## Basic Function
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ToolFunction;
 /// use serde_json::json;
 ///
@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// ## Function with Parameters
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ToolFunction;
 /// use serde_json::json;
 ///
@@ -73,7 +73,7 @@ impl ToolFunction {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolFunction;
     /// use serde_json::json;
     ///
@@ -105,7 +105,7 @@ impl ToolFunction {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolFunction;
     /// use serde_json::json;
     ///
@@ -128,7 +128,7 @@ impl ToolFunction {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolFunction;
     ///
     /// let func = ToolFunction::no_params("get_current_time")

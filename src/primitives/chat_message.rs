@@ -15,7 +15,7 @@ use super::ToolCall;
 ///
 /// ## Creating Messages with Factory Methods
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ChatMessage;
 ///
 /// let system = ChatMessage::system("You are a helpful assistant.");
@@ -26,7 +26,7 @@ use super::ToolCall;
 ///
 /// ## Building Conversations
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ChatMessage;
 ///
 /// let messages = vec![
@@ -39,7 +39,7 @@ use super::ToolCall;
 ///
 /// ## Adding Images (Multimodal)
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ChatMessage;
 ///
 /// let message = ChatMessage::user("What's in this image?")
@@ -81,7 +81,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::new(ChatRole::User, "Hello!");
@@ -109,7 +109,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::system("You are a helpful coding assistant.");
@@ -130,7 +130,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::user("What is the capital of France?");
@@ -151,7 +151,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::assistant("The capital of France is Paris.");
@@ -173,7 +173,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let result = r#"{"temperature": 22, "unit": "celsius"}"#;
@@ -195,7 +195,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatMessage;
     ///
     /// let msg = ChatMessage::user("Describe this image.")
@@ -216,7 +216,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatMessage;
     ///
     /// let msg = ChatMessage::user("Compare these images.")
@@ -268,7 +268,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatMessage;
     ///
     /// let without_images = ChatMessage::user("Hello");

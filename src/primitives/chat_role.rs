@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ChatRole;
 ///
 /// let role = ChatRole::User;

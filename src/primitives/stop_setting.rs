@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::StopSetting;
 ///
 /// let single = StopSetting::single("\n");

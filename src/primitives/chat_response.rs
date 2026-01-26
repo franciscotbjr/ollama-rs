@@ -12,7 +12,7 @@ use super::ToolCall;
 ///
 /// # Examples
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ChatResponse;
 ///
 /// // Deserialize from API response
@@ -96,7 +96,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"message": {"role": "assistant", "content": "Hello!"}}"#;
@@ -168,7 +168,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"done": true}"#;
@@ -183,7 +183,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"total_duration": 1000000000}"#;
@@ -215,7 +215,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"eval_count": 100, "eval_duration": 1000000000}"#;

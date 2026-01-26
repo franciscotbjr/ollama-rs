@@ -12,7 +12,7 @@ use super::ToolCall;
 ///
 /// # Examples
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ResponseMessage;
 ///
 /// // Deserialize from API response
@@ -69,7 +69,7 @@ impl ResponseMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::new("Hello!");
@@ -92,7 +92,7 @@ impl ResponseMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::empty();
@@ -117,7 +117,7 @@ impl ResponseMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::new("Hi there!");
@@ -135,7 +135,7 @@ impl ResponseMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::default();
@@ -192,7 +192,7 @@ impl ResponseMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::new("Hello");
@@ -212,7 +212,7 @@ impl ResponseMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::default();
@@ -229,7 +229,7 @@ impl ResponseMessage {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::new("No images");

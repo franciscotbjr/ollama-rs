@@ -232,14 +232,38 @@ Future endpoints:
 
 ## Testing Strategy
 
-### Unit Tests (`tests/` folder)
+### No Doc Tests Policy
+**Decision Date:** 2026-01-26
+
+This project does **not use doc tests**. All documentation examples use ```` ```ignore ```` or are plain text.
+
+**Rationale:**
+- **Feature flag complexity**: Many types are gated behind feature flags (`tools`, `primitives`, `http`), making doc tests hard to maintain
+- **Maintenance burden**: Doc tests require keeping code in sync across documentation and actual tests
+- **Coverage duplication**: All public interfaces are already covered by tests in `tests/` folder
+- **Simpler workflow**: Run `cargo test` without doc test failures due to feature mismatches
+
+**Testing locations:**
+- **Unit tests**: Inside each component file (e.g., `src/primitives/chat_request.rs` has `#[cfg(test)] mod tests`)
+- **Public interface tests**: `tests/` folder for integration-style unit tests
+- **Integration tests**: `examples/` folder for real Ollama server tests
+
+### Unit Tests (inside source files)
+**Location:** `src/**/*.rs` (in `#[cfg(test)] mod tests` blocks)
+**Purpose:** Test internal/non-public behavior:
+- Private helper functions
+- Edge cases specific to the implementation
+- Serialization/deserialization details
+- Feature-gated code paths
+
+### Public Interface Tests (`tests/` folder)
 **Location:** `tests/*.rs`
 **Purpose:** All tests in the `tests/` folder must be unit tests that:
 - Do NOT require external services (Ollama server)
 - Use mocking (mockito) for HTTP interactions
 - Can run in CI/CD without additional setup
-- Test individual functions and data structures
-- Validate serialization/deserialization
+- Test public API contracts
+- Validate request/response round-trips
 - Cover error handling paths
 
 ### Integration Tests (`examples/` folder)

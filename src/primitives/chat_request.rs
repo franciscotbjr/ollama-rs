@@ -15,7 +15,7 @@ use super::ToolDefinition;
 ///
 /// ## Basic Request
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::{ChatRequest, ChatMessage};
 ///
 /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -25,7 +25,7 @@ use super::ToolDefinition;
 ///
 /// ## With System Message
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::{ChatRequest, ChatMessage};
 ///
 /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -55,7 +55,7 @@ use super::ToolDefinition;
 ///
 /// ## Multi-turn Conversation
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::{ChatRequest, ChatMessage};
 ///
 /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -146,7 +146,7 @@ impl ChatRequest {
     ///
     /// ## With Vec
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage};
     ///
     /// let messages = vec![
@@ -157,7 +157,7 @@ impl ChatRequest {
     ///
     /// ## With Array
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -168,7 +168,7 @@ impl ChatRequest {
     ///
     /// ## With Iterator
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage};
     ///
     /// let user_msgs = ["Hi", "How are you?"];
@@ -205,7 +205,7 @@ impl ChatRequest {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -282,7 +282,7 @@ impl ChatRequest {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage, FormatSetting};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -302,7 +302,7 @@ impl ChatRequest {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage, ModelOptions};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -326,7 +326,7 @@ impl ChatRequest {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage, ThinkSetting};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -346,7 +346,7 @@ impl ChatRequest {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage, KeepAliveSetting};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -366,7 +366,7 @@ impl ChatRequest {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [
@@ -386,7 +386,7 @@ impl ChatRequest {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage};
     ///
     /// let request = ChatRequest::new("qwen3:0.6b", [

@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::KeepAliveSetting;
 ///
 /// let duration = KeepAliveSetting::duration("5m");

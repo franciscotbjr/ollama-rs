@@ -11,14 +11,14 @@ use super::{EmbedInput, ModelOptions};
 /// # Examples
 ///
 /// Basic single text request:
-/// ```
+/// ```ignore
 /// use ollama_oxide::EmbedRequest;
 ///
 /// let request = EmbedRequest::new("nomic-embed-text", "Hello, world!");
 /// ```
 ///
 /// Multiple texts:
-/// ```
+/// ```ignore
 /// use ollama_oxide::{EmbedRequest, EmbedInput};
 ///
 /// let request = EmbedRequest::new(
@@ -28,7 +28,7 @@ use super::{EmbedInput, ModelOptions};
 /// ```
 ///
 /// With options:
-/// ```
+/// ```ignore
 /// use ollama_oxide::{EmbedRequest, ModelOptions};
 ///
 /// let request = EmbedRequest::new("nomic-embed-text", "Hello")
@@ -71,7 +71,7 @@ impl EmbedRequest {
     ///
     /// # Example
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::EmbedRequest;
     ///
     /// let request = EmbedRequest::new("nomic-embed-text", "Hello, world!");

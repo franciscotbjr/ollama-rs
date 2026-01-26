@@ -44,3 +44,7 @@ futures = { version = "0.3.31", optional = true }
 
 [dev-dependencies]
 mockito = "1.7.1"
+
+[[example]]
+name = "tools_async"
+required-features = ["tools"]

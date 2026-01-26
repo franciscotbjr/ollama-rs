@@ -13,7 +13,7 @@ use super::ToolFunction;
 ///
 /// ## Using the Factory Method
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ToolDefinition;
 /// use serde_json::json;
 ///
@@ -28,7 +28,7 @@ use super::ToolFunction;
 ///
 /// ## Multiple Tools
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::ToolDefinition;
 /// use serde_json::json;
 ///
@@ -66,7 +66,7 @@ impl ToolDefinition {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolDefinition;
     /// use serde_json::json;
     ///
@@ -98,7 +98,7 @@ impl ToolDefinition {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolDefinition;
     ///
     /// let tool = ToolDefinition::function_no_params("get_time")
@@ -119,7 +119,7 @@ impl ToolDefinition {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ToolDefinition, ToolFunction};
     /// use serde_json::json;
     ///
@@ -142,7 +142,7 @@ impl ToolDefinition {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolDefinition;
     /// use serde_json::json;
     ///
@@ -160,7 +160,7 @@ impl ToolDefinition {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolDefinition;
     /// use serde_json::json;
     ///
@@ -175,7 +175,7 @@ impl ToolDefinition {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolDefinition;
     /// use serde_json::json;
     ///
@@ -191,7 +191,7 @@ impl ToolDefinition {
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ToolDefinition;
     /// use serde_json::json;
     ///

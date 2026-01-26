@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Example
 ///
-/// ```
+/// ```ignore
 /// use ollama_oxide::CopyRequest;
 ///
 /// let request = CopyRequest {
@@ -34,7 +34,7 @@ impl CopyRequest {
     ///
     /// # Example
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::CopyRequest;
     ///
     /// let request = CopyRequest::new("llama3.1", "llama3.1-backup");

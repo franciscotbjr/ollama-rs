@@ -321,7 +321,22 @@ All response types follow these patterns:
 
 ## Testing Architecture
 
-### Unit Tests (`tests/` folder)
+### No Doc Tests
+
+This project does **not use doc tests**. All documentation code examples use ```` ```ignore ```` or are plain text. See DEV_NOTES.md for rationale.
+
+**Test locations:**
+1. **Unit tests in source files**: `src/**/*.rs` (in `#[cfg(test)] mod tests` blocks) - test internal behavior
+2. **Public interface tests**: `tests/*.rs` - test public API contracts with mocking
+3. **Integration tests**: `examples/*.rs` - test against real Ollama server
+
+### Unit Tests (inside source files)
+Component-level tests live alongside the code:
+- Located in `#[cfg(test)] mod tests` blocks
+- Test internal/private behavior
+- Feature-gated tests use `#[cfg(feature = "...")]`
+
+### Public Interface Tests (`tests/` folder)
 All files in `tests/*.rs` must be **unit tests only**:
 - Use `mockito` for HTTP mocking
 - No external service dependencies
