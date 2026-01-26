@@ -2,7 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting, ToolDefinition};
+use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting};
+#[cfg(feature = "tools")]
+use super::ToolDefinition;
 
 /// Request body for POST /api/chat endpoint.
 ///
@@ -34,7 +36,9 @@ use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSet
 ///
 /// ## With Tools (Function Calling)
 ///
-/// ```
+/// Requires the `tools` feature.
+///
+/// ```ignore
 /// use ollama_oxide::{ChatRequest, ChatMessage, ToolDefinition};
 /// use serde_json::json;
 ///
@@ -77,6 +81,9 @@ pub struct ChatRequest {
     ///
     /// When provided, the model may choose to call one or more of these
     /// functions instead of (or in addition to) generating a text response.
+    ///
+    /// Requires the `tools` feature.
+    #[cfg(feature = "tools")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tools: Option<Vec<ToolDefinition>>,
 
@@ -176,6 +183,7 @@ impl ChatRequest {
         Self {
             model: model.into(),
             messages: messages.into_iter().collect(),
+            #[cfg(feature = "tools")]
             tools: None,
             format: None,
             options: None,
@@ -213,13 +221,15 @@ impl ChatRequest {
     ///
     /// Replaces any existing tools with the provided list.
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Arguments
     ///
     /// * `tools` - Vector of tool definitions
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage, ToolDefinition};
     /// use serde_json::json;
     ///
@@ -230,6 +240,7 @@ impl ChatRequest {
     ///         .with_description("Get the current time")
     /// ]);
     /// ```
+    #[cfg(feature = "tools")]
     pub fn with_tools(mut self, tools: Vec<ToolDefinition>) -> Self {
         self.tools = Some(tools);
         self
@@ -239,13 +250,15 @@ impl ChatRequest {
     ///
     /// Appends a tool to the existing list (creating the list if needed).
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Arguments
     ///
     /// * `tool` - The tool definition to add
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatRequest, ChatMessage, ToolDefinition};
     /// use serde_json::json;
     ///
@@ -255,6 +268,7 @@ impl ChatRequest {
     /// .with_tool(ToolDefinition::function("search", json!({})))
     /// .with_tool(ToolDefinition::function("calculate", json!({})));
     /// ```
+    #[cfg(feature = "tools")]
     pub fn with_tool(mut self, tool: ToolDefinition) -> Self {
         self.tools.get_or_insert_with(Vec::new).push(tool);
         self
@@ -401,11 +415,17 @@ impl ChatRequest {
     }
 
     /// Check if any tools are defined.
+    ///
+    /// Requires the `tools` feature.
+    #[cfg(feature = "tools")]
     pub fn has_tools(&self) -> bool {
         self.tools.as_ref().map(|t| !t.is_empty()).unwrap_or(false)
     }
 
     /// Get the tools if any.
+    ///
+    /// Requires the `tools` feature.
+    #[cfg(feature = "tools")]
     pub fn tools(&self) -> Option<&[ToolDefinition]> {
         self.tools.as_deref()
     }
@@ -457,6 +477,7 @@ mod tests {
         assert_eq!(request.messages.len(), 3);
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_request_with_tools() {
         let tool = ToolDefinition::function("test", json!({}));
@@ -467,6 +488,7 @@ mod tests {
         assert_eq!(request.tools().unwrap().len(), 1);
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_request_with_tool() {
         let request = ChatRequest::new("model", [ChatMessage::user("Hi")])
@@ -538,6 +560,7 @@ mod tests {
         assert_eq!(request.message_count(), 2);
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_request_has_tools() {
         let without = ChatRequest::new("model", [ChatMessage::user("Hi")]);
@@ -558,10 +581,12 @@ mod tests {
         assert_eq!(json["messages"][0]["content"], "Hello");
         assert_eq!(json["stream"], false);
         // Optional fields should be omitted
+        #[cfg(feature = "tools")]
         assert!(json.get("tools").is_none());
         assert!(json.get("format").is_none());
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_request_serialize_with_tools() {
         let request = ChatRequest::new("model", [ChatMessage::user("Hi")]).with_tools(vec![
@@ -631,8 +656,11 @@ mod tests {
 
     #[test]
     fn test_chat_request_clone() {
+        #[cfg(feature = "tools")]
         let request = ChatRequest::new("model", [ChatMessage::user("Hi")])
             .with_tool(ToolDefinition::function("f", json!({})));
+        #[cfg(not(feature = "tools"))]
+        let request = ChatRequest::new("model", [ChatMessage::user("Hi")]);
 
         let cloned = request.clone();
         assert_eq!(request, cloned);
@@ -648,6 +676,7 @@ mod tests {
         assert_ne!(req1, req3);
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_request_matches_api_format() {
         // Test that our serialization matches the expected Ollama API format

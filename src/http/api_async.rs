@@ -346,8 +346,8 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     ///
-    /// With tools (function calling):
-    /// ```no_run
+    /// With tools (function calling) - requires `tools` feature:
+    /// ```ignore
     /// use ollama_oxide::{OllamaClient, OllamaApiAsync, ChatRequest, ChatMessage, ToolDefinition};
     /// use serde_json::json;
     ///

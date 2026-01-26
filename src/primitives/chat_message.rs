@@ -2,7 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::{ChatRole, ToolCall};
+use super::ChatRole;
+#[cfg(feature = "tools")]
+use super::ToolCall;
 
 /// A message in a chat conversation.
 ///
@@ -62,6 +64,9 @@ pub struct ChatMessage {
     ///
     /// When replaying a conversation that included tool calls,
     /// include the original tool_calls in the assistant message.
+    ///
+    /// Requires the `tools` feature.
+    #[cfg(feature = "tools")]
     #[serde(skip_serializing_if = "Option::is_none")]
     pub tool_calls: Option<Vec<ToolCall>>,
 }
@@ -88,6 +93,7 @@ impl ChatMessage {
             role,
             content: content.into(),
             images: None,
+            #[cfg(feature = "tools")]
             tool_calls: None,
         }
     }
@@ -231,13 +237,15 @@ impl ChatMessage {
     /// When replaying a conversation that included tool calls,
     /// include the original tool_calls in the assistant message.
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Arguments
     ///
     /// * `tool_calls` - The tool calls made by the assistant
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatMessage, ToolCall, ToolCallFunction};
     /// use serde_json::json;
     ///
@@ -250,6 +258,7 @@ impl ChatMessage {
     ///     .with_tool_calls(vec![call]);
     /// assert!(msg.tool_calls.is_some());
     /// ```
+    #[cfg(feature = "tools")]
     pub fn with_tool_calls(mut self, tool_calls: Vec<ToolCall>) -> Self {
         self.tool_calls = Some(tool_calls);
         self
@@ -274,9 +283,11 @@ impl ChatMessage {
 
     /// Check if this message has any tool calls.
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::{ChatMessage, ToolCall, ToolCallFunction};
     ///
     /// let without_tools = ChatMessage::assistant("Hello");
@@ -286,6 +297,7 @@ impl ChatMessage {
     ///     .with_tool_calls(vec![ToolCall::new(ToolCallFunction::new("test"))]);
     /// assert!(with_tools.has_tool_calls());
     /// ```
+    #[cfg(feature = "tools")]
     pub fn has_tool_calls(&self) -> bool {
         self.tool_calls
             .as_ref()
@@ -317,6 +329,7 @@ impl ChatMessage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "tools")]
     use crate::ToolCallFunction;
     use serde_json::json;
 
@@ -326,6 +339,7 @@ mod tests {
         assert_eq!(msg.role, ChatRole::User);
         assert_eq!(msg.content, "Hello");
         assert!(msg.images.is_none());
+        #[cfg(feature = "tools")]
         assert!(msg.tool_calls.is_none());
     }
 
@@ -384,6 +398,7 @@ mod tests {
         assert_eq!(images.len(), 3);
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_message_with_tool_calls() {
         let call = ToolCall::new(ToolCallFunction::new("test"));
@@ -401,6 +416,7 @@ mod tests {
             role: ChatRole::User,
             content: "test".into(),
             images: Some(vec![]),
+            #[cfg(feature = "tools")]
             tool_calls: None,
         };
         assert!(!empty_images.has_images());
@@ -409,6 +425,7 @@ mod tests {
         assert!(with_images.has_images());
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_message_has_tool_calls() {
         let no_tools = ChatMessage::assistant("Hi");
@@ -450,6 +467,7 @@ mod tests {
         assert_eq!(json["role"], "user");
         assert_eq!(json["content"], "Hello");
         assert!(json.get("images").is_none()); // Skipped when None
+        #[cfg(feature = "tools")]
         assert!(json.get("tool_calls").is_none());
     }
 
@@ -461,6 +479,7 @@ mod tests {
         assert_eq!(json["images"], json!(["data"]));
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_message_serialize_with_tool_calls() {
         let call = ToolCall::new(ToolCallFunction::with_arguments("f", json!({"x": 1})));
@@ -482,6 +501,7 @@ mod tests {
         assert_eq!(msg.role, ChatRole::User);
         assert_eq!(msg.content, "Hello world");
         assert!(msg.images.is_none());
+        #[cfg(feature = "tools")]
         assert!(msg.tool_calls.is_none());
     }
 
@@ -497,6 +517,7 @@ mod tests {
         assert_eq!(msg.images, Some(vec!["img1".to_string(), "img2".to_string()]));
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_message_deserialize_with_tool_calls() {
         let json = r#"{

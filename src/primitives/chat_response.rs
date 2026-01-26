@@ -2,7 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::{Logprob, ResponseMessage, ToolCall};
+use super::{Logprob, ResponseMessage};
+#[cfg(feature = "tools")]
+use super::ToolCall;
 
 /// Response from POST /api/chat endpoint.
 ///
@@ -118,13 +120,15 @@ impl ChatResponse {
 
     /// Get tool calls from the response.
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Returns
     ///
     /// A slice of tool calls, or `None` if no tool calls.
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{
@@ -138,20 +142,24 @@ impl ChatResponse {
     /// let response: ChatResponse = serde_json::from_str(json).unwrap();
     /// assert!(response.tool_calls().is_some());
     /// ```
+    #[cfg(feature = "tools")]
     pub fn tool_calls(&self) -> Option<&[ToolCall]> {
         self.message.as_ref().and_then(|m| m.tool_calls.as_deref())
     }
 
     /// Check if the response contains tool calls.
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ChatResponse;
     ///
     /// let response = ChatResponse::default();
     /// assert!(!response.has_tool_calls());
     /// ```
+    #[cfg(feature = "tools")]
     pub fn has_tool_calls(&self) -> bool {
         self.tool_calls().map(|tc| !tc.is_empty()).unwrap_or(false)
     }
@@ -277,7 +285,9 @@ impl ChatResponse {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "tools")]
     use crate::ToolCallFunction;
+    #[allow(unused_imports)]
     use serde_json::json;
 
     #[test]
@@ -323,6 +333,7 @@ mod tests {
         assert!(response.has_thinking());
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_response_tool_calls() {
         let json = r#"{
@@ -342,6 +353,7 @@ mod tests {
         assert_eq!(calls[0].function_name(), Some("get_weather"));
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_response_no_tool_calls() {
         let json = r#"{"message": {"role": "assistant", "content": "Hello"}}"#;
@@ -480,6 +492,7 @@ mod tests {
         assert!(response.tokens_per_second().is_some());
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_chat_response_deserialize_with_tool_calls() {
         let json = r#"{

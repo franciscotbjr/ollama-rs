@@ -3,8 +3,10 @@
 use ollama_oxide::{
     ChatMessage, ChatRequest, ChatResponse, ChatRole, ClientConfig, FormatSetting,
     KeepAliveSetting, ModelOptions, OllamaApiAsync, OllamaApiSync, OllamaClient, ResponseMessage,
-    ThinkSetting, ToolCall, ToolCallFunction, ToolDefinition, ToolFunction,
+    ThinkSetting,
 };
+#[cfg(feature = "tools")]
+use ollama_oxide::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 use serde_json::json;
 use std::time::Duration;
 
@@ -104,6 +106,7 @@ fn test_chat_message_with_multiple_images() {
     assert_eq!(msg.images.as_ref().unwrap().len(), 2);
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_chat_message_with_tool_calls() {
     let call = ToolCall::new(ToolCallFunction::new("test"));
@@ -131,9 +134,10 @@ fn test_chat_message_deserialization() {
 }
 
 // ============================================================================
-// ToolFunction Type Tests
+// ToolFunction Type Tests (requires "tools" feature)
 // ============================================================================
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_function_new() {
     let func = ToolFunction::new("get_time", json!({"type": "object", "properties": {}}));
@@ -141,18 +145,21 @@ fn test_tool_function_new() {
     assert!(func.description.is_none());
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_function_with_description() {
     let func = ToolFunction::new("search", json!({})).with_description("Search the web");
     assert_eq!(func.description, Some("Search the web".to_string()));
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_function_no_params() {
     let func = ToolFunction::no_params("get_time");
     assert_eq!(func.parameters["type"], "object");
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_function_serialization() {
     let func = ToolFunction::new(
@@ -172,9 +179,10 @@ fn test_tool_function_serialization() {
 }
 
 // ============================================================================
-// ToolDefinition Type Tests
+// ToolDefinition Type Tests (requires "tools" feature)
 // ============================================================================
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_definition_function() {
     let tool = ToolDefinition::function("test", json!({"type": "object"}));
@@ -182,18 +190,21 @@ fn test_tool_definition_function() {
     assert_eq!(tool.function.name, "test");
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_definition_function_no_params() {
     let tool = ToolDefinition::function_no_params("get_time");
     assert_eq!(tool.name(), "get_time");
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_definition_with_description() {
     let tool = ToolDefinition::function("test", json!({})).with_description("A test tool");
     assert_eq!(tool.description(), Some("A test tool"));
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_definition_serialization() {
     let tool = ToolDefinition::function(
@@ -211,9 +222,10 @@ fn test_tool_definition_serialization() {
 }
 
 // ============================================================================
-// ToolCallFunction Type Tests
+// ToolCallFunction Type Tests (requires "tools" feature)
 // ============================================================================
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_function_new() {
     let func = ToolCallFunction::new("test");
@@ -221,6 +233,7 @@ fn test_tool_call_function_new() {
     assert!(func.arguments.is_none());
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_function_with_arguments() {
     let func = ToolCallFunction::with_arguments("calc", json!({"x": 42}));
@@ -228,6 +241,7 @@ fn test_tool_call_function_with_arguments() {
     assert_eq!(func.arguments.as_ref().unwrap()["x"], 42);
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_function_arguments_as() {
     #[derive(serde::Deserialize, PartialEq, Debug)]
@@ -240,6 +254,7 @@ fn test_tool_call_function_arguments_as() {
     assert_eq!(args.unwrap().x, 42);
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_function_deserialization() {
     let json = r#"{"name": "get_weather", "arguments": {"location": "Paris"}}"#;
@@ -250,9 +265,10 @@ fn test_tool_call_function_deserialization() {
 }
 
 // ============================================================================
-// ToolCall Type Tests
+// ToolCall Type Tests (requires "tools" feature)
 // ============================================================================
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_new() {
     let call = ToolCall::new(ToolCallFunction::new("test"));
@@ -260,6 +276,7 @@ fn test_tool_call_new() {
     assert_eq!(call.function_name(), Some("test"));
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_default() {
     let call = ToolCall::default();
@@ -267,12 +284,14 @@ fn test_tool_call_default() {
     assert!(call.function_name().is_none());
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_arguments() {
     let call = ToolCall::new(ToolCallFunction::with_arguments("calc", json!({"x": 1})));
     assert_eq!(call.arguments().unwrap()["x"], 1);
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_deserialization() {
     let json = r#"{"function": {"name": "test", "arguments": {"a": 1}}}"#;
@@ -299,6 +318,7 @@ fn test_response_message_empty() {
     assert!(!msg.has_content());
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_response_message_with_tool_calls() {
     let json = r#"{
@@ -351,6 +371,7 @@ fn test_chat_request_with_message() {
     assert_eq!(request.messages.len(), 2);
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_chat_request_with_tools() {
     let tool = ToolDefinition::function("test", json!({}));
@@ -360,6 +381,7 @@ fn test_chat_request_with_tools() {
     assert_eq!(request.tools().unwrap().len(), 1);
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_chat_request_with_tool() {
     let request = ChatRequest::new("model", [ChatMessage::user("Hi")])
@@ -419,6 +441,7 @@ fn test_chat_request_serialization_minimal() {
     assert!(json.contains(r#""content":"Hello""#));
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_chat_request_serialization_with_tools() {
     let request = ChatRequest::new("model", [ChatMessage::user("Hi")]).with_tools(vec![
@@ -452,6 +475,7 @@ fn test_chat_response_content() {
     assert_eq!(response.content(), Some("Hello!"));
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_chat_response_tool_calls() {
     let json = r#"{
@@ -628,6 +652,7 @@ async fn test_chat_async_multi_turn() {
     mock.assert_async().await;
 }
 
+#[cfg(feature = "tools")]
 #[tokio::test]
 async fn test_chat_async_with_tools() {
     let mut server = mockito::Server::new_async().await;
@@ -854,24 +879,28 @@ fn test_chat_response_is_send_sync() {
     assert_send_sync::<ChatResponse>();
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_function_is_send_sync() {
     fn assert_send_sync<T: Send + Sync>() {}
     assert_send_sync::<ToolFunction>();
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_definition_is_send_sync() {
     fn assert_send_sync<T: Send + Sync>() {}
     assert_send_sync::<ToolDefinition>();
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_is_send_sync() {
     fn assert_send_sync<T: Send + Sync>() {}
     assert_send_sync::<ToolCall>();
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_call_function_is_send_sync() {
     fn assert_send_sync<T: Send + Sync>() {}
@@ -911,6 +940,7 @@ fn test_chat_response_clone() {
     assert_eq!(response, cloned);
 }
 
+#[cfg(feature = "tools")]
 #[test]
 fn test_tool_definition_clone() {
     let tool = ToolDefinition::function("test", json!({})).with_description("A test");

@@ -10,8 +10,10 @@
 
 use ollama_oxide::{
     ChatMessage, ChatRequest, FormatSetting, ModelOptions, OllamaApiAsync, OllamaClient,
-    ToolDefinition,
 };
+#[cfg(feature = "tools")]
+use ollama_oxide::ToolDefinition;
+#[cfg(feature = "tools")]
 use serde_json::json;
 
 #[tokio::main]
@@ -90,40 +92,49 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("JSON: {}", response.content().unwrap_or("No JSON"));
 
     // Example 6: With tools (function calling)
-    println!("\n--- With Tools (Function Calling) ---");
-    let request = ChatRequest::new(
-        model,
-        [ChatMessage::user("What's the weather like in Paris?")],
-    )
-    .with_tools(vec![ToolDefinition::function(
-        "get_weather",
-        json!({
-            "type": "object",
-            "properties": {
-                "location": {
-                    "type": "string",
-                    "description": "The city name"
+    // Note: Requires the "tools" feature to be enabled
+    #[cfg(feature = "tools")]
+    {
+        println!("\n--- With Tools (Function Calling) ---");
+        let request = ChatRequest::new(
+            model,
+            [ChatMessage::user("What's the weather like in Paris?")],
+        )
+        .with_tools(vec![ToolDefinition::function(
+            "get_weather",
+            json!({
+                "type": "object",
+                "properties": {
+                    "location": {
+                        "type": "string",
+                        "description": "The city name"
+                    },
+                    "unit": {
+                        "type": "string",
+                        "enum": ["celsius", "fahrenheit"]
+                    }
                 },
-                "unit": {
-                    "type": "string",
-                    "enum": ["celsius", "fahrenheit"]
-                }
-            },
-            "required": ["location"]
-        }),
-    )
-    .with_description("Get the current weather for a location")]);
+                "required": ["location"]
+            }),
+        )
+        .with_description("Get the current weather for a location")]);
 
-    let response = client.chat(&request).await?;
+        let response = client.chat(&request).await?;
 
-    if response.has_tool_calls() {
-        println!("Model requested tool calls:");
-        for call in response.tool_calls().unwrap() {
-            println!("  Function: {:?}", call.function_name());
-            println!("  Arguments: {:?}", call.arguments());
+        if response.has_tool_calls() {
+            println!("Model requested tool calls:");
+            for call in response.tool_calls().unwrap() {
+                println!("  Function: {:?}", call.function_name());
+                println!("  Arguments: {:?}", call.arguments());
+            }
+        } else {
+            println!("Response: {}", response.content().unwrap_or("No response"));
         }
-    } else {
-        println!("Response: {}", response.content().unwrap_or("No response"));
+    }
+    #[cfg(not(feature = "tools"))]
+    {
+        println!("\n--- With Tools (Function Calling) ---");
+        println!("(Skipped: requires 'tools' feature)");
     }
 
     // Example 7: Performance metrics

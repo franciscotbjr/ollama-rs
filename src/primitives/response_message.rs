@@ -2,6 +2,7 @@
 
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "tools")]
 use super::ToolCall;
 
 /// Message in a chat response.
@@ -46,6 +47,9 @@ pub struct ResponseMessage {
     /// When present, the assistant is requesting your application to
     /// execute one or more functions. Execute them and send the results
     /// back in a follow-up request.
+    ///
+    /// Requires the `tools` feature.
+    #[cfg(feature = "tools")]
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tool_calls: Option<Vec<ToolCall>>,
 
@@ -76,6 +80,7 @@ impl ResponseMessage {
             role: Some("assistant".to_string()),
             content: Some(content.into()),
             thinking: None,
+            #[cfg(feature = "tools")]
             tool_calls: None,
             images: None,
         }
@@ -98,6 +103,7 @@ impl ResponseMessage {
             role: Some("assistant".to_string()),
             content: None,
             thinking: None,
+            #[cfg(feature = "tools")]
             tool_calls: None,
             images: None,
         }
@@ -141,32 +147,38 @@ impl ResponseMessage {
 
     /// Get the tool calls if any.
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Returns
     ///
     /// A slice of tool calls, or `None` if no tool calls.
     ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::new("Hello");
     /// assert!(msg.tool_calls().is_none());
     /// ```
+    #[cfg(feature = "tools")]
     pub fn tool_calls(&self) -> Option<&[ToolCall]> {
         self.tool_calls.as_deref()
     }
 
     /// Check if the message contains tool calls.
     ///
+    /// Requires the `tools` feature.
+    ///
     /// # Examples
     ///
-    /// ```
+    /// ```ignore
     /// use ollama_oxide::ResponseMessage;
     ///
     /// let msg = ResponseMessage::new("No tools here");
     /// assert!(!msg.has_tool_calls());
     /// ```
+    #[cfg(feature = "tools")]
     pub fn has_tool_calls(&self) -> bool {
         self.tool_calls
             .as_ref()
@@ -243,7 +255,9 @@ impl ResponseMessage {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[cfg(feature = "tools")]
     use crate::ToolCallFunction;
+    #[allow(unused_imports)]
     use serde_json::json;
 
     #[test]
@@ -252,6 +266,7 @@ mod tests {
         assert_eq!(msg.role, Some("assistant".to_string()));
         assert_eq!(msg.content, Some("Hello".to_string()));
         assert!(msg.thinking.is_none());
+        #[cfg(feature = "tools")]
         assert!(msg.tool_calls.is_none());
         assert!(msg.images.is_none());
     }
@@ -269,6 +284,7 @@ mod tests {
         assert!(msg.role.is_none());
         assert!(msg.content.is_none());
         assert!(msg.thinking.is_none());
+        #[cfg(feature = "tools")]
         assert!(msg.tool_calls.is_none());
         assert!(msg.images.is_none());
     }
@@ -289,6 +305,7 @@ mod tests {
         assert_eq!(msg.thinking(), Some("Thinking process..."));
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_response_message_tool_calls() {
         let call = ToolCall::new(ToolCallFunction::new("test"));
@@ -299,6 +316,7 @@ mod tests {
         assert_eq!(msg.tool_calls().unwrap().len(), 1);
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_response_message_has_tool_calls() {
         let msg = ResponseMessage::new("No tools");
@@ -367,10 +385,12 @@ mod tests {
         assert_eq!(json["role"], "assistant");
         assert_eq!(json["content"], "Hello!");
         assert!(json.get("thinking").is_none()); // Skipped when None
+        #[cfg(feature = "tools")]
         assert!(json.get("tool_calls").is_none());
         assert!(json.get("images").is_none());
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_response_message_serialize_with_tool_calls() {
         let mut msg = ResponseMessage::empty();
@@ -409,6 +429,7 @@ mod tests {
         assert_eq!(msg.thinking(), Some("Let me calculate this step by step..."));
     }
 
+    #[cfg(feature = "tools")]
     #[test]
     fn test_response_message_deserialize_with_tool_calls() {
         let json = r#"{
@@ -442,7 +463,10 @@ mod tests {
     fn test_response_message_clone() {
         let mut msg = ResponseMessage::new("Test");
         msg.thinking = Some("Thinking".to_string());
-        msg.tool_calls = Some(vec![ToolCall::new(ToolCallFunction::new("f"))]);
+        #[cfg(feature = "tools")]
+        {
+            msg.tool_calls = Some(vec![ToolCall::new(ToolCallFunction::new("f"))]);
+        }
 
         let cloned = msg.clone();
         assert_eq!(msg, cloned);
