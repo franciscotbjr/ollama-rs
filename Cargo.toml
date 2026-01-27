@@ -16,9 +16,11 @@ exclude = [
     "spec/*",
     "impl/*",
     "tmp/*",
-    "DEV_NOTES.md",
-    "CONTRIBUTING.md",
     "ARCHITECTURE.md",
+    "BLOCKERS.md",
+    "CONTRIBUTING.md",
+    "DECISIONS.md",
+    "DEV_NOTES.md",
     "impl.md",
 ]
 
@@ -28,6 +30,7 @@ conveniences = ["http", "primitives"]
 http = []
 primitives = []
 tools = ["dep:schemars", "dep:futures"]
+create = []
 
 [dependencies]
 tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread", "time"] }

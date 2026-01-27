@@ -23,7 +23,7 @@
 //!
 //! # Quick Start
 //!
-//! ```ignore
+//! ```no_run
 //! use ollama_oxide::tools::{Tool, ToolRegistry, ToolResult};
 //! use schemars::JsonSchema;
 //! use serde::{Deserialize, Serialize};

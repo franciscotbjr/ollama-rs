@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ToolCallFunction;
 /// use serde_json::json;
 ///
@@ -52,7 +52,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     ///
     /// let func = ToolCallFunction::new("get_time");
@@ -76,7 +76,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     /// use serde_json::json;
     ///
@@ -99,7 +99,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     ///
     /// let func = ToolCallFunction::new("search")
@@ -126,7 +126,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     /// use serde::Deserialize;
     /// use serde_json::json;

@@ -11,7 +11,7 @@ use super::StopSetting;
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ModelOptions;
 ///
 /// let options = ModelOptions::default()

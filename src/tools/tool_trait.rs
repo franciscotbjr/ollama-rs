@@ -26,7 +26,7 @@ use super::tool_error::ToolResult;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::tools::{Tool, ToolResult};
 /// use schemars::JsonSchema;
 /// use serde::{Deserialize, Serialize};
