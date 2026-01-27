@@ -1,10 +1,16 @@
 //! Async API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest, CreateRequest, CreateResponse, DeleteRequest,
+    ChatRequest, ChatResponse, CopyRequest, DeleteRequest,
     EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
     Result, ShowRequest, ShowResponse, VersionResponse,
 };
+
+#[cfg(feature = "create")]
+use crate::{
+    CreateRequest, CreateResponse,
+};
+
 use async_trait::async_trait;
 
 use super::OllamaClient;
@@ -347,7 +353,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// ```
     ///
     /// With tools (function calling) - requires `tools` feature:
-    /// ```no_run
+    /// ```ignore
     /// use ollama_oxide::{OllamaClient, OllamaApiAsync, ChatRequest, ChatMessage, ToolDefinition};
     /// use serde_json::json;
     ///
@@ -405,6 +411,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "create")]
     async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse>;
 }
 
@@ -455,6 +462,7 @@ impl OllamaApiAsync for OllamaClient {
         self.post_with_retry(&url, request).await
     }
 
+    #[cfg(feature = "create")]
     async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse> {
         let url = self.config.url(Endpoints::CREATE);
         self.post_with_retry(&url, request).await

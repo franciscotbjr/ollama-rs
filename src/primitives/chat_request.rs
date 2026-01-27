@@ -38,7 +38,7 @@ use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSet
 ///
 /// Requires the `tools` feature.
 ///
-/// ```no_run
+/// ```ignore
 /// use ollama_oxide::{ChatRequest, ChatMessage, ToolDefinition};
 /// use serde_json::json;
 ///

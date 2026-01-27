@@ -54,8 +54,6 @@ pub use primitives::{
     // Other primitives
     CopyRequest,
     // Create types
-    CreateRequest,
-    CreateResponse,
     DeleteRequest,
     EmbedInput,
     EmbedRequest,
@@ -64,7 +62,6 @@ pub use primitives::{
     GenerateRequest,
     GenerateResponse,
     KeepAliveSetting,
-    LicenseSetting,
     ListResponse,
     Logprob,
     ModelDetails,
@@ -97,6 +94,16 @@ pub mod http;
 pub use http::{ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
 
 // ============================================================================
+// Create Module
+// ============================================================================
+
+#[cfg(feature = "create")]
+pub mod create;
+
+#[cfg(feature = "create")]
+pub use create::{LicenseSetting, CreateRequest, CreateResponse};
+
+// ============================================================================
 // Ergonomic Tools Module (requires "tools" feature)
 // ============================================================================
 
@@ -123,8 +130,6 @@ pub mod prelude {
         // Other primitives
         CopyRequest,
         // Create types
-        CreateRequest,
-        CreateResponse,
         DeleteRequest,
         EmbedInput,
         EmbedRequest,
@@ -133,7 +138,6 @@ pub mod prelude {
         GenerateRequest,
         GenerateResponse,
         KeepAliveSetting,
-        LicenseSetting,
         ListResponse,
         Logprob,
         ModelDetails,
@@ -154,4 +158,9 @@ pub mod prelude {
     // Tool types (requires both "primitives" and "tools" features)
     #[cfg(all(feature = "primitives", feature = "tools"))]
     pub use crate::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
+
+    // Create types (requires both "primitives" and "create" features)
+    #[cfg(all(feature = "primitives", feature = "create"))]
+    pub use crate::{LicenseSetting, CreateRequest, CreateResponse};
+
 }

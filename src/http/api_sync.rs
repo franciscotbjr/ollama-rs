@@ -1,9 +1,14 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest, CreateRequest, CreateResponse, DeleteRequest,
+    ChatRequest, ChatResponse, CopyRequest, DeleteRequest,
     EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
     Result, ShowRequest, ShowResponse, VersionResponse,
+};
+
+#[cfg(feature = "create")]
+use crate::{
+    CreateRequest, CreateResponse,
 };
 
 use super::OllamaClient;
@@ -345,6 +350,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "create")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse>;
 }
 
@@ -394,6 +400,7 @@ impl OllamaApiSync for OllamaClient {
         self.post_blocking_with_retry(&url, request)
     }
 
+    #[cfg(feature = "create")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse> {
         let url = self.config.url(Endpoints::CREATE);
         self.post_blocking_with_retry(&url, request)

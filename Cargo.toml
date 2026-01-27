@@ -59,3 +59,7 @@ required-features = ["tools"]
 [[example]]
 name = "chat_with_tools_async"
 required-features = ["tools"]
+
+[[example]]
+name = "create_model_async"
+required-features = ["create"]
