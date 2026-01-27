@@ -53,8 +53,6 @@ pub use primitives::{
     ChatRole,
     // Other primitives
     CopyRequest,
-    // Create types
-    DeleteRequest,
     EmbedInput,
     EmbedRequest,
     EmbedResponse,
@@ -101,7 +99,7 @@ pub use http::{ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
 pub mod create;
 
 #[cfg(feature = "create")]
-pub use create::{LicenseSetting, CreateRequest, CreateResponse};
+pub use create::{LicenseSetting, CreateRequest, CreateResponse, DeleteRequest};
 
 // ============================================================================
 // Ergonomic Tools Module (requires "tools" feature)
@@ -129,8 +127,6 @@ pub mod prelude {
         ChatRole,
         // Other primitives
         CopyRequest,
-        // Create types
-        DeleteRequest,
         EmbedInput,
         EmbedRequest,
         EmbedResponse,
@@ -161,6 +157,6 @@ pub mod prelude {
 
     // Create types (requires both "primitives" and "create" features)
     #[cfg(all(feature = "primitives", feature = "create"))]
-    pub use crate::{LicenseSetting, CreateRequest, CreateResponse};
+    pub use crate::{LicenseSetting, CreateRequest, CreateResponse, DeleteRequest};
 
 }

@@ -1,14 +1,14 @@
 //! Async API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest, DeleteRequest,
+    ChatRequest, ChatResponse, CopyRequest, 
     EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
     Result, ShowRequest, ShowResponse, VersionResponse,
 };
 
 #[cfg(feature = "create")]
 use crate::{
-    CreateRequest, CreateResponse,
+    CreateRequest, CreateResponse, DeleteRequest
 };
 
 use async_trait::async_trait;
@@ -170,7 +170,7 @@ pub trait OllamaApiAsync: Send + Sync {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```ignore
     /// use ollama_oxide::{OllamaClient, OllamaApiAsync, DeleteRequest};
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
@@ -181,6 +181,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "create")]
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()>;
 
     /// Show detailed information about a model (async)
@@ -437,6 +438,7 @@ impl OllamaApiAsync for OllamaClient {
         self.get_with_retry(&url).await
     }
 
+    #[cfg(feature = "create")]
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_with_retry(&url, request).await

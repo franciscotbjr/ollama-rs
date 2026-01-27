@@ -1,14 +1,14 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest, DeleteRequest,
+    ChatRequest, ChatResponse, CopyRequest,
     EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
     Result, ShowRequest, ShowResponse, VersionResponse,
 };
 
 #[cfg(feature = "create")]
 use crate::{
-    CreateRequest, CreateResponse,
+    CreateRequest, CreateResponse, DeleteRequest
 };
 
 use super::OllamaClient;
@@ -172,7 +172,7 @@ pub trait OllamaApiSync: Send + Sync {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```ignore
     /// use ollama_oxide::{OllamaClient, OllamaApiSync, DeleteRequest};
     ///
     /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
@@ -183,6 +183,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "create")]
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()>;
 
     /// Show detailed information about a model (blocking)
@@ -375,6 +376,7 @@ impl OllamaApiSync for OllamaClient {
         self.get_blocking_with_retry(&url)
     }
 
+    #[cfg(feature = "create")]
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_blocking_with_retry(&url, request)
