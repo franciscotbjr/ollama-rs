@@ -75,3 +75,12 @@ required-features = ["create"]
 [[example]]
 name = "delete_model_sync"
 required-features = ["create"]
+
+[[test]]
+name = "client_delete_model_tests"
+required-features = ["create"]
+
+[[test]]
+name = "client_create_model_tests"
+required-features = ["create"]
+

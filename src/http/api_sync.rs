@@ -1,15 +1,12 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest,
-    EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
-    Result, ShowRequest, ShowResponse, VersionResponse,
+    ChatRequest, ChatResponse, CopyRequest, EmbedRequest, EmbedResponse, GenerateRequest,
+    GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
 };
 
 #[cfg(feature = "create")]
-use crate::{
-    CreateRequest, CreateResponse, DeleteRequest
-};
+use crate::{CreateRequest, CreateResponse, DeleteRequest};
 
 use super::OllamaClient;
 use super::endpoints::Endpoints;

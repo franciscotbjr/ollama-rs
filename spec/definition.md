@@ -655,7 +655,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 **Complex POST Endpoints (5) - Non-Streaming Mode:**
 - [x] `POST /api/generate` - Text generation (non-streaming only)
 - [x] `POST /api/chat` - Chat completions (non-streaming only)
-- [ ] `POST /api/create` - Model creation (non-streaming only)
+- [x] `POST /api/create` - Model creation (non-streaming only)
 - [ ] `POST /api/pull` - Model download (non-streaming only)
 - [ ] `POST /api/push` - Model upload (non-streaming only)
 

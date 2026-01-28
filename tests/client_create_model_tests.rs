@@ -3,15 +3,9 @@
 //! All tests use mockito for HTTP mocking - no real Ollama server required.
 
 use mockito::{Matcher, Server};
-use ollama_oxide::{
-    ChatMessage, ClientConfig, OllamaApiAsync,
-    OllamaApiSync, OllamaClient,
-};
+use ollama_oxide::{ChatMessage, ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
 
-#[cfg(feature = "create")]
-use ollama_oxide::{
-    CreateRequest, CreateResponse, LicenseSetting,
-};
+use ollama_oxide::{CreateRequest, CreateResponse, LicenseSetting};
 use serde_json::json;
 use std::time::Duration;
 
@@ -27,7 +21,6 @@ fn make_config(base_url: String) -> ClientConfig {
 // Async Client Tests (with mocking)
 // ============================================================================
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_success() {
     let mut server = Server::new_async().await;
@@ -55,7 +48,6 @@ async fn test_create_model_async_success() {
     mock.assert_async().await;
 }
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_with_system() {
     let mut server = Server::new_async().await;
@@ -85,7 +77,6 @@ async fn test_create_model_async_with_system() {
     mock.assert_async().await;
 }
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_with_all_options() {
     let mut server = Server::new_async().await;
@@ -121,7 +112,6 @@ async fn test_create_model_async_with_all_options() {
     mock.assert_async().await;
 }
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_with_messages() {
     let mut server = Server::new_async().await;
@@ -156,7 +146,6 @@ async fn test_create_model_async_with_messages() {
     mock.assert_async().await;
 }
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_with_parameters() {
     let mut server = Server::new_async().await;
@@ -191,7 +180,6 @@ async fn test_create_model_async_with_parameters() {
     mock.assert_async().await;
 }
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_with_multiple_licenses() {
     let mut server = Server::new_async().await;
@@ -221,7 +209,6 @@ async fn test_create_model_async_with_multiple_licenses() {
     mock.assert_async().await;
 }
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_not_found() {
     let mut server = Server::new_async().await;
@@ -243,7 +230,6 @@ async fn test_create_model_async_not_found() {
     mock.assert_async().await;
 }
 
-#[cfg(feature = "create")]
 #[tokio::test]
 async fn test_create_model_async_response_status() {
     let mut server = Server::new_async().await;
@@ -271,7 +257,6 @@ async fn test_create_model_async_response_status() {
 // Sync Client Tests (with mocking)
 // ============================================================================
 
-#[cfg(feature = "create")]
 #[test]
 fn test_create_model_sync_success() {
     let mut server = Server::new();
@@ -298,7 +283,6 @@ fn test_create_model_sync_success() {
     mock.assert();
 }
 
-#[cfg(feature = "create")]
 #[test]
 fn test_create_model_sync_with_system() {
     let mut server = Server::new();
@@ -327,7 +311,6 @@ fn test_create_model_sync_with_system() {
     mock.assert();
 }
 
-#[cfg(feature = "create")]
 #[test]
 fn test_create_model_sync_not_found() {
     let mut server = Server::new();
@@ -352,7 +335,6 @@ fn test_create_model_sync_not_found() {
 // CreateResponse Tests
 // ============================================================================
 
-#[cfg(feature = "create")]
 #[test]
 fn test_create_response_deserialization() {
     let json = r#"{"status": "success"}"#;
@@ -361,21 +343,18 @@ fn test_create_response_deserialization() {
     assert!(response.is_success());
 }
 
-#[cfg(feature = "create")]
 #[test]
 fn test_create_response_is_success_true() {
     let response: CreateResponse = serde_json::from_str(r#"{"status": "success"}"#).unwrap();
     assert!(response.is_success());
 }
 
-#[cfg(feature = "create")]
 #[test]
 fn test_create_response_is_success_false() {
     let response: CreateResponse = serde_json::from_str(r#"{"status": "creating"}"#).unwrap();
     assert!(!response.is_success());
 }
 
-#[cfg(feature = "create")]
 #[test]
 fn test_create_response_empty() {
     let response: CreateResponse = serde_json::from_str("{}").unwrap();

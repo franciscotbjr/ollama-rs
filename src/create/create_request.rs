@@ -3,8 +3,8 @@
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use super::{LicenseSetting};
-use crate::{ChatMessage};
+use super::LicenseSetting;
+use crate::ChatMessage;
 
 /// Request body for POST /api/create endpoint
 ///
