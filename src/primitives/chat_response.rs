@@ -2,9 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
-use super::{Logprob, ResponseMessage};
 #[cfg(feature = "tools")]
 use super::ToolCall;
+use super::{Logprob, ResponseMessage};
 
 /// Response from POST /api/chat endpoint.
 ///
@@ -12,7 +12,7 @@ use super::ToolCall;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ChatResponse;
 ///
 /// // Deserialize from API response
@@ -96,7 +96,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"message": {"role": "assistant", "content": "Hello!"}}"#;
@@ -128,7 +128,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{
@@ -153,7 +153,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatResponse;
     ///
     /// let response = ChatResponse::default();
@@ -168,7 +168,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"done": true}"#;
@@ -183,7 +183,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"total_duration": 1000000000}"#;
@@ -215,7 +215,7 @@ impl ChatResponse {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatResponse;
     ///
     /// let json = r#"{"eval_count": 100, "eval_duration": 1000000000}"#;

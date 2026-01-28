@@ -285,8 +285,6 @@ Future endpoints:
 ### No Doc Tests Policy
 **Decision Date:** 2026-01-26
 
-This project does **not use doc tests**. All documentation examples use ```` ```ignore ```` or are plain text.
-
 **Rationale:**
 - **Feature flag complexity**: Many types are gated behind feature flags (`tools`, `primitives`, `http`), making doc tests hard to maintain
 - **Maintenance burden**: Doc tests require keeping code in sync across documentation and actual tests

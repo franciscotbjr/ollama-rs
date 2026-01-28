@@ -9,7 +9,7 @@ use std::time::Duration;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ClientConfig;
 /// use std::time::Duration;
 ///
@@ -56,7 +56,7 @@ impl ClientConfig {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ClientConfig;
     ///
     /// let config = ClientConfig::default();

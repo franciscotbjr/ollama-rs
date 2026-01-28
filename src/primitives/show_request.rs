@@ -8,7 +8,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Example
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ShowRequest;
 ///
 /// // Basic request
@@ -42,7 +42,7 @@ impl ShowRequest {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ShowRequest;
     ///
     /// let request = ShowRequest::new("llama3.1");
@@ -62,7 +62,7 @@ impl ShowRequest {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ShowRequest;
     ///
     /// let request = ShowRequest::verbose("llama3.1");

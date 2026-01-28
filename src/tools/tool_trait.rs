@@ -26,7 +26,7 @@ use super::tool_error::ToolResult;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::tools::{Tool, ToolResult};
 /// use schemars::JsonSchema;
 /// use serde::{Deserialize, Serialize};
@@ -82,7 +82,10 @@ pub trait Tool: Send + Sync {
     /// Execute the tool with the given parameters
     ///
     /// This is an async function that performs the tool's action.
-    fn execute(&self, params: Self::Params) -> impl Future<Output = ToolResult<Self::Output>> + Send;
+    fn execute(
+        &self,
+        params: Self::Params,
+    ) -> impl Future<Output = ToolResult<Self::Output>> + Send;
 
     /// Generate the JSON schema for the tool's parameters
     ///

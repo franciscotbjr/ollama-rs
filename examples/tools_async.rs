@@ -8,9 +8,7 @@
 //! Note: Requires a running Ollama server with a model that supports
 //! function calling (e.g., qwen3:0.6b, llama3.2, etc.)
 
-use ollama_oxide::{
-    ChatMessage, ChatRequest, OllamaApiAsync, OllamaClient, ToolDefinition,
-};
+use ollama_oxide::{ChatMessage, ChatRequest, OllamaApiAsync, OllamaClient, ToolDefinition};
 use serde_json::json;
 
 #[tokio::main]
@@ -100,11 +98,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     )
     .with_description("Search the web for information");
 
-    let request = ChatRequest::new(
-        model,
-        [ChatMessage::user("What is 25 * 4 + 10?")],
-    )
-    .with_tools(vec![calculator_tool, search_tool]);
+    let request = ChatRequest::new(model, [ChatMessage::user("What is 25 * 4 + 10?")])
+        .with_tools(vec![calculator_tool, search_tool]);
 
     let response = client.chat(&request).await?;
 
@@ -123,11 +118,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let time_tool = ToolDefinition::function_no_params("get_current_time")
         .with_description("Get the current date and time");
 
-    let request = ChatRequest::new(
-        model,
-        [ChatMessage::user("What time is it right now?")],
-    )
-    .with_tools(vec![time_tool]);
+    let request = ChatRequest::new(model, [ChatMessage::user("What time is it right now?")])
+        .with_tools(vec![time_tool]);
 
     let response = client.chat(&request).await?;
 
@@ -183,11 +175,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     println!("\n--- Tool Call Response Flow ---");
     println!("Step 1: Send initial request with tools");
 
-    let request = ChatRequest::new(
-        model,
-        [ChatMessage::user("What's 15 + 27?")],
-    )
-    .with_tool(
+    let request = ChatRequest::new(model, [ChatMessage::user("What's 15 + 27?")]).with_tool(
         ToolDefinition::function(
             "add",
             json!({
@@ -206,7 +194,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     if response.has_tool_calls() {
         let calls = response.tool_calls().unwrap();
-        println!("Step 2: Model requested function: {:?}", calls[0].function_name());
+        println!(
+            "Step 2: Model requested function: {:?}",
+            calls[0].function_name()
+        );
         println!("        With arguments: {:?}", calls[0].arguments());
 
         // In a real application, you would:
@@ -225,7 +216,10 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
         println!("Step 3: (In production) Execute function and send result back");
     } else {
-        println!("Model answered directly: {}", response.content().unwrap_or("No response"));
+        println!(
+            "Model answered directly: {}",
+            response.content().unwrap_or("No response")
+        );
     }
 
     println!("\nDone!");

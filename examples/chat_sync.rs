@@ -21,7 +21,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // Example 1: Basic chat
     println!("\n--- Basic Chat ---");
-    let request = ChatRequest::new(model, [ChatMessage::user("Hello! What can you help me with?")]);
+    let request = ChatRequest::new(
+        model,
+        [ChatMessage::user("Hello! What can you help me with?")],
+    );
 
     let response = client.chat_blocking(&request)?;
     println!("Assistant: {}", response.content().unwrap_or("No response"));
@@ -46,7 +49,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         [
             ChatMessage::system("You are a helpful assistant."),
             ChatMessage::user("What is Rust?"),
-            ChatMessage::assistant("Rust is a systems programming language focused on safety, speed, and concurrency."),
+            ChatMessage::assistant(
+                "Rust is a systems programming language focused on safety, speed, and concurrency.",
+            ),
             ChatMessage::user("What are its main features?"),
         ],
     );

@@ -10,7 +10,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ToolCallFunction;
 /// use serde_json::json;
 ///
@@ -52,7 +52,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     ///
     /// let func = ToolCallFunction::new("get_time");
@@ -76,7 +76,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     /// use serde_json::json;
     ///
@@ -99,7 +99,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     ///
     /// let func = ToolCallFunction::new("search")
@@ -126,7 +126,7 @@ impl ToolCallFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolCallFunction;
     /// use serde::Deserialize;
     /// use serde_json::json;
@@ -200,10 +200,7 @@ mod tests {
 
         let func: ToolCallFunction = serde_json::from_str(json).unwrap();
         assert_eq!(func.name, "calculate");
-        assert_eq!(
-            func.arguments.unwrap()["expression"],
-            json!("2 + 2")
-        );
+        assert_eq!(func.arguments.unwrap()["expression"], json!("2 + 2"));
     }
 
     #[test]
@@ -269,8 +266,8 @@ mod tests {
 
     #[test]
     fn test_tool_call_function_clone() {
-        let func = ToolCallFunction::with_arguments("test", json!({"a": 1}))
-            .with_description("desc");
+        let func =
+            ToolCallFunction::with_arguments("test", json!({"a": 1})).with_description("desc");
         let cloned = func.clone();
         assert_eq!(func, cloned);
     }

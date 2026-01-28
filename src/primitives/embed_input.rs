@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::EmbedInput;
 ///
 /// // Single text input
@@ -51,7 +51,7 @@ impl EmbedInput {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::EmbedInput;
     ///
     /// let input = EmbedInput::single("Hello, world!");
@@ -68,7 +68,7 @@ impl EmbedInput {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::EmbedInput;
     ///
     /// let input = EmbedInput::multiple(["First", "Second", "Third"]);
@@ -85,7 +85,7 @@ impl EmbedInput {
     ///
     /// # Example
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::EmbedInput;
     ///
     /// let single = EmbedInput::single("Hello");

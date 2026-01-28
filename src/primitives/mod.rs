@@ -22,7 +22,6 @@ mod tool_function;
 
 // Other primitives
 mod copy_request;
-mod delete_request;
 mod embed_input;
 mod embed_request;
 mod embed_response;
@@ -64,7 +63,6 @@ pub use tool_function::ToolFunction;
 
 // Other primitives re-exports
 pub use copy_request::CopyRequest;
-pub use delete_request::DeleteRequest;
 pub use embed_input::EmbedInput;
 pub use embed_request::EmbedRequest;
 pub use embed_response::EmbedResponse;

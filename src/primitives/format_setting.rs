@@ -9,7 +9,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::FormatSetting;
 ///
 /// let json = FormatSetting::json();

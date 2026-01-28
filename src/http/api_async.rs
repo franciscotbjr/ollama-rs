@@ -1,10 +1,16 @@
 //! Async API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest, DeleteRequest, EmbedRequest, EmbedResponse,
-    GenerateRequest, GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse,
-    VersionResponse,
+    ChatRequest, ChatResponse, CopyRequest, 
+    EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
+    Result, ShowRequest, ShowResponse, VersionResponse,
 };
+
+#[cfg(feature = "create")]
+use crate::{
+    CreateRequest, CreateResponse, DeleteRequest
+};
+
 use async_trait::async_trait;
 
 use super::OllamaClient;
@@ -164,7 +170,7 @@ pub trait OllamaApiAsync: Send + Sync {
     ///
     /// # Examples
     ///
-    /// ```no_run
+    /// ```ignore
     /// use ollama_oxide::{OllamaClient, OllamaApiAsync, DeleteRequest};
     ///
     /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
@@ -175,6 +181,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "create")]
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()>;
 
     /// Show detailed information about a model (async)
@@ -373,6 +380,40 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # }
     /// ```
     async fn chat(&self, request: &ChatRequest) -> Result<ChatResponse>;
+
+    /// Create a custom model (async, non-streaming)
+    ///
+    /// Creates a new model from an existing model with custom configuration.
+    /// This method uses non-streaming mode.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - Create request containing model name, base model, and options
+    ///
+    /// # Errors
+    ///
+    /// Returns an error if:
+    /// - Base model doesn't exist (404)
+    /// - Model name is invalid
+    /// - Network request fails
+    /// - Maximum retry attempts exceeded
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, CreateRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = CreateRequest::from_model("mario", "qwen3:0.6b")
+    ///     .with_system("You are Mario from Super Mario Bros.");
+    /// let response = client.create_model(&request).await?;
+    /// println!("Status: {:?}", response.status());
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "create")]
+    async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse>;
 }
 
 #[async_trait]
@@ -397,6 +438,7 @@ impl OllamaApiAsync for OllamaClient {
         self.get_with_retry(&url).await
     }
 
+    #[cfg(feature = "create")]
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_with_retry(&url, request).await
@@ -419,6 +461,12 @@ impl OllamaApiAsync for OllamaClient {
 
     async fn chat(&self, request: &ChatRequest) -> Result<ChatResponse> {
         let url = self.config.url(Endpoints::CHAT);
+        self.post_with_retry(&url, request).await
+    }
+
+    #[cfg(feature = "create")]
+    async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse> {
+        let url = self.config.url(Endpoints::CREATE);
         self.post_with_retry(&url, request).await
     }
 }

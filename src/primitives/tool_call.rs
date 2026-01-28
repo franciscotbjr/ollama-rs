@@ -23,7 +23,7 @@ use super::ToolCallFunction;
 ///
 /// # Examples
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ToolCall;
 ///
 /// // Typically received from API response, not constructed manually
@@ -55,7 +55,7 @@ impl ToolCall {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ToolCall, ToolCallFunction};
     /// use serde_json::json;
     ///
@@ -78,7 +78,7 @@ impl ToolCall {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ToolCall, ToolCallFunction};
     ///
     /// let call = ToolCall::new(ToolCallFunction::new("my_function"));
@@ -99,7 +99,7 @@ impl ToolCall {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ToolCall, ToolCallFunction};
     /// use serde_json::json;
     ///
@@ -128,7 +128,7 @@ impl ToolCall {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ToolCall, ToolCallFunction};
     /// use serde::Deserialize;
     /// use serde_json::json;
@@ -162,7 +162,7 @@ impl ToolCall {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ToolCall, ToolCallFunction};
     ///
     /// let valid_call = ToolCall::new(ToolCallFunction::new("test"));

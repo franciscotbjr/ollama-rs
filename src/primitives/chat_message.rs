@@ -15,7 +15,7 @@ use super::ToolCall;
 ///
 /// ## Creating Messages with Factory Methods
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ChatMessage;
 ///
 /// let system = ChatMessage::system("You are a helpful assistant.");
@@ -26,7 +26,7 @@ use super::ToolCall;
 ///
 /// ## Building Conversations
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ChatMessage;
 ///
 /// let messages = vec![
@@ -39,7 +39,7 @@ use super::ToolCall;
 ///
 /// ## Adding Images (Multimodal)
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ChatMessage;
 ///
 /// let message = ChatMessage::user("What's in this image?")
@@ -81,7 +81,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::new(ChatRole::User, "Hello!");
@@ -109,7 +109,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::system("You are a helpful coding assistant.");
@@ -130,7 +130,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::user("What is the capital of France?");
@@ -151,7 +151,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let msg = ChatMessage::assistant("The capital of France is Paris.");
@@ -173,7 +173,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ChatMessage, ChatRole};
     ///
     /// let result = r#"{"temperature": 22, "unit": "celsius"}"#;
@@ -195,7 +195,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatMessage;
     ///
     /// let msg = ChatMessage::user("Describe this image.")
@@ -216,7 +216,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatMessage;
     ///
     /// let msg = ChatMessage::user("Compare these images.")
@@ -245,7 +245,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ChatMessage, ToolCall, ToolCallFunction};
     /// use serde_json::json;
     ///
@@ -268,7 +268,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ChatMessage;
     ///
     /// let without_images = ChatMessage::user("Hello");
@@ -287,7 +287,7 @@ impl ChatMessage {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::{ChatMessage, ToolCall, ToolCallFunction};
     ///
     /// let without_tools = ChatMessage::assistant("Hello");
@@ -439,8 +439,8 @@ mod tests {
         };
         assert!(!empty_tools.has_tool_calls());
 
-        let with_tools =
-            ChatMessage::assistant("").with_tool_calls(vec![ToolCall::new(ToolCallFunction::new("f"))]);
+        let with_tools = ChatMessage::assistant("")
+            .with_tool_calls(vec![ToolCall::new(ToolCallFunction::new("f"))]);
         assert!(with_tools.has_tool_calls());
     }
 
@@ -514,7 +514,10 @@ mod tests {
         }"#;
 
         let msg: ChatMessage = serde_json::from_str(json).unwrap();
-        assert_eq!(msg.images, Some(vec!["img1".to_string(), "img2".to_string()]));
+        assert_eq!(
+            msg.images,
+            Some(vec!["img1".to_string(), "img2".to_string()])
+        );
     }
 
     #[cfg(feature = "tools")]
@@ -530,7 +533,10 @@ mod tests {
 
         let msg: ChatMessage = serde_json::from_str(json).unwrap();
         assert!(msg.tool_calls.is_some());
-        assert_eq!(msg.tool_calls.as_ref().unwrap()[0].function_name(), Some("test"));
+        assert_eq!(
+            msg.tool_calls.as_ref().unwrap()[0].function_name(),
+            Some("test")
+        );
     }
 
     #[test]

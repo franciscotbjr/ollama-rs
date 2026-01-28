@@ -440,10 +440,6 @@ sequenceDiagram
 
 ## Testing Architecture
 
-### No Doc Tests
-
-This project does **not use doc tests**. All documentation code examples use ```` ```ignore ```` or are plain text. See DEV_NOTES.md for rationale.
-
 **Test locations:**
 1. **Unit tests in source files**: `src/**/*.rs` (in `#[cfg(test)] mod tests` blocks) - test internal behavior
 2. **Public interface tests**: `tests/*.rs` - test public API contracts with mocking

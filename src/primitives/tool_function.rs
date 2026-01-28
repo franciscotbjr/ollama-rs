@@ -11,7 +11,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// ## Basic Function
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ToolFunction;
 /// use serde_json::json;
 ///
@@ -23,7 +23,7 @@ use serde::{Deserialize, Serialize};
 ///
 /// ## Function with Parameters
 ///
-/// ```ignore
+/// ```no_run
 /// use ollama_oxide::ToolFunction;
 /// use serde_json::json;
 ///
@@ -73,7 +73,7 @@ impl ToolFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolFunction;
     /// use serde_json::json;
     ///
@@ -105,7 +105,7 @@ impl ToolFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolFunction;
     /// use serde_json::json;
     ///
@@ -128,7 +128,7 @@ impl ToolFunction {
     ///
     /// # Examples
     ///
-    /// ```ignore
+    /// ```no_run
     /// use ollama_oxide::ToolFunction;
     ///
     /// let func = ToolFunction::no_params("get_current_time")
@@ -197,7 +197,10 @@ mod tests {
         assert_eq!(json["name"], "get_weather");
         assert_eq!(json["description"], "Get weather");
         assert_eq!(json["parameters"]["type"], "object");
-        assert_eq!(json["parameters"]["properties"]["location"]["type"], "string");
+        assert_eq!(
+            json["parameters"]["properties"]["location"]["type"],
+            "string"
+        );
     }
 
     #[test]
