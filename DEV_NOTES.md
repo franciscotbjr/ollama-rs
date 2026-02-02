@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-02-01
+**Last Updated:** 2026-02-02
 
 ## Architecture Overview
 
@@ -49,24 +49,28 @@ ollama-oxide/
 
 ```toml
 [features]
-default = ["http", "primitives"]      # Standard usage
+default = ["http", "primitives"]      # Standard usage (inference only)
 conveniences = ["http", "primitives"] # High-level APIs
 http = []                             # HTTP client layer
 primitives = []                       # Data types
 tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
-create = ["http", "primitives"]       # Model creation/deletion (destructive)
+model = ["http", "primitives"]        # All model operations (opt-in)
 ```
 
 **Feature Matrix:**
 
 | Feature | Dependencies | Purpose |
 |---------|-------------|---------|
-| `default` | `http`, `primitives` | Standard usage - HTTP client + all data types |
+| `default` | `http`, `primitives` | Standard usage - inference APIs (generate, chat, embed, version) |
 | `primitives` | - | Standalone data types for serialization/deserialization |
 | `http` | - | HTTP client implementation (async/sync) |
 | `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
-| `model` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `model` | `http`, `primitives` | All model operations: list, show, copy, create, delete (opt-in) |
 | `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
+
+**Model Feature Contents:**
+- Types: `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `CopyRequest`, `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting`
+- Methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()`, `create_model()`, `delete_model()`
 
 ## Current State
 

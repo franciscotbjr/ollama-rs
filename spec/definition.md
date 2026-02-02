@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.4
-**Last Updated:** 2026-02-01
+**Document Version:** 1.5
+**Last Updated:** 2026-02-02
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -101,18 +101,21 @@ Each module follows single-concern file structure:
 **Feature:** `tools` (optional, requires `schemars` and `futures`)
 **Status:** Implementation complete
 
-#### 4. create (Module)
-**Purpose:** Model creation and deletion operations.
+#### 4. model (Module)
+**Purpose:** Model management operations and types.
 
 **Key Responsibilities:**
-- `CreateRequest` for model creation
-- `CreateResponse` for creation status
+- `CreateRequest` / `CreateResponse` for model creation
 - `DeleteRequest` for model deletion
 - `LicenseSetting` for license configuration
+- `CopyRequest` for model copying
+- `ListResponse` / `ModelSummary` / `ModelDetails` for listing models
+- `PsResponse` / `RunningModel` for running model info
+- `ShowRequest` / `ShowResponse` / `ShowModelDetails` for model details
 
 **Feature:** `model` (optional, requires `http` and `primitives`)
 **Status:** Implementation complete
-**Note:** Opt-in feature to prevent accidental destructive operations
+**Note:** Opt-in feature consolidating all model-related operations and types. Includes destructive operations (create/delete).
 
 #### 5. conveniences (Module)
 **Purpose:** High-level, ergonomic APIs for common workflows.
@@ -147,7 +150,7 @@ model = ["http", "primitives"]        # Model creation/deletion (destructive)
 | `primitives` | - | Standalone data types for serialization/deserialization |
 | `http` | - | HTTP client implementation (async/sync) |
 | `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
-| `model` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `model` | `http`, `primitives` | Model management API - all model-related types and operations (list, show, copy, create, delete) |
 | `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
 
 **Usage Examples:**

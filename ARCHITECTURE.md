@@ -62,20 +62,29 @@ src/
 │   ├── mod.rs                      # Re-exports: ClientConfig, OllamaClient, traits
 │   ├── config.rs                   # ClientConfig + impl Default
 │   ├── client.rs                   # OllamaClient + constructors + validation
-│   ├── api_async.rs                # OllamaApiAsync (#[cfg(feature = "model")] for create/delete)
-│   └── api_sync.rs                 # OllamaApiSync (#[cfg(feature = "model")] for create/delete)
+│   ├── api_async.rs                # OllamaApiAsync (#[cfg(feature = "model")] for model ops)
+│   └── api_sync.rs                 # OllamaApiSync (#[cfg(feature = "model")] for model ops)
 ├── tools/                          # Feature: "tools" (optional, requires schemars + futures)
 │   ├── mod.rs                      # Tool trait, ToolRegistry, ToolError exports
 │   ├── tool_trait.rs               # Tool trait with auto-schema generation
 │   ├── tool_registry.rs            # ToolRegistry for automatic dispatch
 │   ├── erased_tool.rs              # Type-erased tool wrapper for registry storage
 │   └── tool_error.rs               # ToolError and ToolResult types
-├── model/                          # Feature: "model" (optional, opt-in for destructive ops)
-│   ├── mod.rs                      # CreateRequest, CreateResponse, DeleteRequest exports
+├── model/                          # Feature: "model" (optional, all model-related operations)
+│   ├── mod.rs                      # All model types exports
 │   ├── create_request.rs           # Model creation request
 │   ├── create_response.rs          # Model creation response
 │   ├── delete_request.rs           # Model deletion request
-│   └── license_setting.rs          # License configuration
+│   ├── license_setting.rs          # License configuration
+│   ├── copy_request.rs             # Model copy request
+│   ├── list_response.rs            # List models response
+│   ├── model_details.rs            # Model details shared type
+│   ├── model_summary.rs            # Model summary in list
+│   ├── ps_response.rs              # Running models response
+│   ├── running_model.rs            # Running model info
+│   ├── show_model_details.rs       # Show model details
+│   ├── show_request.rs             # Show model request
+│   └── show_response.rs            # Show model response
 └── conveniences/
     └── mod.rs                      # (Future: convenience APIs)
 ```
@@ -93,7 +102,7 @@ conveniences = ["http", "primitives"] # High-level APIs
 http = []                             # HTTP client layer
 primitives = []                       # Data types
 tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
-model = ["http", "primitives"]        # Model creation/deletion (destructive)
+model = ["http", "primitives"]        # All model operations (list, show, copy, create, delete)
 ```
 
 ### Feature Dependency Graph
