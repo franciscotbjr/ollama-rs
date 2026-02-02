@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Feature-based library design**: Modular opt-in architecture via Cargo features
+  - `tools` feature: Ergonomic function calling with auto-generated JSON schemas
+    - `Tool` trait for type-safe tool definitions
+    - `ToolRegistry` for automatic dispatch
+    - Optional dependencies: `schemars`, `futures`
+    - Examples: `tools_async`, `chat_with_tools_async`, `chat_with_tools_registry_async`
+  - `create` feature: Model creation/deletion (opt-in for destructive operations)
+    - `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting` types
+    - Gated API methods: `create_model()`, `delete_model()`
+    - Examples: `create_model_async`, `delete_model_async`
+  - Three-level conditional compilation: module, struct field, and method level
+  - Example and test gating via `required-features` in Cargo.toml
 - **New example: `chat_with_tools_async`**: Complete chat with tools flow using weather API
   - Demonstrates full tool call cycle (request → tool calls → execution → response)
   - Mock weather service simulating HTTP calls to Open-Meteo API
@@ -80,6 +92,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `list_models_sync.rs` - Sync list models example
 
 ### Changed
+- **Feature flag architecture**: Expanded from 4 features to 6
+  - New: `tools` feature for ergonomic function calling
+  - New: `create` feature for model creation/deletion (opt-in)
+  - Updated dependency configuration for optional deps
+- **Documentation updates**: All critical documents reflect feature-based design
+  - README.md: Feature flags table and usage examples
+  - ARCHITECTURE.md: Feature dependency graph and conditional compilation patterns
+  - CONTRIBUTING.md: Feature development guidelines
+  - DEV_NOTES.md: Feature-based design decisions
+  - spec/definition.md: Updated module descriptions
 - **Versioning strategy update**: All 12 endpoints will be implemented in v0.1.0 (non-streaming mode)
   - Streaming features moved to v0.2.0
   - v0.3.0 will focus on conveniences module

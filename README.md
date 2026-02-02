@@ -19,7 +19,7 @@ The Llama in the Crate is a Rust library providing low-level primitives and high
 
 ## Architecture
 
-Single-crate design with modular structure:
+Single-crate design with modular structure and feature flags:
 
 ```
 ollama-oxide/
@@ -27,12 +27,23 @@ ollama-oxide/
     ├── lib.rs           # Main library entry point
     ├── primitives/      # Low-level API primitives (default)
     ├── http/            # HTTP client layer (default)
+    ├── tools/           # Ergonomic function calling (optional)
+    ├── create/          # Model creation/deletion (optional)
     └── conveniences/    # High-level APIs (optional)
 ```
 
-**Feature Flags:**
-- `default` = `["http", "primitives"]` - Core functionality
-- `conveniences` - Optional ergonomic high-level APIs
+## Feature Flags
+
+The library uses feature flags to let you include only what you need:
+
+| Feature | Dependencies | Purpose |
+|---------|-------------|---------|
+| `default` | `http`, `primitives` | Standard usage - HTTP client + all data types |
+| `primitives` | - | Standalone data types for serialization/deserialization |
+| `http` | - | HTTP client implementation (async/sync) |
+| `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
+| `create` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
 
 ## Installation
 
@@ -43,9 +54,21 @@ Add this to your `Cargo.toml`:
 [dependencies]
 ollama-oxide = "0.1.0"
 
-# With high-level conveniences
+# With function calling support
 [dependencies]
-ollama-oxide = { version = "0.1.0", features = ["conveniences"] }
+ollama-oxide = { version = "0.1.0", features = ["tools"] }
+
+# With model creation/deletion
+[dependencies]
+ollama-oxide = { version = "0.1.0", features = ["create"] }
+
+# Full featured
+[dependencies]
+ollama-oxide = { version = "0.1.0", features = ["tools", "create"] }
+
+# Data types only (no HTTP client)
+[dependencies]
+ollama-oxide = { version = "0.1.0", default-features = false, features = ["primitives"] }
 ```
 
 ## Quick Start

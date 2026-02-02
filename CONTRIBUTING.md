@@ -72,14 +72,30 @@ ollama-oxide/
 
 - **primitives** (module): Data structures and types matching Ollama's API specification
 - **http** (module): HTTP communication, request/response handling
-- **conveniences** (module): Ergonomic, high-level APIs built on primitives (optional feature)
+- **tools** (module): Ergonomic function calling with auto-generated JSON schemas
+- **create** (module): Model creation and deletion operations (opt-in)
+- **conveniences** (module): High-level APIs built on primitives (optional feature)
 
 ### Feature Flags
 
 ```toml
-default = ["http", "primitives"]     # Core functionality
-conveniences = ["http", "primitives"] # Optional high-level APIs
+[features]
+default = ["http", "primitives"]      # Standard usage
+conveniences = ["http", "primitives"] # High-level APIs
+http = []                             # HTTP client layer
+primitives = []                       # Data types
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+create = ["http", "primitives"]       # Model creation/deletion (destructive)
 ```
+
+| Feature | Purpose | Optional Dependencies |
+|---------|---------|----------------------|
+| `default` | Standard HTTP client + data types | - |
+| `primitives` | Standalone data types only | - |
+| `http` | HTTP client implementation | - |
+| `tools` | Type-safe function calling | `schemars`, `futures` |
+| `create` | Model creation/deletion | - |
+| `conveniences` | High-level ergonomic APIs | - |
 
 ## Development Workflow
 
@@ -194,17 +210,79 @@ mod tests {
 ### Running Tests
 
 ```bash
-# All tests
+# All tests (default features)
 cargo test
 
-# Specific package
-cargo test --package primitives
+# Tests with all features
+cargo test --all-features
+
+# Tests for specific feature
+cargo test --features tools
+cargo test --features create
 
 # With output
 cargo test -- --nocapture
 
 # Single test
 cargo test test_name
+```
+
+### Working with Feature Flags
+
+When adding new functionality:
+
+**1. Decide if it needs a feature flag:**
+- Optional dependencies → Yes (e.g., `tools` needs `schemars`)
+- Destructive operations → Yes (e.g., `create` for model deletion)
+- Core functionality → No (use `default` features)
+
+**2. Gate code with `#[cfg(feature = "...")]`:**
+```rust
+// Module level (in lib.rs)
+#[cfg(feature = "tools")]
+pub mod tools;
+
+// Struct field level
+pub struct ChatRequest {
+    #[cfg(feature = "tools")]
+    pub tools: Option<Vec<ToolDefinition>>,
+}
+
+// Method level
+impl ChatRequest {
+    #[cfg(feature = "tools")]
+    pub fn with_tools(mut self, tools: Vec<ToolDefinition>) -> Self {
+        self.tools = Some(tools);
+        self
+    }
+}
+```
+
+**3. Gate examples and tests in Cargo.toml:**
+```toml
+[[example]]
+name = "chat_with_tools_async"
+required-features = ["tools"]
+
+[[test]]
+name = "client_create_model_tests"
+required-features = ["create"]
+```
+
+**4. Test with different feature combinations:**
+```bash
+# Test default only
+cargo test
+
+# Test with each optional feature
+cargo test --features tools
+cargo test --features create
+
+# Test all features together
+cargo test --all-features
+
+# Verify no-default-features compiles
+cargo check --no-default-features --features primitives
 ```
 
 ## Submitting Changes

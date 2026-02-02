@@ -52,17 +52,128 @@ http/
 src/
 ├── lib.rs                          # Module declarations + re-exports + prelude
 ├── error.rs                        # Error enum + impl From + Result alias
-├── primitives/
-│   ├── mod.rs                      # Re-exports: VersionResponse
-│   └── version.rs                  # VersionResponse struct
-├── http/
+├── primitives/                     # Feature: "primitives" (default)
+│   ├── mod.rs                      # Re-exports (with #[cfg(feature = "tools")] gates)
+│   ├── version.rs                  # VersionResponse struct
+│   ├── chat_*.rs                   # Chat types (#[cfg(feature = "tools")] for tool fields)
+│   ├── tool_*.rs                   # Tool types (only when "tools" feature enabled)
+│   └── ...                         # Other primitives
+├── http/                           # Feature: "http" (default)
 │   ├── mod.rs                      # Re-exports: ClientConfig, OllamaClient, traits
 │   ├── config.rs                   # ClientConfig + impl Default
 │   ├── client.rs                   # OllamaClient + constructors + validation
-│   ├── api_async.rs                # OllamaApiAsync trait + impl
-│   └── api_sync.rs                 # OllamaApiSync trait + impl
+│   ├── api_async.rs                # OllamaApiAsync (#[cfg(feature = "create")] for create/delete)
+│   └── api_sync.rs                 # OllamaApiSync (#[cfg(feature = "create")] for create/delete)
+├── tools/                          # Feature: "tools" (optional, requires schemars + futures)
+│   ├── mod.rs                      # Tool trait, ToolRegistry, ToolError exports
+│   ├── tool_trait.rs               # Tool trait with auto-schema generation
+│   ├── tool_registry.rs            # ToolRegistry for automatic dispatch
+│   ├── erased_tool.rs              # Type-erased tool wrapper for registry storage
+│   └── tool_error.rs               # ToolError and ToolResult types
+├── create/                         # Feature: "create" (optional, opt-in for destructive ops)
+│   ├── mod.rs                      # CreateRequest, CreateResponse, DeleteRequest exports
+│   ├── create_request.rs           # Model creation request
+│   ├── create_response.rs          # Model creation response
+│   ├── delete_request.rs           # Model deletion request
+│   └── license_setting.rs          # License configuration
 └── conveniences/
     └── mod.rs                      # (Future: convenience APIs)
+```
+
+---
+
+## Feature Flag Architecture
+
+The library uses Cargo features to provide a modular, opt-in design:
+
+```toml
+[features]
+default = ["http", "primitives"]      # Standard usage
+conveniences = ["http", "primitives"] # High-level APIs
+http = []                             # HTTP client layer
+primitives = []                       # Data types
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+create = ["http", "primitives"]       # Model creation/deletion (destructive)
+```
+
+### Feature Dependency Graph
+
+```
+                    ┌─────────────┐
+                    │   default   │
+                    └──────┬──────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+        ┌─────▼─────┐            ┌──────▼──────┐
+        │    http   │            │  primitives │
+        └───────────┘            └─────────────┘
+              │                         │
+              └────────────┬────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+  ┌─────▼─────┐     ┌──────▼──────┐    ┌──────▼──────┐
+  │  create   │     │conveniences │    │   tools     │
+  │(opt-in)   │     │  (future)   │    │ (optional)  │
+  └───────────┘     └─────────────┘    └─────────────┘
+        │                                     │
+        ▼                                     ▼
+  Destructive ops                       dep:schemars
+  (create/delete model)                 dep:futures
+```
+
+### Conditional Compilation Patterns
+
+The codebase uses `#[cfg(feature = "...")]` at three levels:
+
+**1. Module Level** - Entire modules gated in `lib.rs`:
+```rust
+#[cfg(feature = "tools")]
+pub mod tools;
+
+#[cfg(feature = "create")]
+pub mod create;
+```
+
+**2. Struct Field Level** - Optional fields in primitives:
+```rust
+pub struct ChatRequest {
+    pub model: String,
+    pub messages: Vec<ChatMessage>,
+    #[cfg(feature = "tools")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tools: Option<Vec<ToolDefinition>>,
+}
+```
+
+**3. Method Level** - Conditional method implementations:
+```rust
+impl ChatRequest {
+    #[cfg(feature = "tools")]
+    pub fn with_tools(mut self, tools: Vec<ToolDefinition>) -> Self {
+        self.tools = Some(tools);
+        self
+    }
+}
+```
+
+### Example and Test Gating
+
+Examples and tests requiring specific features use `required-features`:
+
+```toml
+[[example]]
+name = "chat_with_tools_async"
+required-features = ["tools"]
+
+[[example]]
+name = "create_model_async"
+required-features = ["create"]
+
+[[test]]
+name = "client_create_model_tests"
+required-features = ["create"]
 ```
 
 ---
@@ -126,7 +237,11 @@ The crate follows a strict layered architecture where higher-level modules can d
 ┌─────────────────────────────────────────┐
 │            lib.rs (re-exports)          │  ← Top: Facade only
 ├─────────────────────────────────────────┤
-│    http/ (client, api_async, api_sync)  │  ← High: Can use primitives
+│    tools/ (Tool, ToolRegistry)          │  ← High: Uses primitives (optional)
+├─────────────────────────────────────────┤
+│    http/ (client, api_async, api_sync)  │  ← High: Can use primitives, create
+├─────────────────────────────────────────┤
+│    create/ (CreateRequest, etc.)        │  ← Mid: Independent types (optional)
 ├─────────────────────────────────────────┤
 │    primitives/ (request/response types) │  ← Low: Independent types
 ├─────────────────────────────────────────┤
@@ -138,9 +253,11 @@ The crate follows a strict layered architecture where higher-level modules can d
 
 | Module | Can depend on | Cannot depend on |
 |--------|---------------|------------------|
-| `error` | std, external crates | primitives, http |
-| `primitives` | error, serde, std | http |
-| `http` | error, primitives, reqwest | — |
+| `error` | std, external crates | primitives, http, tools, create |
+| `primitives` | error, serde, std | http, tools, create |
+| `create` | error, serde, std | http, tools |
+| `http` | error, primitives, create, reqwest | tools |
+| `tools` | error, primitives, schemars, futures | http, create |
 | `lib.rs` | all (re-exports only) | — |
 
 **Key Principle:** Primitives must remain pure data types with no knowledge of how they are transported. This ensures:
@@ -481,6 +598,7 @@ Integration tests are implemented as **examples**:
 
 ## Version History
 
+- **2026-02-01**: Added feature flag architecture documentation (tools, create features)
 - **2026-01-13**: Initial architecture document
 
 ---

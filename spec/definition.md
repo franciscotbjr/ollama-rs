@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.3
-**Last Updated:** 2026-01-26
+**Document Version:** 1.4
+**Last Updated:** 2026-02-01
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -39,11 +39,15 @@ The project is organized as a **single crate** with modular structure and featur
 ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
-    ├── primitives/      # Low-level API primitives module
+    ├── primitives/      # Low-level API primitives module (default)
     │   └── mod.rs
-    ├── http/            # HTTP client module
+    ├── http/            # HTTP client module (default)
     │   └── mod.rs
-    └── conveniences/    # High-level convenience APIs module (optional feature)
+    ├── tools/           # Ergonomic function calling (optional, "tools" feature)
+    │   └── mod.rs
+    ├── create/          # Model creation/deletion (optional, "create" feature)
+    │   └── mod.rs
+    └── conveniences/    # High-level convenience APIs module (optional)
         └── mod.rs
 ```
 
@@ -85,7 +89,32 @@ Each module follows single-concern file structure:
 **Feature:** `http` (default)
 **Status:** Implementation in progress
 
-#### 3. conveniences (Module)
+#### 3. tools (Module)
+**Purpose:** Ergonomic function calling with auto-generated JSON schemas.
+
+**Key Responsibilities:**
+- `Tool` trait for type-safe tool definitions
+- `ToolRegistry` for automatic dispatch
+- Auto-generated JSON schemas from Rust types via `schemars`
+- Type-erased tool storage for heterogeneous collections
+
+**Feature:** `tools` (optional, requires `schemars` and `futures`)
+**Status:** Implementation complete
+
+#### 4. create (Module)
+**Purpose:** Model creation and deletion operations.
+
+**Key Responsibilities:**
+- `CreateRequest` for model creation
+- `CreateResponse` for creation status
+- `DeleteRequest` for model deletion
+- `LicenseSetting` for license configuration
+
+**Feature:** `create` (optional, requires `http` and `primitives`)
+**Status:** Implementation complete
+**Note:** Opt-in feature to prevent accidental destructive operations
+
+#### 5. conveniences (Module)
 **Purpose:** High-level, ergonomic APIs for common workflows.
 
 **Key Responsibilities:**
@@ -102,22 +131,41 @@ Each module follows single-concern file structure:
 
 ```toml
 [features]
-default = ["http", "primitives"]           # Default features
-conveniences = ["http", "primitives"]      # High-level API (optional)
-http = []                                  # HTTP client layer
-primitives = []                            # Low-level primitives
+default = ["http", "primitives"]      # Standard usage
+conveniences = ["http", "primitives"] # High-level APIs
+http = []                             # HTTP client layer
+primitives = []                       # Data types
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+create = ["http", "primitives"]       # Model creation/deletion (destructive)
 ```
+
+**Feature Matrix:**
+
+| Feature | Dependencies | Purpose |
+|---------|-------------|---------|
+| `default` | `http`, `primitives` | Standard usage - HTTP client + all data types |
+| `primitives` | - | Standalone data types for serialization/deserialization |
+| `http` | - | HTTP client implementation (async/sync) |
+| `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
+| `create` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
 
 **Usage Examples:**
 ```toml
-# Full featured (default)
+# Default features (primitives + http)
 ollama-oxide = "0.1.0"
 
-# With conveniences
-ollama-oxide = { version = "0.1.0", features = ["conveniences"] }
+# With function calling support
+ollama-oxide = { version = "0.1.0", features = ["tools"] }
 
-# Minimal (only primitives and http)
-ollama-oxide = { version = "0.1.0", default-features = true }
+# With model creation/deletion
+ollama-oxide = { version = "0.1.0", features = ["create"] }
+
+# Full featured
+ollama-oxide = { version = "0.1.0", features = ["tools", "create"] }
+
+# Data types only (no HTTP client)
+ollama-oxide = { version = "0.1.0", default-features = false, features = ["primitives"] }
 ```
 
 ## Technical Stack
@@ -136,7 +184,8 @@ ollama-oxide = { version = "0.1.0", default-features = true }
 - Single crate architecture
 - Feature-based module organization
 - Default features: `http` + `primitives`
-- Optional feature: `conveniences`
+- Optional features: `tools`, `create`, `conveniences`
+- Optional dependencies: `schemars`, `futures` (for `tools` feature)
 
 ### Dependency Rationale
 

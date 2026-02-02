@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-01-24
+**Last Updated:** 2026-02-01
 
 ## Architecture Overview
 
@@ -49,11 +49,24 @@ ollama-oxide/
 
 ```toml
 [features]
-default = ["http", "primitives"]
-conveniences = ["http", "primitives"]
-http = []
-primitives = []
+default = ["http", "primitives"]      # Standard usage
+conveniences = ["http", "primitives"] # High-level APIs
+http = []                             # HTTP client layer
+primitives = []                       # Data types
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+create = ["http", "primitives"]       # Model creation/deletion (destructive)
 ```
+
+**Feature Matrix:**
+
+| Feature | Dependencies | Purpose |
+|---------|-------------|---------|
+| `default` | `http`, `primitives` | Standard usage - HTTP client + all data types |
+| `primitives` | - | Standalone data types for serialization/deserialization |
+| `http` | - | HTTP client implementation (async/sync) |
+| `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
+| `create` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
 
 ## Current State
 
@@ -172,6 +185,42 @@ trait ErasedTool {
 - `ToolWrapper<T>` bridges typed `Tool` → type-erased `ErasedTool`
 
 **Location:** `src/tools/erased_tool.rs`
+
+### Feature-Based Design Strategy
+
+**Decision Date:** 2026-02-01
+
+**Implementation:**
+The library uses Cargo features to provide a modular, opt-in design where developers include only what they need.
+
+**Key Design Decisions:**
+
+1. **Opt-in for Destructive Operations**: The `create` feature isolates `CreateRequest`, `DeleteRequest`, and related API methods. Developers must explicitly enable model creation/deletion to prevent accidental misuse.
+
+2. **Conditional Dependencies**: The `tools` feature brings in `schemars` and `futures` only when needed, keeping the default dependency tree lean.
+
+3. **Three-Level Conditional Compilation**:
+   - Module level: `#[cfg(feature = "tools")] pub mod tools;`
+   - Struct field level: `#[cfg(feature = "tools")] pub tools: Option<Vec<ToolDefinition>>`
+   - Method level: `#[cfg(feature = "tools")] pub fn with_tools(...)`
+
+4. **Example/Test Gating**: Examples and tests requiring specific features use `required-features` in Cargo.toml.
+
+**Benefits:**
+- Minimal footprint by default
+- Reduced compile times for users who don't need all features
+- Clear separation of concerns
+- Protection against accidental destructive operations
+- Flexibility for different use cases (data types only, full client, with tools, etc.)
+
+**Developer Experience Scenarios:**
+
+| Use Case | Cargo.toml | What's Included |
+|----------|------------|-----------------|
+| Basic API client | (default) | HTTP client + all primitives |
+| Data types only | `default-features = false, features = ["primitives"]` | Just structs for JSON parsing |
+| With function calling | `features = ["tools"]` | + ToolRegistry, auto-schema generation |
+| Full with model management | `features = ["tools", "create"]` | Everything including model creation/deletion |
 
 ### Example Naming Convention
 
