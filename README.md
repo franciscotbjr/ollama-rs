@@ -25,10 +25,10 @@ Single-crate design with modular structure and feature flags:
 ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
-    ├── primitives/      # Low-level API primitives (default)
+    ├── inference/       # Inference types: chat, generate, embed (default)
     ├── http/            # HTTP client layer (default)
     ├── tools/           # Ergonomic function calling (optional)
-    ├── create/          # Model creation/deletion (optional)
+    ├── model/           # Model management (optional)
     └── conveniences/    # High-level APIs (optional)
 ```
 
@@ -38,19 +38,19 @@ The library uses feature flags to let you include only what you need:
 
 | Feature | Dependencies | Purpose |
 |---------|-------------|---------|
-| `default` | `http`, `primitives` | Standard usage - HTTP client + all data types |
-| `primitives` | - | Standalone data types for serialization/deserialization |
+| `default` | `http`, `inference` | Standard usage - HTTP client + all inference types |
+| `inference` | - | Standalone inference types (chat, generate, embed) |
 | `http` | - | HTTP client implementation (async/sync) |
 | `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
-| `model` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
-| `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
+| `model` | `http`, `inference` | Model management API (list, show, copy, create, delete) |
+| `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 
 ## Installation
 
 Add this to your `Cargo.toml`:
 
 ```toml
-# Default features (primitives + http)
+# Default features (inference + http)
 [dependencies]
 ollama-oxide = "0.1.0"
 
@@ -58,7 +58,7 @@ ollama-oxide = "0.1.0"
 [dependencies]
 ollama-oxide = { version = "0.1.0", features = ["tools"] }
 
-# With model creation/deletion
+# With model management
 [dependencies]
 ollama-oxide = { version = "0.1.0", features = ["model"] }
 
@@ -66,9 +66,9 @@ ollama-oxide = { version = "0.1.0", features = ["model"] }
 [dependencies]
 ollama-oxide = { version = "0.1.0", features = ["tools", "model"] }
 
-# Data types only (no HTTP client)
+# Inference types only (no HTTP client)
 [dependencies]
-ollama-oxide = { version = "0.1.0", default-features = false, features = ["primitives"] }
+ollama-oxide = { version = "0.1.0", default-features = false, features = ["inference"] }
 ```
 
 ## Quick Start

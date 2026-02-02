@@ -1,10 +1,8 @@
-// Existing modules
 mod create_request;
 mod create_response;
 mod delete_request;
 mod license_setting;
 
-// Moved from primitives
 mod copy_request;
 mod list_response;
 mod model_details;
@@ -15,13 +13,11 @@ mod show_model_details;
 mod show_request;
 mod show_response;
 
-// Existing re-exports
 pub use create_request::CreateRequest;
 pub use create_response::CreateResponse;
 pub use delete_request::DeleteRequest;
 pub use license_setting::LicenseSetting;
 
-// New re-exports (moved from primitives)
 pub use copy_request::CopyRequest;
 pub use list_response::ListResponse;
 pub use model_details::ModelDetails;

@@ -282,8 +282,8 @@ fn main() {
     println!("🏗️  Architecture:");
     println!("  Type: Single crate");
     println!("  Build System: {}", context.build_system);
-    println!("  Modules: primitives, http, conveniences");
-    println!("  Features: default (http + primitives), conveniences (optional)");
+    println!("  Modules: inference, http, conveniences");
+    println!("  Features: default (http + inference), conveniences (optional)");
     println!();
 
     println!("📁 Critical Files ({} tracked):", context.critical_files.len());
@@ -375,7 +375,7 @@ fn main() {
                     println!("    - Implementing GET /api/version endpoint");
                 }
                 if def_content.contains("Primitives crate structure") {
-                    println!("    - Setting up primitives crate structure");
+                    println!("    - Setting up inference crate structure");
                 }
                 if def_content.contains("HTTP client implementation") {
                     println!("    - Building HTTP client in http-core");

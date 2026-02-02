@@ -20,8 +20,10 @@ The project uses a **single-crate architecture** with modular organization:
 ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
-    ├── primitives/      # API data structures (default feature)
+    ├── inference/       # Inference types: chat, generate, embed (default feature)
     ├── http/            # HTTP client layer (default feature)
+    ├── model/           # Model management types (optional feature)
+    ├── tools/           # Ergonomic function calling (optional feature)
     └── conveniences/    # High-level API (optional feature)
 ```
 
@@ -49,24 +51,24 @@ ollama-oxide/
 
 ```toml
 [features]
-default = ["http", "primitives"]      # Standard usage (inference only)
-conveniences = ["http", "primitives"] # High-level APIs
+default = ["http", "inference"]       # Standard usage (inference only)
+conveniences = ["http", "inference"]  # High-level APIs
 http = []                             # HTTP client layer
-primitives = []                       # Data types
+inference = []                        # Inference types (chat, generate, embed)
 tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
-model = ["http", "primitives"]        # All model operations (opt-in)
+model = ["http", "inference"]         # All model operations (opt-in)
 ```
 
 **Feature Matrix:**
 
 | Feature | Dependencies | Purpose |
 |---------|-------------|---------|
-| `default` | `http`, `primitives` | Standard usage - inference APIs (generate, chat, embed, version) |
-| `primitives` | - | Standalone data types for serialization/deserialization |
+| `default` | `http`, `inference` | Standard usage - inference APIs (generate, chat, embed, version) |
+| `inference` | - | Standalone inference types for chat, generate, embed |
 | `http` | - | HTTP client implementation (async/sync) |
 | `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
-| `model` | `http`, `primitives` | All model operations: list, show, copy, create, delete (opt-in) |
-| `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
+| `model` | `http`, `inference` | All model operations: list, show, copy, create, delete (opt-in) |
+| `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 
 **Model Feature Contents:**
 - Types: `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `CopyRequest`, `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting`
@@ -76,7 +78,7 @@ model = ["http", "primitives"]        # All model operations (opt-in)
 
 ### Implemented
 - Single-crate configuration with feature flags
-- Module structure (primitives, http, conveniences)
+- Module structure (inference, http, model, tools, conveniences)
 - Dependency setup (tokio, serde, reqwest, async-trait)
 - 12 OpenAPI specifications documented
 - Comprehensive documentation foundation
@@ -221,8 +223,8 @@ The library uses Cargo features to provide a modular, opt-in design where develo
 
 | Use Case | Cargo.toml | What's Included |
 |----------|------------|-----------------|
-| Basic API client | (default) | HTTP client + all primitives |
-| Data types only | `default-features = false, features = ["primitives"]` | Just structs for JSON parsing |
+| Basic API client | (default) | HTTP client + all inference types |
+| Data types only | `default-features = false, features = ["inference"]` | Just structs for JSON parsing |
 | With function calling | `features = ["tools"]` | + ToolRegistry, auto-schema generation |
 | Full with model management | `features = ["tools", "model"]` | Everything including model creation/deletion |
 
@@ -339,13 +341,13 @@ Future endpoints:
 **Decision Date:** 2026-01-26
 
 **Rationale:**
-- **Feature flag complexity**: Many types are gated behind feature flags (`tools`, `primitives`, `http`), making doc tests hard to maintain
+- **Feature flag complexity**: Many types are gated behind feature flags (`tools`, `inference`, `http`, `model`), making doc tests hard to maintain
 - **Maintenance burden**: Doc tests require keeping code in sync across documentation and actual tests
 - **Coverage duplication**: All public interfaces are already covered by tests in `tests/` folder
 - **Simpler workflow**: Run `cargo test` without doc test failures due to feature mismatches
 
 **Testing locations:**
-- **Unit tests**: Inside each component file (e.g., `src/primitives/chat_request.rs` has `#[cfg(test)] mod tests`)
+- **Unit tests**: Inside each component file (e.g., `src/inference/chat_request.rs` has `#[cfg(test)] mod tests`)
 - **Public interface tests**: `tests/` folder for integration-style unit tests
 - **Integration tests**: `examples/` folder for real Ollama server tests
 

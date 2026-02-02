@@ -60,8 +60,10 @@ This is a single-crate project with modular organization:
 ollama-oxide/
 ├── src/
 │   ├── lib.rs           # Main library entry point
-│   ├── primitives/      # Low-level API primitives (default)
+│   ├── inference/       # Inference types: chat, generate, embed (default)
 │   ├── http/            # HTTP client implementation (default)
+│   ├── model/           # Model management types (optional)
+│   ├── tools/           # Ergonomic function calling (optional)
 │   └── conveniences/    # High-level APIs (optional feature)
 ├── examples/            # Usage examples
 ├── spec/                # OpenAPI specifications
@@ -70,31 +72,31 @@ ollama-oxide/
 
 ### Module Responsibilities
 
-- **primitives** (module): Data structures and types matching Ollama's API specification
+- **inference** (module): Data structures for inference operations (chat, generate, embed)
 - **http** (module): HTTP communication, request/response handling
 - **tools** (module): Ergonomic function calling with auto-generated JSON schemas
-- **create** (module): Model creation and deletion operations (opt-in)
-- **conveniences** (module): High-level APIs built on primitives (optional feature)
+- **model** (module): Model management operations (list, show, copy, create, delete)
+- **conveniences** (module): High-level APIs built on inference types (optional feature)
 
 ### Feature Flags
 
 ```toml
 [features]
-default = ["http", "primitives"]      # Standard usage
-conveniences = ["http", "primitives"] # High-level APIs
+default = ["http", "inference"]       # Standard usage
+conveniences = ["http", "inference"]  # High-level APIs
 http = []                             # HTTP client layer
-primitives = []                       # Data types
+inference = []                        # Inference types
 tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
-create = ["http", "primitives"]       # Model creation/deletion (destructive)
+model = ["http", "inference"]         # Model management (opt-in)
 ```
 
 | Feature | Purpose | Optional Dependencies |
 |---------|---------|----------------------|
-| `default` | Standard HTTP client + data types | - |
-| `primitives` | Standalone data types only | - |
+| `default` | Standard HTTP client + inference types | - |
+| `inference` | Standalone inference types only | - |
 | `http` | HTTP client implementation | - |
 | `tools` | Type-safe function calling | `schemars`, `futures` |
-| `model` | Model creation/deletion | - |
+| `model` | Model management operations | - |
 | `conveniences` | High-level ergonomic APIs | - |
 
 ## Development Workflow
@@ -282,7 +284,7 @@ cargo test --features model
 cargo test --all-features
 
 # Verify no-default-features compiles
-cargo check --no-default-features --features primitives
+cargo check --no-default-features --features inference
 ```
 
 ## Submitting Changes

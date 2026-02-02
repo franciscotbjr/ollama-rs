@@ -1,7 +1,7 @@
-//! Primitive types for Ollama API responses and requests
+//! Inference types for Ollama API responses and requests
 //!
-//! This module contains all primitive data types used in the Ollama API,
-//! including request and response structures.
+//! This module contains all data types used for inference operations:
+//! chat completions, text generation, and embeddings.
 
 // Chat types
 mod chat_message;
@@ -20,7 +20,7 @@ mod tool_definition;
 #[cfg(feature = "tools")]
 mod tool_function;
 
-// Other primitives
+// Inference types
 mod embed_input;
 mod embed_request;
 mod embed_response;
@@ -52,7 +52,7 @@ pub use tool_definition::ToolDefinition;
 #[cfg(feature = "tools")]
 pub use tool_function::ToolFunction;
 
-// Other primitives re-exports
+// Inference types re-exports
 pub use embed_input::EmbedInput;
 pub use embed_request::EmbedRequest;
 pub use embed_response::EmbedResponse;

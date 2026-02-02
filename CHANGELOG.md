@@ -92,11 +92,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `list_models_sync.rs` - Sync list models example
 
 ### Changed
+- **Renamed feature**: `primitives` → `inference` for better semantic clarity
+  - Feature flag `primitives` renamed to `inference` in Cargo.toml
+  - Module `src/primitives/` renamed to `src/inference/`
+  - All inference-related types (chat, generate, embed) now under `inference` feature
+  - Test file `primitives_list_tests.rs` renamed to `model_list_tests.rs`
+  - **Breaking change**: Users using `features = ["primitives"]` must change to `features = ["inference"]`
 - **Model feature consolidation**: All model-related types and methods now behind `model` feature
-  - Moved 9 primitive types from `src/primitives/` to `src/model/`: `CopyRequest`, `ListResponse`, `ModelDetails`, `ModelSummary`, `PsResponse`, `RunningModel`, `ShowModelDetails`, `ShowRequest`, `ShowResponse`
+  - Moved 9 types from `src/inference/` to `src/model/`: `CopyRequest`, `ListResponse`, `ModelDetails`, `ModelSummary`, `PsResponse`, `RunningModel`, `ShowModelDetails`, `ShowRequest`, `ShowResponse`
   - Gated methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()` now require `model` feature
   - Updated Cargo.toml with `required-features = ["model"]` for 8 examples and 5 tests
-  - Simplified feature conditionals: `#[cfg(feature = "model")]` instead of `#[cfg(all(feature = "primitives", feature = "model"))]`
+  - Simplified feature conditionals: `#[cfg(feature = "model")]` instead of `#[cfg(all(feature = "inference", feature = "model"))]`
   - **Breaking change**: Users must add `model` feature to use model-related APIs
 - **Feature flag architecture**: Expanded from 4 features to 6
   - New: `tools` feature for ergonomic function calling

@@ -38,20 +38,19 @@ mod error;
 pub use error::{Error, Result};
 
 // ============================================================================
-// Primitives Module
+// Inference Module
 // ============================================================================
 
-#[cfg(feature = "primitives")]
-pub mod primitives;
+#[cfg(feature = "inference")]
+pub mod inference;
 
-#[cfg(feature = "primitives")]
-pub use primitives::{
+#[cfg(feature = "inference")]
+pub use inference::{
     // Chat types
     ChatMessage,
     ChatRequest,
     ChatResponse,
     ChatRole,
-    // Other primitives
     EmbedInput,
     EmbedRequest,
     EmbedResponse,
@@ -68,9 +67,9 @@ pub use primitives::{
     VersionResponse,
 };
 
-// Tool types re-exports (requires both "primitives" and "tools" features)
-#[cfg(all(feature = "primitives", feature = "tools"))]
-pub use primitives::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
+// Tool types re-exports (requires both "inference" and "tools" features)
+#[cfg(all(feature = "inference", feature = "tools"))]
+pub use inference::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 
 // ============================================================================
 // HTTP Client Module
@@ -123,14 +122,14 @@ pub mod prelude {
     #[cfg(feature = "http")]
     pub use crate::{ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
 
-    #[cfg(feature = "primitives")]
+    #[cfg(feature = "inference")]
     pub use crate::{
         // Chat types
         ChatMessage,
         ChatRequest,
         ChatResponse,
         ChatRole,
-        // Other primitives
+        // Inference types
         EmbedInput,
         EmbedRequest,
         EmbedResponse,
@@ -147,8 +146,8 @@ pub mod prelude {
         VersionResponse,
     };
 
-    // Tool types (requires both "primitives" and "tools" features)
-    #[cfg(all(feature = "primitives", feature = "tools"))]
+    // Tool types (requires both "inference" and "tools" features)
+    #[cfg(all(feature = "inference", feature = "tools"))]
     pub use crate::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 
     // Model types (requires "model" feature)
