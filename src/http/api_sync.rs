@@ -5,7 +5,7 @@ use crate::{
     GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
 };
 
-#[cfg(feature = "create")]
+#[cfg(feature = "model")]
 use crate::{CreateRequest, CreateResponse, DeleteRequest};
 
 use super::OllamaClient;
@@ -180,7 +180,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()>;
 
     /// Show detailed information about a model (blocking)
@@ -348,7 +348,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse>;
 }
 
@@ -373,7 +373,7 @@ impl OllamaApiSync for OllamaClient {
         self.get_blocking_with_retry(&url)
     }
 
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_blocking_with_retry(&url, request)
@@ -399,7 +399,7 @@ impl OllamaApiSync for OllamaClient {
         self.post_blocking_with_retry(&url, request)
     }
 
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse> {
         let url = self.config.url(Endpoints::CREATE);
         self.post_blocking_with_retry(&url, request)

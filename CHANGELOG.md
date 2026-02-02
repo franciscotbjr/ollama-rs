@@ -14,10 +14,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - `ToolRegistry` for automatic dispatch
     - Optional dependencies: `schemars`, `futures`
     - Examples: `tools_async`, `chat_with_tools_async`, `chat_with_tools_registry_async`
-  - `create` feature: Model creation/deletion (opt-in for destructive operations)
+  - `model` feature: Model creation/deletion (opt-in for destructive operations)
     - `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting` types
     - Gated API methods: `create_model()`, `delete_model()`
-    - Examples: `create_model_async`, `delete_model_async`
+    - Examples: `model_create_async`, `model_delete_async`
   - Three-level conditional compilation: module, struct field, and method level
   - Example and test gating via `required-features` in Cargo.toml
 - **New example: `chat_with_tools_async`**: Complete chat with tools flow using weather API
@@ -94,7 +94,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 - **Feature flag architecture**: Expanded from 4 features to 6
   - New: `tools` feature for ergonomic function calling
-  - New: `create` feature for model creation/deletion (opt-in)
+  - New: `model` feature for model creation/deletion (opt-in)
   - Updated dependency configuration for optional deps
 - **Documentation updates**: All critical documents reflect feature-based design
   - README.md: Feature flags table and usage examples

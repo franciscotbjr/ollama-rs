@@ -30,7 +30,7 @@ conveniences = ["http", "primitives"]
 http = []
 primitives = []
 tools = ["dep:schemars", "dep:futures"]
-create = ["http", "primitives"]
+model = ["http", "primitives"]
 
 [dependencies]
 tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread", "time"] }
@@ -61,26 +61,26 @@ name = "chat_with_tools_async"
 required-features = ["tools"]
 
 [[example]]
-name = "create_model_async"
-required-features = ["create"]
+name = "model_create_async"
+required-features = ["model"]
 
 [[example]]
-name = "create_model_cleanup_async"
-required-features = ["create"]
+name = "model_cleanup_async"
+required-features = ["model"]
 
 [[example]]
-name = "delete_model_async"
-required-features = ["create"]
+name = "model_delete_async"
+required-features = ["model"]
 
 [[example]]
-name = "delete_model_sync"
-required-features = ["create"]
+name = "model_delete_sync"
+required-features = ["model"]
 
 [[test]]
 name = "client_delete_model_tests"
-required-features = ["create"]
+required-features = ["model"]
 
 [[test]]
 name = "client_create_model_tests"
-required-features = ["create"]
+required-features = ["model"]
 

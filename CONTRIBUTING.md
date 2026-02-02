@@ -94,7 +94,7 @@ create = ["http", "primitives"]       # Model creation/deletion (destructive)
 | `primitives` | Standalone data types only | - |
 | `http` | HTTP client implementation | - |
 | `tools` | Type-safe function calling | `schemars`, `futures` |
-| `create` | Model creation/deletion | - |
+| `model` | Model creation/deletion | - |
 | `conveniences` | High-level ergonomic APIs | - |
 
 ## Development Workflow
@@ -218,7 +218,7 @@ cargo test --all-features
 
 # Tests for specific feature
 cargo test --features tools
-cargo test --features create
+cargo test --features model
 
 # With output
 cargo test -- --nocapture
@@ -233,7 +233,7 @@ When adding new functionality:
 
 **1. Decide if it needs a feature flag:**
 - Optional dependencies → Yes (e.g., `tools` needs `schemars`)
-- Destructive operations → Yes (e.g., `create` for model deletion)
+- Destructive operations → Yes (e.g., `model` for model deletion)
 - Core functionality → No (use `default` features)
 
 **2. Gate code with `#[cfg(feature = "...")]`:**
@@ -265,8 +265,8 @@ name = "chat_with_tools_async"
 required-features = ["tools"]
 
 [[test]]
-name = "client_create_model_tests"
-required-features = ["create"]
+name = "client_model_tests"
+required-features = ["model"]
 ```
 
 **4. Test with different feature combinations:**
@@ -276,7 +276,7 @@ cargo test
 
 # Test with each optional feature
 cargo test --features tools
-cargo test --features create
+cargo test --features model
 
 # Test all features together
 cargo test --all-features

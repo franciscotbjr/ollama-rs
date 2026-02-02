@@ -45,7 +45,7 @@ ollama-oxide/
     │   └── mod.rs
     ├── tools/           # Ergonomic function calling (optional, "tools" feature)
     │   └── mod.rs
-    ├── create/          # Model creation/deletion (optional, "create" feature)
+    ├── model/           # Model creation/deletion (optional, "model" feature)
     │   └── mod.rs
     └── conveniences/    # High-level convenience APIs module (optional)
         └── mod.rs
@@ -110,7 +110,7 @@ Each module follows single-concern file structure:
 - `DeleteRequest` for model deletion
 - `LicenseSetting` for license configuration
 
-**Feature:** `create` (optional, requires `http` and `primitives`)
+**Feature:** `model` (optional, requires `http` and `primitives`)
 **Status:** Implementation complete
 **Note:** Opt-in feature to prevent accidental destructive operations
 
@@ -136,7 +136,7 @@ conveniences = ["http", "primitives"] # High-level APIs
 http = []                             # HTTP client layer
 primitives = []                       # Data types
 tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
-create = ["http", "primitives"]       # Model creation/deletion (destructive)
+model = ["http", "primitives"]        # Model creation/deletion (destructive)
 ```
 
 **Feature Matrix:**
@@ -147,7 +147,7 @@ create = ["http", "primitives"]       # Model creation/deletion (destructive)
 | `primitives` | - | Standalone data types for serialization/deserialization |
 | `http` | - | HTTP client implementation (async/sync) |
 | `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
-| `create` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `model` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
 | `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
 
 **Usage Examples:**
@@ -159,10 +159,10 @@ ollama-oxide = "0.1.0"
 ollama-oxide = { version = "0.1.0", features = ["tools"] }
 
 # With model creation/deletion
-ollama-oxide = { version = "0.1.0", features = ["create"] }
+ollama-oxide = { version = "0.1.0", features = ["model"] }
 
 # Full featured
-ollama-oxide = { version = "0.1.0", features = ["tools", "create"] }
+ollama-oxide = { version = "0.1.0", features = ["tools", "model"] }
 
 # Data types only (no HTTP client)
 ollama-oxide = { version = "0.1.0", default-features = false, features = ["primitives"] }
@@ -184,7 +184,7 @@ ollama-oxide = { version = "0.1.0", default-features = false, features = ["primi
 - Single crate architecture
 - Feature-based module organization
 - Default features: `http` + `primitives`
-- Optional features: `tools`, `create`, `conveniences`
+- Optional features: `tools`, `model`, `conveniences`
 - Optional dependencies: `schemars`, `futures` (for `tools` feature)
 
 ### Dependency Rationale

@@ -65,7 +65,7 @@ create = ["http", "primitives"]       # Model creation/deletion (destructive)
 | `primitives` | - | Standalone data types for serialization/deserialization |
 | `http` | - | HTTP client implementation (async/sync) |
 | `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
-| `create` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `model` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
 | `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
 
 ## Current State
@@ -195,7 +195,7 @@ The library uses Cargo features to provide a modular, opt-in design where develo
 
 **Key Design Decisions:**
 
-1. **Opt-in for Destructive Operations**: The `create` feature isolates `CreateRequest`, `DeleteRequest`, and related API methods. Developers must explicitly enable model creation/deletion to prevent accidental misuse.
+1. **Opt-in for Destructive Operations**: The `model` feature isolates `CreateRequest`, `DeleteRequest`, and related API methods. Developers must explicitly enable model creation/deletion to prevent accidental misuse.
 
 2. **Conditional Dependencies**: The `tools` feature brings in `schemars` and `futures` only when needed, keeping the default dependency tree lean.
 
@@ -220,7 +220,7 @@ The library uses Cargo features to provide a modular, opt-in design where develo
 | Basic API client | (default) | HTTP client + all primitives |
 | Data types only | `default-features = false, features = ["primitives"]` | Just structs for JSON parsing |
 | With function calling | `features = ["tools"]` | + ToolRegistry, auto-schema generation |
-| Full with model management | `features = ["tools", "create"]` | Everything including model creation/deletion |
+| Full with model management | `features = ["tools", "model"]` | Everything including model creation/deletion |
 
 ### Example Naming Convention
 

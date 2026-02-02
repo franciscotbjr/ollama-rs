@@ -42,7 +42,7 @@ The library uses feature flags to let you include only what you need:
 | `primitives` | - | Standalone data types for serialization/deserialization |
 | `http` | - | HTTP client implementation (async/sync) |
 | `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
-| `create` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
+| `model` | `http`, `primitives` | Model creation/deletion API (opt-in for destructive operations) |
 | `conveniences` | `http`, `primitives` | High-level ergonomic APIs |
 
 ## Installation
@@ -60,11 +60,11 @@ ollama-oxide = { version = "0.1.0", features = ["tools"] }
 
 # With model creation/deletion
 [dependencies]
-ollama-oxide = { version = "0.1.0", features = ["create"] }
+ollama-oxide = { version = "0.1.0", features = ["model"] }
 
 # Full featured
 [dependencies]
-ollama-oxide = { version = "0.1.0", features = ["tools", "create"] }
+ollama-oxide = { version = "0.1.0", features = ["tools", "model"] }
 
 # Data types only (no HTTP client)
 [dependencies]

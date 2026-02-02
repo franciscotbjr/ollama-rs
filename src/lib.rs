@@ -92,14 +92,14 @@ pub mod http;
 pub use http::{ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
 
 // ============================================================================
-// Create Module
+// Model Module
 // ============================================================================
 
-#[cfg(feature = "create")]
-pub mod create;
+#[cfg(feature = "model")]
+pub mod model;
 
-#[cfg(feature = "create")]
-pub use create::{CreateRequest, CreateResponse, DeleteRequest, LicenseSetting};
+#[cfg(feature = "model")]
+pub use model::{CreateRequest, CreateResponse, DeleteRequest, LicenseSetting};
 
 // ============================================================================
 // Ergonomic Tools Module (requires "tools" feature)
@@ -155,7 +155,7 @@ pub mod prelude {
     #[cfg(all(feature = "primitives", feature = "tools"))]
     pub use crate::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 
-    // Create types (requires both "primitives" and "create" features)
-    #[cfg(all(feature = "primitives", feature = "create"))]
+    // Model types (requires both "primitives" and "model" features)
+    #[cfg(all(feature = "primitives", feature = "model"))]
     pub use crate::{CreateRequest, CreateResponse, DeleteRequest, LicenseSetting};
 }

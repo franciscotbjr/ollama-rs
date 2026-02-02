@@ -5,7 +5,7 @@ use crate::{
     GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
 };
 
-#[cfg(feature = "create")]
+#[cfg(feature = "model")]
 use crate::{CreateRequest, CreateResponse, DeleteRequest};
 
 use async_trait::async_trait;
@@ -178,7 +178,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()>;
 
     /// Show detailed information about a model (async)
@@ -409,7 +409,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse>;
 }
 
@@ -435,7 +435,7 @@ impl OllamaApiAsync for OllamaClient {
         self.get_with_retry(&url).await
     }
 
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     async fn delete_model(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_with_retry(&url, request).await
@@ -461,7 +461,7 @@ impl OllamaApiAsync for OllamaClient {
         self.post_with_retry(&url, request).await
     }
 
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse> {
         let url = self.config.url(Endpoints::CREATE);
         self.post_with_retry(&url, request).await

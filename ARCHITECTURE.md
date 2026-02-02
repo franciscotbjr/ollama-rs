@@ -62,15 +62,15 @@ src/
 │   ├── mod.rs                      # Re-exports: ClientConfig, OllamaClient, traits
 │   ├── config.rs                   # ClientConfig + impl Default
 │   ├── client.rs                   # OllamaClient + constructors + validation
-│   ├── api_async.rs                # OllamaApiAsync (#[cfg(feature = "create")] for create/delete)
-│   └── api_sync.rs                 # OllamaApiSync (#[cfg(feature = "create")] for create/delete)
+│   ├── api_async.rs                # OllamaApiAsync (#[cfg(feature = "model")] for create/delete)
+│   └── api_sync.rs                 # OllamaApiSync (#[cfg(feature = "model")] for create/delete)
 ├── tools/                          # Feature: "tools" (optional, requires schemars + futures)
 │   ├── mod.rs                      # Tool trait, ToolRegistry, ToolError exports
 │   ├── tool_trait.rs               # Tool trait with auto-schema generation
 │   ├── tool_registry.rs            # ToolRegistry for automatic dispatch
 │   ├── erased_tool.rs              # Type-erased tool wrapper for registry storage
 │   └── tool_error.rs               # ToolError and ToolResult types
-├── create/                         # Feature: "create" (optional, opt-in for destructive ops)
+├── model/                          # Feature: "model" (optional, opt-in for destructive ops)
 │   ├── mod.rs                      # CreateRequest, CreateResponse, DeleteRequest exports
 │   ├── create_request.rs           # Model creation request
 │   ├── create_response.rs          # Model creation response
@@ -93,7 +93,7 @@ conveniences = ["http", "primitives"] # High-level APIs
 http = []                             # HTTP client layer
 primitives = []                       # Data types
 tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
-create = ["http", "primitives"]       # Model creation/deletion (destructive)
+model = ["http", "primitives"]        # Model creation/deletion (destructive)
 ```
 
 ### Feature Dependency Graph
@@ -114,7 +114,7 @@ create = ["http", "primitives"]       # Model creation/deletion (destructive)
         ┌──────────────────┼──────────────────┐
         │                  │                  │
   ┌─────▼─────┐     ┌──────▼──────┐    ┌──────▼──────┐
-  │  create   │     │conveniences │    │   tools     │
+  │   model   │     │conveniences │    │   tools     │
   │(opt-in)   │     │  (future)   │    │ (optional)  │
   └───────────┘     └─────────────┘    └─────────────┘
         │                                     │
@@ -132,8 +132,8 @@ The codebase uses `#[cfg(feature = "...")]` at three levels:
 #[cfg(feature = "tools")]
 pub mod tools;
 
-#[cfg(feature = "create")]
-pub mod create;
+#[cfg(feature = "model")]
+pub mod model;
 ```
 
 **2. Struct Field Level** - Optional fields in primitives:
@@ -168,12 +168,12 @@ name = "chat_with_tools_async"
 required-features = ["tools"]
 
 [[example]]
-name = "create_model_async"
-required-features = ["create"]
+name = "model_create_async"
+required-features = ["model"]
 
 [[test]]
-name = "client_create_model_tests"
-required-features = ["create"]
+name = "client_model_tests"
+required-features = ["model"]
 ```
 
 ---
@@ -253,11 +253,11 @@ The crate follows a strict layered architecture where higher-level modules can d
 
 | Module | Can depend on | Cannot depend on |
 |--------|---------------|------------------|
-| `error` | std, external crates | primitives, http, tools, create |
-| `primitives` | error, serde, std | http, tools, create |
-| `create` | error, serde, std | http, tools |
-| `http` | error, primitives, create, reqwest | tools |
-| `tools` | error, primitives, schemars, futures | http, create |
+| `error` | std, external crates | primitives, http, tools, model |
+| `primitives` | error, serde, std | http, tools, model |
+| `model` | error, serde, std | http, tools |
+| `http` | error, primitives, model, reqwest | tools |
+| `tools` | error, primitives, schemars, futures | http, model |
 | `lib.rs` | all (re-exports only) | — |
 
 **Key Principle:** Primitives must remain pure data types with no knowledge of how they are transported. This ensures:
@@ -598,7 +598,7 @@ Integration tests are implemented as **examples**:
 
 ## Version History
 
-- **2026-02-01**: Added feature flag architecture documentation (tools, create features)
+- **2026-02-01**: Added feature flag architecture documentation (tools, model features)
 - **2026-01-13**: Initial architecture document
 
 ---
