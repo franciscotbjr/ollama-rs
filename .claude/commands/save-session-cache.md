@@ -4,7 +4,7 @@ I'll save the current session context for the ollama-oxide project by reading cr
 
 ## Session Context (CRITICAL)
 
-After running the cache script, you MUST update the `session_context` in the cache file with:
+Before running the cache script, you MUST execute `/compact` command. 
 
 ### `task` attribute
 - Must contain the current/last task being developed in the project
@@ -12,18 +12,7 @@ After running the cache script, you MUST update the `session_context` in the cac
 
 ### `summary` attribute
 - **MUST have content equivalent to the result of `/compact` command execution**
-- Must follow the exact structure with these 9 sections:
-  1. **Primary Request and Intent** - What the user requested and invoked
-  2. **Key Technical Concepts** - Technical patterns and concepts involved
-  3. **Files and Code Sections** - All files modified/created with descriptions
-  4. **Errors and fixes** - Any errors encountered and how they were resolved
-  5. **Problem Solving** - How the task was approached and completed
-  6. **All user messages** - List of user commands/messages in the session
-  7. **Pending Tasks** - What remains to be done (if any)
-  8. **Current Work** - Current state of work and verification results
-  9. **Optional Next Step** - Logical next action to take
-
-**IMPORTANT**: If `session_context.task` or `session_context.summary` are empty after running the script, you MUST manually update them in the cache file before completing this command.
+The content of `session_context.summary` is the result obtained from `/compact` previously executed.
 
 ## What Gets Cached
 

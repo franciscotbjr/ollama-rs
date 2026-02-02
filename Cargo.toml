@@ -76,11 +76,63 @@ required-features = ["model"]
 name = "model_delete_sync"
 required-features = ["model"]
 
+[[example]]
+name = "list_models_async"
+required-features = ["model"]
+
+[[example]]
+name = "list_models_sync"
+required-features = ["model"]
+
+[[example]]
+name = "list_running_models_async"
+required-features = ["model"]
+
+[[example]]
+name = "list_running_models_sync"
+required-features = ["model"]
+
+[[example]]
+name = "copy_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "copy_model_sync"
+required-features = ["model"]
+
+[[example]]
+name = "show_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "show_model_sync"
+required-features = ["model"]
+
 [[test]]
 name = "client_delete_model_tests"
 required-features = ["model"]
 
 [[test]]
 name = "client_create_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_list_models_tests"
+required-features = ["model"]
+
+[[test]]
+name = "primitives_list_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_list_running_models_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_copy_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_show_model_tests"
 required-features = ["model"]
 

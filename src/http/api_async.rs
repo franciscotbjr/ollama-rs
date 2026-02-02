@@ -1,12 +1,15 @@
 //! Async API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest, EmbedRequest, EmbedResponse, GenerateRequest,
-    GenerateResponse, ListResponse, PsResponse, Result, ShowRequest, ShowResponse, VersionResponse,
+    ChatRequest, ChatResponse, EmbedRequest, EmbedResponse, GenerateRequest,
+    GenerateResponse, Result, VersionResponse,
 };
 
 #[cfg(feature = "model")]
-use crate::{CreateRequest, CreateResponse, DeleteRequest};
+use crate::{
+    CopyRequest, CreateRequest, CreateResponse, DeleteRequest, ListResponse, PsResponse,
+    ShowRequest, ShowResponse,
+};
 
 use async_trait::async_trait;
 
@@ -86,6 +89,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     async fn list_models(&self) -> Result<ListResponse>;
 
     /// Copy a model (async)
@@ -118,6 +122,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     async fn copy_model(&self, request: &CopyRequest) -> Result<()>;
 
     /// List currently running models (async)
@@ -147,6 +152,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     async fn list_running_models(&self) -> Result<PsResponse>;
 
     /// Delete a model (async)
@@ -216,6 +222,7 @@ pub trait OllamaApiAsync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     async fn show_model(&self, request: &ShowRequest) -> Result<ShowResponse>;
 
     /// Generate embeddings for text (async)
@@ -420,16 +427,19 @@ impl OllamaApiAsync for OllamaClient {
         self.get_with_retry(&url).await
     }
 
+    #[cfg(feature = "model")]
     async fn list_models(&self) -> Result<ListResponse> {
         let url = self.config.url(Endpoints::TAGS);
         self.get_with_retry(&url).await
     }
 
+    #[cfg(feature = "model")]
     async fn copy_model(&self, request: &CopyRequest) -> Result<()> {
         let url = self.config.url(Endpoints::COPY);
         self.post_empty_with_retry(&url, request).await
     }
 
+    #[cfg(feature = "model")]
     async fn list_running_models(&self) -> Result<PsResponse> {
         let url = self.config.url(Endpoints::PS);
         self.get_with_retry(&url).await
@@ -441,6 +451,7 @@ impl OllamaApiAsync for OllamaClient {
         self.delete_empty_with_retry(&url, request).await
     }
 
+    #[cfg(feature = "model")]
     async fn show_model(&self, request: &ShowRequest) -> Result<ShowResponse> {
         let url = self.config.url(Endpoints::SHOW);
         self.post_with_retry(&url, request).await

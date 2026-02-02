@@ -52,7 +52,6 @@ pub use primitives::{
     ChatResponse,
     ChatRole,
     // Other primitives
-    CopyRequest,
     EmbedInput,
     EmbedRequest,
     EmbedResponse,
@@ -60,17 +59,9 @@ pub use primitives::{
     GenerateRequest,
     GenerateResponse,
     KeepAliveSetting,
-    ListResponse,
     Logprob,
-    ModelDetails,
     ModelOptions,
-    ModelSummary,
-    PsResponse,
     ResponseMessage,
-    RunningModel,
-    ShowModelDetails,
-    ShowRequest,
-    ShowResponse,
     StopSetting,
     ThinkSetting,
     TokenLogprob,
@@ -99,7 +90,21 @@ pub use http::{ClientConfig, OllamaApiAsync, OllamaApiSync, OllamaClient};
 pub mod model;
 
 #[cfg(feature = "model")]
-pub use model::{CreateRequest, CreateResponse, DeleteRequest, LicenseSetting};
+pub use model::{
+    CopyRequest,
+    CreateRequest,
+    CreateResponse,
+    DeleteRequest,
+    LicenseSetting,
+    ListResponse,
+    ModelDetails,
+    ModelSummary,
+    PsResponse,
+    RunningModel,
+    ShowModelDetails,
+    ShowRequest,
+    ShowResponse,
+};
 
 // ============================================================================
 // Ergonomic Tools Module (requires "tools" feature)
@@ -126,7 +131,6 @@ pub mod prelude {
         ChatResponse,
         ChatRole,
         // Other primitives
-        CopyRequest,
         EmbedInput,
         EmbedRequest,
         EmbedResponse,
@@ -134,17 +138,9 @@ pub mod prelude {
         GenerateRequest,
         GenerateResponse,
         KeepAliveSetting,
-        ListResponse,
         Logprob,
-        ModelDetails,
         ModelOptions,
-        ModelSummary,
-        PsResponse,
         ResponseMessage,
-        RunningModel,
-        ShowModelDetails,
-        ShowRequest,
-        ShowResponse,
         StopSetting,
         ThinkSetting,
         TokenLogprob,
@@ -155,7 +151,21 @@ pub mod prelude {
     #[cfg(all(feature = "primitives", feature = "tools"))]
     pub use crate::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 
-    // Model types (requires both "primitives" and "model" features)
-    #[cfg(all(feature = "primitives", feature = "model"))]
-    pub use crate::{CreateRequest, CreateResponse, DeleteRequest, LicenseSetting};
+    // Model types (requires "model" feature)
+    #[cfg(feature = "model")]
+    pub use crate::{
+        CopyRequest,
+        CreateRequest,
+        CreateResponse,
+        DeleteRequest,
+        LicenseSetting,
+        ListResponse,
+        ModelDetails,
+        ModelSummary,
+        PsResponse,
+        RunningModel,
+        ShowModelDetails,
+        ShowRequest,
+        ShowResponse,
+    };
 }
