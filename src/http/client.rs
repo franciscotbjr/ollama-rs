@@ -372,6 +372,7 @@ impl OllamaClient {
     /// Returns an error if:
     /// - Maximum retry attempts exceeded
     /// - Client errors (4xx) occur (no retry)
+    #[cfg(feature = "model")]
     pub(super) async fn post_empty_with_retry<R>(&self, url: &str, body: &R) -> Result<()>
     where
         R: serde::Serialize,
@@ -423,6 +424,7 @@ impl OllamaClient {
     /// Returns an error if:
     /// - Maximum retry attempts exceeded
     /// - Client errors (4xx) occur (no retry)
+    #[cfg(feature = "model")]
     pub(super) fn post_empty_blocking_with_retry<R>(&self, url: &str, body: &R) -> Result<()>
     where
         R: serde::Serialize,
@@ -478,7 +480,7 @@ impl OllamaClient {
     /// Returns an error if:
     /// - Maximum retry attempts exceeded
     /// - Client errors (4xx) occur (no retry)
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     pub(super) async fn delete_empty_with_retry<R>(&self, url: &str, body: &R) -> Result<()>
     where
         R: serde::Serialize,
@@ -530,7 +532,7 @@ impl OllamaClient {
     /// Returns an error if:
     /// - Maximum retry attempts exceeded
     /// - Client errors (4xx) occur (no retry)
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     pub(super) fn delete_empty_blocking_with_retry<R>(&self, url: &str, body: &R) -> Result<()>
     where
         R: serde::Serialize,

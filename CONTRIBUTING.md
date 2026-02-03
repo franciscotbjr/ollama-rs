@@ -60,8 +60,10 @@ This is a single-crate project with modular organization:
 ollama-oxide/
 ├── src/
 │   ├── lib.rs           # Main library entry point
-│   ├── primitives/      # Low-level API primitives (default)
+│   ├── inference/       # Inference types: chat, generate, embed (default)
 │   ├── http/            # HTTP client implementation (default)
+│   ├── model/           # Model management types (optional)
+│   ├── tools/           # Ergonomic function calling (optional)
 │   └── conveniences/    # High-level APIs (optional feature)
 ├── examples/            # Usage examples
 ├── spec/                # OpenAPI specifications
@@ -70,16 +72,32 @@ ollama-oxide/
 
 ### Module Responsibilities
 
-- **primitives** (module): Data structures and types matching Ollama's API specification
+- **inference** (module): Data structures for inference operations (chat, generate, embed)
 - **http** (module): HTTP communication, request/response handling
-- **conveniences** (module): Ergonomic, high-level APIs built on primitives (optional feature)
+- **tools** (module): Ergonomic function calling with auto-generated JSON schemas
+- **model** (module): Model management operations (list, show, copy, create, delete)
+- **conveniences** (module): High-level APIs built on inference types (optional feature)
 
 ### Feature Flags
 
 ```toml
-default = ["http", "primitives"]     # Core functionality
-conveniences = ["http", "primitives"] # Optional high-level APIs
+[features]
+default = ["http", "inference"]       # Standard usage
+conveniences = ["http", "inference"]  # High-level APIs
+http = []                             # HTTP client layer
+inference = []                        # Inference types
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+model = ["http", "inference"]         # Model management (opt-in)
 ```
+
+| Feature | Purpose | Optional Dependencies |
+|---------|---------|----------------------|
+| `default` | Standard HTTP client + inference types | - |
+| `inference` | Standalone inference types only | - |
+| `http` | HTTP client implementation | - |
+| `tools` | Type-safe function calling | `schemars`, `futures` |
+| `model` | Model management operations | - |
+| `conveniences` | High-level ergonomic APIs | - |
 
 ## Development Workflow
 
@@ -194,17 +212,79 @@ mod tests {
 ### Running Tests
 
 ```bash
-# All tests
+# All tests (default features)
 cargo test
 
-# Specific package
-cargo test --package primitives
+# Tests with all features
+cargo test --all-features
+
+# Tests for specific feature
+cargo test --features tools
+cargo test --features model
 
 # With output
 cargo test -- --nocapture
 
 # Single test
 cargo test test_name
+```
+
+### Working with Feature Flags
+
+When adding new functionality:
+
+**1. Decide if it needs a feature flag:**
+- Optional dependencies → Yes (e.g., `tools` needs `schemars`)
+- Destructive operations → Yes (e.g., `model` for model deletion)
+- Core functionality → No (use `default` features)
+
+**2. Gate code with `#[cfg(feature = "...")]`:**
+```rust
+// Module level (in lib.rs)
+#[cfg(feature = "tools")]
+pub mod tools;
+
+// Struct field level
+pub struct ChatRequest {
+    #[cfg(feature = "tools")]
+    pub tools: Option<Vec<ToolDefinition>>,
+}
+
+// Method level
+impl ChatRequest {
+    #[cfg(feature = "tools")]
+    pub fn with_tools(mut self, tools: Vec<ToolDefinition>) -> Self {
+        self.tools = Some(tools);
+        self
+    }
+}
+```
+
+**3. Gate examples and tests in Cargo.toml:**
+```toml
+[[example]]
+name = "chat_with_tools_async"
+required-features = ["tools"]
+
+[[test]]
+name = "client_model_tests"
+required-features = ["model"]
+```
+
+**4. Test with different feature combinations:**
+```bash
+# Test default only
+cargo test
+
+# Test with each optional feature
+cargo test --features tools
+cargo test --features model
+
+# Test all features together
+cargo test --all-features
+
+# Verify no-default-features compiles
+cargo check --no-default-features --features inference
 ```
 
 ## Submitting Changes

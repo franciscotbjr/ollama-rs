@@ -3,7 +3,7 @@
 use serde::{Deserialize, Serialize};
 
 #[cfg(feature = "tools")]
-use super::ToolCall;
+use crate::tools::ToolCall;
 
 /// Message in a chat response.
 ///

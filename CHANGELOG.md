@@ -8,6 +8,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Feature-based library design**: Modular opt-in architecture via Cargo features
+  - `tools` feature: Ergonomic function calling with auto-generated JSON schemas
+    - `Tool` trait for type-safe tool definitions
+    - `ToolRegistry` for automatic dispatch
+    - Optional dependencies: `schemars`, `futures`
+    - Examples: `tools_async`, `chat_with_tools_async`, `chat_with_tools_registry_async`
+  - `model` feature: Model creation/deletion (opt-in for destructive operations)
+    - `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting` types
+    - Gated API methods: `create_model()`, `delete_model()`
+    - Examples: `model_create_async`, `model_delete_async`
+  - Three-level conditional compilation: module, struct field, and method level
+  - Example and test gating via `required-features` in Cargo.toml
 - **New example: `chat_with_tools_async`**: Complete chat with tools flow using weather API
   - Demonstrates full tool call cycle (request → tool calls → execution → response)
   - Mock weather service simulating HTTP calls to Open-Meteo API
@@ -80,6 +92,32 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `list_models_sync.rs` - Sync list models example
 
 ### Changed
+- **Tool types consolidated in `src/tools/` module**: Moved `ToolCall`, `ToolCallFunction`, `ToolDefinition`, `ToolFunction` from `src/inference/` to `src/tools/`
+  - Simplified feature gating: Tool types now require only `tools` feature, not `all(feature = "inference", feature = "tools")`
+  - Updated imports in chat types to use `crate::tools::` instead of `super::`
+  - Cleaner module separation: API data structures (inference) vs Rust abstractions (tools)
+- **Renamed feature**: `primitives` → `inference` for better semantic clarity
+  - Feature flag `primitives` renamed to `inference` in Cargo.toml
+  - Module `src/primitives/` renamed to `src/inference/`
+  - All inference-related types (chat, generate, embed) now under `inference` feature
+  - Test file `primitives_list_tests.rs` renamed to `model_list_tests.rs`
+  - **Breaking change**: Users using `features = ["primitives"]` must change to `features = ["inference"]`
+- **Model feature consolidation**: All model-related types and methods now behind `model` feature
+  - Moved 9 types from `src/inference/` to `src/model/`: `CopyRequest`, `ListResponse`, `ModelDetails`, `ModelSummary`, `PsResponse`, `RunningModel`, `ShowModelDetails`, `ShowRequest`, `ShowResponse`
+  - Gated methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()` now require `model` feature
+  - Updated Cargo.toml with `required-features = ["model"]` for 8 examples and 5 tests
+  - Simplified feature conditionals: `#[cfg(feature = "model")]` instead of `#[cfg(all(feature = "inference", feature = "model"))]`
+  - **Breaking change**: Users must add `model` feature to use model-related APIs
+- **Feature flag architecture**: Expanded from 4 features to 6
+  - New: `tools` feature for ergonomic function calling
+  - New: `model` feature for model creation/deletion (opt-in)
+  - Updated dependency configuration for optional deps
+- **Documentation updates**: All critical documents reflect feature-based design
+  - README.md: Feature flags table and usage examples
+  - ARCHITECTURE.md: Feature dependency graph and conditional compilation patterns
+  - CONTRIBUTING.md: Feature development guidelines
+  - DEV_NOTES.md: Feature-based design decisions
+  - spec/definition.md: Updated module descriptions
 - **Versioning strategy update**: All 12 endpoints will be implemented in v0.1.0 (non-streaming mode)
   - Streaming features moved to v0.2.0
   - v0.3.0 will focus on conveniences module

@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-01-24
+**Last Updated:** 2026-02-03
 
 ## Architecture Overview
 
@@ -20,8 +20,10 @@ The project uses a **single-crate architecture** with modular organization:
 ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
-    ├── primitives/      # API data structures (default feature)
+    ├── inference/       # Inference types: chat, generate, embed (default feature)
     ├── http/            # HTTP client layer (default feature)
+    ├── model/           # Model management types (optional feature)
+    ├── tools/           # Tool types + ergonomic function calling (optional feature)
     └── conveniences/    # High-level API (optional feature)
 ```
 
@@ -49,17 +51,34 @@ ollama-oxide/
 
 ```toml
 [features]
-default = ["http", "primitives"]
-conveniences = ["http", "primitives"]
-http = []
-primitives = []
+default = ["http", "inference"]       # Standard usage (inference only)
+conveniences = ["http", "inference"]  # High-level APIs
+http = []                             # HTTP client layer
+inference = []                        # Inference types (chat, generate, embed)
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+model = ["http", "inference"]         # All model operations (opt-in)
 ```
+
+**Feature Matrix:**
+
+| Feature | Dependencies | Purpose |
+|---------|-------------|---------|
+| `default` | `http`, `inference` | Standard usage - inference APIs (generate, chat, embed, version) |
+| `inference` | - | Standalone inference types for chat, generate, embed |
+| `http` | - | HTTP client implementation (async/sync) |
+| `tools` | `schemars`, `futures` | Tool types (ToolCall, ToolDefinition) + ergonomic function calling |
+| `model` | `http`, `inference` | All model operations: list, show, copy, create, delete (opt-in) |
+| `conveniences` | `http`, `inference` | High-level ergonomic APIs |
+
+**Model Feature Contents:**
+- Types: `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `CopyRequest`, `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting`
+- Methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()`, `create_model()`, `delete_model()`
 
 ## Current State
 
 ### Implemented
 - Single-crate configuration with feature flags
-- Module structure (primitives, http, conveniences)
+- Module structure (inference, http, model, tools, conveniences)
 - Dependency setup (tokio, serde, reqwest, async-trait)
 - 12 OpenAPI specifications documented
 - Comprehensive documentation foundation
@@ -172,6 +191,42 @@ trait ErasedTool {
 - `ToolWrapper<T>` bridges typed `Tool` → type-erased `ErasedTool`
 
 **Location:** `src/tools/erased_tool.rs`
+
+### Feature-Based Design Strategy
+
+**Decision Date:** 2026-02-01
+
+**Implementation:**
+The library uses Cargo features to provide a modular, opt-in design where developers include only what they need.
+
+**Key Design Decisions:**
+
+1. **Opt-in for Destructive Operations**: The `model` feature isolates `CreateRequest`, `DeleteRequest`, and related API methods. Developers must explicitly enable model creation/deletion to prevent accidental misuse.
+
+2. **Conditional Dependencies**: The `tools` feature brings in `schemars` and `futures` only when needed, keeping the default dependency tree lean.
+
+3. **Three-Level Conditional Compilation**:
+   - Module level: `#[cfg(feature = "tools")] pub mod tools;`
+   - Struct field level: `#[cfg(feature = "tools")] pub tools: Option<Vec<ToolDefinition>>`
+   - Method level: `#[cfg(feature = "tools")] pub fn with_tools(...)`
+
+4. **Example/Test Gating**: Examples and tests requiring specific features use `required-features` in Cargo.toml.
+
+**Benefits:**
+- Minimal footprint by default
+- Reduced compile times for users who don't need all features
+- Clear separation of concerns
+- Protection against accidental destructive operations
+- Flexibility for different use cases (data types only, full client, with tools, etc.)
+
+**Developer Experience Scenarios:**
+
+| Use Case | Cargo.toml | What's Included |
+|----------|------------|-----------------|
+| Basic API client | (default) | HTTP client + all inference types |
+| Data types only | `default-features = false, features = ["inference"]` | Just structs for JSON parsing |
+| With function calling | `features = ["tools"]` | + ToolRegistry, auto-schema generation |
+| Full with model management | `features = ["tools", "model"]` | Everything including model creation/deletion |
 
 ### Example Naming Convention
 
@@ -286,13 +341,13 @@ Future endpoints:
 **Decision Date:** 2026-01-26
 
 **Rationale:**
-- **Feature flag complexity**: Many types are gated behind feature flags (`tools`, `primitives`, `http`), making doc tests hard to maintain
+- **Feature flag complexity**: Many types are gated behind feature flags (`tools`, `inference`, `http`, `model`), making doc tests hard to maintain
 - **Maintenance burden**: Doc tests require keeping code in sync across documentation and actual tests
 - **Coverage duplication**: All public interfaces are already covered by tests in `tests/` folder
 - **Simpler workflow**: Run `cargo test` without doc test failures due to feature mismatches
 
 **Testing locations:**
-- **Unit tests**: Inside each component file (e.g., `src/primitives/chat_request.rs` has `#[cfg(test)] mod tests`)
+- **Unit tests**: Inside each component file (e.g., `src/inference/chat_request.rs` has `#[cfg(test)] mod tests`)
 - **Public interface tests**: `tests/` folder for integration-style unit tests
 - **Integration tests**: `examples/` folder for real Ollama server tests
 

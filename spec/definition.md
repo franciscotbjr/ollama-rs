@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.3
-**Last Updated:** 2026-01-26
+**Document Version:** 1.7
+**Last Updated:** 2026-02-03
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -39,11 +39,15 @@ The project is organized as a **single crate** with modular structure and featur
 ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
-    ├── primitives/      # Low-level API primitives module
+    ├── inference/       # Inference types module (default)
     │   └── mod.rs
-    ├── http/            # HTTP client module
+    ├── http/            # HTTP client module (default)
     │   └── mod.rs
-    └── conveniences/    # High-level convenience APIs module (optional feature)
+    ├── tools/           # Ergonomic function calling (optional, "tools" feature)
+    │   └── mod.rs
+    ├── model/           # Model creation/deletion (optional, "model" feature)
+    │   └── mod.rs
+    └── conveniences/    # High-level convenience APIs module (optional)
         └── mod.rs
 ```
 
@@ -54,17 +58,17 @@ Each module follows single-concern file structure:
 - `mod.rs` serves as re-export facade
 - Example: `error.rs` contains Error enum + implementations; `lib.rs` imports from error module
 
-#### 1. primitives (Module)
-**Purpose:** Low-level data structures matching Ollama's API specification.
+#### 1. inference (Module)
+**Purpose:** Data structures for inference operations (chat, generate, embed).
 
 **Key Responsibilities:**
-- Request/response type definitions
+- Request/response type definitions for inference APIs
 - Serialization/deserialization implementations
 - API model validation
 - Type-safe enum representations
 
-**Feature:** `primitives` (default)
-**Status:** Implementation in progress
+**Feature:** `inference` (default)
+**Status:** Implementation complete
 
 #### 2. http (Module)
 **Purpose:** HTTP client layer for API communication.
@@ -85,7 +89,38 @@ Each module follows single-concern file structure:
 **Feature:** `http` (default)
 **Status:** Implementation in progress
 
-#### 3. conveniences (Module)
+#### 3. tools (Module)
+**Purpose:** Tool types and ergonomic function calling with auto-generated JSON schemas.
+
+**Key Responsibilities:**
+- `ToolCall`, `ToolCallFunction` - API response types for tool invocations
+- `ToolDefinition`, `ToolFunction` - API request types for tool definitions
+- `Tool` trait for type-safe tool definitions
+- `ToolRegistry` for automatic dispatch
+- Auto-generated JSON schemas from Rust types via `schemars`
+- Type-erased tool storage for heterogeneous collections
+
+**Feature:** `tools` (optional, requires `schemars` and `futures`)
+**Status:** Implementation complete
+**Note:** All tool-related types consolidated here. Simplifies feature gating (only requires `tools` feature).
+
+#### 4. model (Module)
+**Purpose:** Model management operations and types.
+
+**Key Responsibilities:**
+- `CreateRequest` / `CreateResponse` for model creation
+- `DeleteRequest` for model deletion
+- `LicenseSetting` for license configuration
+- `CopyRequest` for model copying
+- `ListResponse` / `ModelSummary` / `ModelDetails` for listing models
+- `PsResponse` / `RunningModel` for running model info
+- `ShowRequest` / `ShowResponse` / `ShowModelDetails` for model details
+
+**Feature:** `model` (optional, requires `http` and `inference`)
+**Status:** Implementation complete
+**Note:** Opt-in feature consolidating all model-related operations and types. Includes destructive operations (create/delete).
+
+#### 5. conveniences (Module)
 **Purpose:** High-level, ergonomic APIs for common workflows.
 
 **Key Responsibilities:**
@@ -95,29 +130,48 @@ Each module follows single-concern file structure:
 - Streaming abstractions
 - Response post-processing
 
-**Feature:** `conveniences` (optional, requires `http` and `primitives`)
+**Feature:** `conveniences` (optional, requires `http` and `inference`)
 **Status:** Implementation pending
 
 ### Feature Flags
 
 ```toml
 [features]
-default = ["http", "primitives"]           # Default features
-conveniences = ["http", "primitives"]      # High-level API (optional)
-http = []                                  # HTTP client layer
-primitives = []                            # Low-level primitives
+default = ["http", "inference"]       # Standard usage
+conveniences = ["http", "inference"]  # High-level APIs
+http = []                             # HTTP client layer
+inference = []                        # Inference types
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+model = ["http", "inference"]         # Model management (opt-in)
 ```
+
+**Feature Matrix:**
+
+| Feature | Dependencies | Purpose |
+|---------|-------------|---------|
+| `default` | `http`, `inference` | Standard usage - HTTP client + all inference types |
+| `inference` | - | Standalone inference types (chat, generate, embed) |
+| `http` | - | HTTP client implementation (async/sync) |
+| `tools` | `schemars`, `futures` | Tool types (ToolCall, ToolDefinition) + ergonomic function calling |
+| `model` | `http`, `inference` | Model management API - all model-related types and operations (list, show, copy, create, delete) |
+| `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 
 **Usage Examples:**
 ```toml
-# Full featured (default)
+# Default features (inference + http)
 ollama-oxide = "0.1.0"
 
-# With conveniences
-ollama-oxide = { version = "0.1.0", features = ["conveniences"] }
+# With function calling support
+ollama-oxide = { version = "0.1.0", features = ["tools"] }
 
-# Minimal (only primitives and http)
-ollama-oxide = { version = "0.1.0", default-features = true }
+# With model management
+ollama-oxide = { version = "0.1.0", features = ["model"] }
+
+# Full featured
+ollama-oxide = { version = "0.1.0", features = ["tools", "model"] }
+
+# Inference types only (no HTTP client)
+ollama-oxide = { version = "0.1.0", default-features = false, features = ["inference"] }
 ```
 
 ## Technical Stack
@@ -135,8 +189,9 @@ ollama-oxide = { version = "0.1.0", default-features = true }
 **Build Configuration:**
 - Single crate architecture
 - Feature-based module organization
-- Default features: `http` + `primitives`
-- Optional feature: `conveniences`
+- Default features: `http` + `inference`
+- Optional features: `tools`, `model`, `conveniences`
+- Optional dependencies: `schemars`, `futures` (for `tools` feature)
 
 ### Dependency Rationale
 
@@ -183,7 +238,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 **Focus:** Primitives module structure, HTTP module implementation, and all 12 endpoints in non-streaming mode
 
 **Scope:**
-- Set up `primitives` module with shared types (ModelOptions, Logprob, etc.)
+- Set up `inference` module with shared types (ModelOptions, Logprob, etc.)
 - Implement `http` module with connection management
 - Build error handling infrastructure
 - Create serialization/deserialization framework
@@ -213,7 +268,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 **Deliverables:**
 - All 12 endpoints fully implemented (streaming endpoints in non-streaming mode)
 - Functional HTTP client in `http` module (GET, POST, DELETE)
-- Error types and handling in `primitives` module
+- Error types and handling in error module
 - Basic integration test framework
 - Module structure with feature flags working
 
@@ -241,7 +296,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Documentation for streaming usage
 
 #### Phase 3 (v0.3.0): Conveniences Module
-**Focus:** High-level ergonomic APIs built on primitives module
+**Focus:** High-level ergonomic APIs built on inference module
 
 **Scope:**
 - Implement `conveniences` module as optional feature
@@ -285,14 +340,14 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Performance benchmarks and optimization
 - Production-ready documentation
 - Stable API (v1.0.0 target)
-- Migration guide (primitives → conveniences)
+- Migration guide (inference → conveniences)
 
 ## Design Philosophy
 
 ### Core Principles
 
 1. **Layered Architecture**
-   - Clear separation between primitives and conveniences
+   - Clear separation between inference types and conveniences
    - Users can choose their abstraction level
    - Internal flexibility for future changes
 
@@ -633,9 +688,9 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] OpenAPI specifications (12 endpoints documented)
 - [x] Git repository initialized
 - [x] Workspace configuration
-- [x] `primitives` module structure with shared types
+- [x] `inference` module structure with shared types
 - [x] `http` module implementation
-- [x] Error type hierarchy in `primitives`
+- [x] Error type hierarchy in error module
 - [x] Testing infrastructure
 - [x] Feature flags configuration
 
@@ -655,7 +710,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 **Complex POST Endpoints (5) - Non-Streaming Mode:**
 - [x] `POST /api/generate` - Text generation (non-streaming only)
 - [x] `POST /api/chat` - Chat completions (non-streaming only)
-- [ ] `POST /api/create` - Model creation (non-streaming only)
+- [x] `POST /api/create` - Model creation (non-streaming only)
 - [ ] `POST /api/pull` - Model download (non-streaming only)
 - [ ] `POST /api/push` - Model upload (non-streaming only)
 
@@ -670,7 +725,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - POST helper methods with retry logic implemented (`post_empty_with_retry`, `post_with_retry`)
 - DELETE helper methods with retry logic implemented
 - Error handling system in place (including HttpStatusError)
-- Feature flags (`http`, `primitives`) working correctly
+- Feature flags (`http`, `inference`) working correctly
 - Unit test framework operational
 - Integration test setup complete
 

@@ -1,14 +1,14 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, CopyRequest,
-    EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse, ListResponse, PsResponse,
-    Result, ShowRequest, ShowResponse, VersionResponse,
+    ChatRequest, ChatResponse, EmbedRequest, EmbedResponse, GenerateRequest,
+    GenerateResponse, Result, VersionResponse,
 };
 
-#[cfg(feature = "create")]
+#[cfg(feature = "model")]
 use crate::{
-    CreateRequest, CreateResponse, DeleteRequest
+    CopyRequest, CreateRequest, CreateResponse, DeleteRequest, ListResponse, PsResponse,
+    ShowRequest, ShowResponse,
 };
 
 use super::OllamaClient;
@@ -88,6 +88,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     fn list_models_blocking(&self) -> Result<ListResponse>;
 
     /// Copy a model (blocking)
@@ -121,6 +122,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     fn copy_model_blocking(&self, request: &CopyRequest) -> Result<()>;
 
     /// List currently running models (blocking)
@@ -151,6 +153,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     fn list_running_models_blocking(&self) -> Result<PsResponse>;
 
     /// Delete a model (blocking)
@@ -183,7 +186,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()>;
 
     /// Show detailed information about a model (blocking)
@@ -222,6 +225,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
+    #[cfg(feature = "model")]
     fn show_model_blocking(&self, request: &ShowRequest) -> Result<ShowResponse>;
 
     /// Generate embeddings for text (blocking)
@@ -351,7 +355,7 @@ pub trait OllamaApiSync: Send + Sync {
     /// # Ok(())
     /// # }
     /// ```
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse>;
 }
 
@@ -361,27 +365,31 @@ impl OllamaApiSync for OllamaClient {
         self.get_blocking_with_retry(&url)
     }
 
+    #[cfg(feature = "model")]
     fn list_models_blocking(&self) -> Result<ListResponse> {
         let url = self.config.url(Endpoints::TAGS);
         self.get_blocking_with_retry(&url)
     }
 
+    #[cfg(feature = "model")]
     fn copy_model_blocking(&self, request: &CopyRequest) -> Result<()> {
         let url = self.config.url(Endpoints::COPY);
         self.post_empty_blocking_with_retry(&url, request)
     }
 
+    #[cfg(feature = "model")]
     fn list_running_models_blocking(&self) -> Result<PsResponse> {
         let url = self.config.url(Endpoints::PS);
         self.get_blocking_with_retry(&url)
     }
 
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn delete_model_blocking(&self, request: &DeleteRequest) -> Result<()> {
         let url = self.config.url(Endpoints::DELETE);
         self.delete_empty_blocking_with_retry(&url, request)
     }
 
+    #[cfg(feature = "model")]
     fn show_model_blocking(&self, request: &ShowRequest) -> Result<ShowResponse> {
         let url = self.config.url(Endpoints::SHOW);
         self.post_blocking_with_retry(&url, request)
@@ -402,7 +410,7 @@ impl OllamaApiSync for OllamaClient {
         self.post_blocking_with_retry(&url, request)
     }
 
-    #[cfg(feature = "create")]
+    #[cfg(feature = "model")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse> {
         let url = self.config.url(Endpoints::CREATE);
         self.post_blocking_with_retry(&url, request)

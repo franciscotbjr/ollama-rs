@@ -38,7 +38,7 @@ struct ProjectContext {
 
     // Critical files inventory
     critical_files: Vec<String>,
-    spec_files: Vec<String>,
+    apis_spec_files: Vec<String>,
     impl_files: Vec<String>,
 
     // Session tracking
@@ -137,16 +137,16 @@ fn find_critical_files() -> Vec<String> {
     files
 }
 
-fn find_spec_files() -> Vec<String> {
+fn find_apis_spec_files() -> Vec<String> {
     let mut files = Vec::new();
-    let spec_dir = PathBuf::from("spec/primitives");
+    let spec_dir = PathBuf::from("spec/apis");
 
     if spec_dir.exists() {
         if let Ok(entries) = fs::read_dir(&spec_dir) {
             for entry in entries.flatten() {
                 if let Some(name) = entry.file_name().to_str() {
                     if name.ends_with(".yaml") {
-                        files.push(format!("spec/primitives/{}", name));
+                        files.push(format!("spec/apis/{}", name));
                     }
                 }
             }
@@ -266,7 +266,7 @@ fn main() {
 
     // Find critical, spec, and impl files
     let critical_files = find_critical_files();
-    let spec_files = find_spec_files();
+    let apis_spec_files = find_apis_spec_files();
     let impl_files = find_impl_files();
 
     // Parse CLI args for session context
@@ -291,7 +291,7 @@ fn main() {
 
         // Critical files inventory
         critical_files,
-        spec_files: spec_files.clone(),
+        apis_spec_files: apis_spec_files.clone(),
         impl_files: impl_files.clone(),
 
         // Session tracking
@@ -322,7 +322,7 @@ fn main() {
     println!("  Project: {} v{}", context.project_name, context.version);
     println!("  Session: #{}", context.session_count);
     println!("  Architecture: Single crate with {} modules", context.total_crates);
-    println!("  API Specs: {} endpoints", spec_files.len());
+    println!("  API Specs: {} endpoints", apis_spec_files.len());
     println!("  Impl Plans: {} files", impl_files.len());
     println!("  Build: {}", context.build_status);
     println!("\n📁 Critical Files Tracked:");

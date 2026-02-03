@@ -2,7 +2,7 @@
 name = "ollama-oxide"
 version = "0.1.0"
 edition = "2024"
-description = "A Rust library for integrating with Ollama's native API, providing low-level primitives and high-level conveniences."
+description = "A Rust library for integrating with Ollama's native API, providing low-level inference and high-level conveniences."
 keywords = ["ollama", "ai", "llm", "api", "client"]
 categories = ["api-bindings", "asynchronous"]
 license = "MIT"
@@ -25,12 +25,12 @@ exclude = [
 ]
 
 [features]
-default = ["http", "primitives"]
-conveniences = ["http", "primitives"]
+default = ["http", "inference"]
+conveniences = ["http", "inference"]
 http = []
-primitives = []
+inference = []
 tools = ["dep:schemars", "dep:futures"]
-create = ["http", "primitives"]
+model = ["http", "inference"]
 
 [dependencies]
 tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread", "time"] }
@@ -61,17 +61,78 @@ name = "chat_with_tools_async"
 required-features = ["tools"]
 
 [[example]]
-name = "create_model_async"
-required-features = ["create"]
+name = "model_create_async"
+required-features = ["model"]
 
 [[example]]
-name = "create_model_cleanup_async"
-required-features = ["create"]
+name = "model_cleanup_async"
+required-features = ["model"]
 
 [[example]]
-name = "delete_model_async"
-required-features = ["create"]
+name = "model_delete_async"
+required-features = ["model"]
 
 [[example]]
-name = "delete_model_sync"
-required-features = ["create"]
+name = "model_delete_sync"
+required-features = ["model"]
+
+[[example]]
+name = "list_models_async"
+required-features = ["model"]
+
+[[example]]
+name = "list_models_sync"
+required-features = ["model"]
+
+[[example]]
+name = "list_running_models_async"
+required-features = ["model"]
+
+[[example]]
+name = "list_running_models_sync"
+required-features = ["model"]
+
+[[example]]
+name = "copy_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "copy_model_sync"
+required-features = ["model"]
+
+[[example]]
+name = "show_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "show_model_sync"
+required-features = ["model"]
+
+[[test]]
+name = "client_delete_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_create_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_list_models_tests"
+required-features = ["model"]
+
+[[test]]
+name = "model_list_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_list_running_models_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_copy_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_show_model_tests"
+required-features = ["model"]
+

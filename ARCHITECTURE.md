@@ -52,17 +52,140 @@ http/
 src/
 ├── lib.rs                          # Module declarations + re-exports + prelude
 ├── error.rs                        # Error enum + impl From + Result alias
-├── primitives/
-│   ├── mod.rs                      # Re-exports: VersionResponse
-│   └── version.rs                  # VersionResponse struct
-├── http/
+├── inference/                      # Feature: "inference" (default)
+│   ├── mod.rs                      # Re-exports for inference types
+│   ├── version.rs                  # VersionResponse struct
+│   ├── chat_*.rs                   # Chat types (#[cfg(feature = "tools")] for tool fields)
+│   └── ...                         # Other inference types (generate, embed)
+├── http/                           # Feature: "http" (default)
 │   ├── mod.rs                      # Re-exports: ClientConfig, OllamaClient, traits
 │   ├── config.rs                   # ClientConfig + impl Default
 │   ├── client.rs                   # OllamaClient + constructors + validation
-│   ├── api_async.rs                # OllamaApiAsync trait + impl
-│   └── api_sync.rs                 # OllamaApiSync trait + impl
+│   ├── api_async.rs                # OllamaApiAsync (#[cfg(feature = "model")] for model ops)
+│   └── api_sync.rs                 # OllamaApiSync (#[cfg(feature = "model")] for model ops)
+├── tools/                          # Feature: "tools" (optional, requires schemars + futures)
+│   ├── mod.rs                      # Tool trait, ToolRegistry, ToolError, ToolCall exports
+│   ├── tool_trait.rs               # Tool trait with auto-schema generation
+│   ├── tool_registry.rs            # ToolRegistry for automatic dispatch
+│   ├── erased_tool.rs              # Type-erased tool wrapper for registry storage
+│   ├── tool_error.rs               # ToolError and ToolResult types
+│   ├── tool_call.rs                # ToolCall struct (API response type)
+│   ├── tool_call_function.rs       # ToolCallFunction struct
+│   ├── tool_definition.rs          # ToolDefinition struct (API request type)
+│   └── tool_function.rs            # ToolFunction struct
+├── model/                          # Feature: "model" (optional, all model-related operations)
+│   ├── mod.rs                      # All model types exports
+│   ├── create_request.rs           # Model creation request
+│   ├── create_response.rs          # Model creation response
+│   ├── delete_request.rs           # Model deletion request
+│   ├── license_setting.rs          # License configuration
+│   ├── copy_request.rs             # Model copy request
+│   ├── list_response.rs            # List models response
+│   ├── model_details.rs            # Model details shared type
+│   ├── model_summary.rs            # Model summary in list
+│   ├── ps_response.rs              # Running models response
+│   ├── running_model.rs            # Running model info
+│   ├── show_model_details.rs       # Show model details
+│   ├── show_request.rs             # Show model request
+│   └── show_response.rs            # Show model response
 └── conveniences/
     └── mod.rs                      # (Future: convenience APIs)
+```
+
+---
+
+## Feature Flag Architecture
+
+The library uses Cargo features to provide a modular, opt-in design:
+
+```toml
+[features]
+default = ["http", "inference"]       # Standard usage
+conveniences = ["http", "inference"]  # High-level APIs
+http = []                             # HTTP client layer
+inference = []                        # Inference types (chat, generate, embed)
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+model = ["http", "inference"]         # All model operations (list, show, copy, create, delete)
+```
+
+### Feature Dependency Graph
+
+```
+                    ┌─────────────┐
+                    │   default   │
+                    └──────┬──────┘
+                           │
+              ┌────────────┴────────────┐
+              │                         │
+        ┌─────▼─────┐            ┌──────▼──────┐
+        │    http   │            │  inference  │
+        └───────────┘            └─────────────┘
+              │                         │
+              └────────────┬────────────┘
+                           │
+        ┌──────────────────┼──────────────────┐
+        │                  │                  │
+  ┌─────▼─────┐     ┌──────▼──────┐    ┌──────▼──────┐
+  │   model   │     │conveniences │    │   tools     │
+  │(opt-in)   │     │  (future)   │    │ (optional)  │
+  └───────────┘     └─────────────┘    └─────────────┘
+        │                                     │
+        ▼                                     ▼
+  Model management                      dep:schemars
+  (list/show/copy/create/delete)        dep:futures
+```
+
+### Conditional Compilation Patterns
+
+The codebase uses `#[cfg(feature = "...")]` at three levels:
+
+**1. Module Level** - Entire modules gated in `lib.rs`:
+```rust
+#[cfg(feature = "tools")]
+pub mod tools;
+
+#[cfg(feature = "model")]
+pub mod model;
+```
+
+**2. Struct Field Level** - Optional fields in inference types:
+```rust
+pub struct ChatRequest {
+    pub model: String,
+    pub messages: Vec<ChatMessage>,
+    #[cfg(feature = "tools")]
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub tools: Option<Vec<ToolDefinition>>,
+}
+```
+
+**3. Method Level** - Conditional method implementations:
+```rust
+impl ChatRequest {
+    #[cfg(feature = "tools")]
+    pub fn with_tools(mut self, tools: Vec<ToolDefinition>) -> Self {
+        self.tools = Some(tools);
+        self
+    }
+}
+```
+
+### Example and Test Gating
+
+Examples and tests requiring specific features use `required-features`:
+
+```toml
+[[example]]
+name = "chat_with_tools_async"
+required-features = ["tools"]
+
+[[example]]
+name = "model_create_async"
+required-features = ["model"]
+
+[[test]]
+name = "client_model_tests"
+required-features = ["model"]
 ```
 
 ---
@@ -71,7 +194,7 @@ src/
 
 ### New Primitive Type
 
-1. Create `src/primitives/model_info.rs`:
+1. Create `src/inference/model_info.rs`:
    ```rust
    use serde::{Deserialize, Serialize};
 
@@ -82,7 +205,7 @@ src/
    }
    ```
 
-2. Update `src/primitives/mod.rs`:
+2. Update `src/inference/mod.rs`:
    ```rust
    mod version;
    mod model_info;
@@ -126,9 +249,13 @@ The crate follows a strict layered architecture where higher-level modules can d
 ┌─────────────────────────────────────────┐
 │            lib.rs (re-exports)          │  ← Top: Facade only
 ├─────────────────────────────────────────┤
-│    http/ (client, api_async, api_sync)  │  ← High: Can use primitives
+│    tools/ (Tool, ToolRegistry)          │  ← High: Uses inference (optional)
 ├─────────────────────────────────────────┤
-│    primitives/ (request/response types) │  ← Low: Independent types
+│    http/ (client, api_async, api_sync)  │  ← High: Uses inference, model
+├─────────────────────────────────────────┤
+│    model/ (CreateRequest, etc.)         │  ← Mid: Independent types (optional)
+├─────────────────────────────────────────┤
+│    inference/ (request/response types)  │  ← Low: Independent types
 ├─────────────────────────────────────────┤
 │    error.rs                             │  ← Base: Used by all
 └─────────────────────────────────────────┘
@@ -138,12 +265,14 @@ The crate follows a strict layered architecture where higher-level modules can d
 
 | Module | Can depend on | Cannot depend on |
 |--------|---------------|------------------|
-| `error` | std, external crates | primitives, http |
-| `primitives` | error, serde, std | http |
-| `http` | error, primitives, reqwest | — |
+| `error` | std, external crates | inference, http, tools, model |
+| `inference` | error, serde, std | http, tools, model |
+| `model` | error, serde, std | http, tools |
+| `http` | error, inference, model, reqwest | tools |
+| `tools` | error, serde, schemars, futures | http, model, inference |
 | `lib.rs` | all (re-exports only) | — |
 
-**Key Principle:** Primitives must remain pure data types with no knowledge of how they are transported. This ensures:
+**Key Principle:** Inference types must remain pure data types with no knowledge of how they are transported. This ensures:
 
 1. **Testability** - Primitives can be tested without HTTP mocking
 2. **Reusability** - Primitives can be used with different transports
@@ -152,13 +281,13 @@ The crate follows a strict layered architecture where higher-level modules can d
 **Anti-pattern to avoid:**
 ```rust
 // ❌ BAD: Primitive importing from http module
-// src/primitives/show_response.rs
+// src/model/show_response.rs
 use crate::http::OllamaApiAsync;  // WRONG!
 ```
 
 **Correct pattern:**
 ```rust
-// ✅ GOOD: HTTP module importing primitives
+// ✅ GOOD: HTTP module importing inference types
 // src/http/api_async.rs
 use crate::{ShowRequest, ShowResponse};  // Correct direction
 ```
@@ -373,16 +502,16 @@ classDiagram
         Custom(String)
     }
 
-    %% Primitives (from primitives module)
+    %% Tool types (API data structures)
     class ToolDefinition {
-        <<primitives>>
+        <<tools>>
         +name: String
         +parameters: Value
         +description: Option~String~
     }
 
     class ToolCall {
-        <<primitives>>
+        <<tools>>
         +function: ToolCallFunction
         +function_name() Option~&str~
         +arguments() Option~&Value~
@@ -481,6 +610,8 @@ Integration tests are implemented as **examples**:
 
 ## Version History
 
+- **2026-02-03**: Tool types (ToolCall, ToolDefinition) moved from inference to tools module
+- **2026-02-01**: Added feature flag architecture documentation (tools, model features)
 - **2026-01-13**: Initial architecture document
 
 ---
