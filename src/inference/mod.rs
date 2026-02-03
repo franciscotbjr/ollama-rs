@@ -10,16 +10,6 @@ mod chat_response;
 mod chat_role;
 mod response_message;
 
-// Tool types (requires "tools" feature)
-#[cfg(feature = "tools")]
-mod tool_call;
-#[cfg(feature = "tools")]
-mod tool_call_function;
-#[cfg(feature = "tools")]
-mod tool_definition;
-#[cfg(feature = "tools")]
-mod tool_function;
-
 // Inference types
 mod embed_input;
 mod embed_request;
@@ -41,16 +31,6 @@ pub use chat_request::ChatRequest;
 pub use chat_response::ChatResponse;
 pub use chat_role::ChatRole;
 pub use response_message::ResponseMessage;
-
-// Tool types re-exports (requires "tools" feature)
-#[cfg(feature = "tools")]
-pub use tool_call::ToolCall;
-#[cfg(feature = "tools")]
-pub use tool_call_function::ToolCallFunction;
-#[cfg(feature = "tools")]
-pub use tool_definition::ToolDefinition;
-#[cfg(feature = "tools")]
-pub use tool_function::ToolFunction;
 
 // Inference types re-exports
 pub use embed_input::EmbedInput;

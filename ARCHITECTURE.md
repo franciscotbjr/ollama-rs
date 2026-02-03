@@ -53,11 +53,10 @@ src/
 ├── lib.rs                          # Module declarations + re-exports + prelude
 ├── error.rs                        # Error enum + impl From + Result alias
 ├── inference/                      # Feature: "inference" (default)
-│   ├── mod.rs                      # Re-exports (with #[cfg(feature = "tools")] gates)
+│   ├── mod.rs                      # Re-exports for inference types
 │   ├── version.rs                  # VersionResponse struct
 │   ├── chat_*.rs                   # Chat types (#[cfg(feature = "tools")] for tool fields)
-│   ├── tool_*.rs                   # Tool types (only when "tools" feature enabled)
-│   └── ...                         # Other inference types
+│   └── ...                         # Other inference types (generate, embed)
 ├── http/                           # Feature: "http" (default)
 │   ├── mod.rs                      # Re-exports: ClientConfig, OllamaClient, traits
 │   ├── config.rs                   # ClientConfig + impl Default
@@ -65,11 +64,15 @@ src/
 │   ├── api_async.rs                # OllamaApiAsync (#[cfg(feature = "model")] for model ops)
 │   └── api_sync.rs                 # OllamaApiSync (#[cfg(feature = "model")] for model ops)
 ├── tools/                          # Feature: "tools" (optional, requires schemars + futures)
-│   ├── mod.rs                      # Tool trait, ToolRegistry, ToolError exports
+│   ├── mod.rs                      # Tool trait, ToolRegistry, ToolError, ToolCall exports
 │   ├── tool_trait.rs               # Tool trait with auto-schema generation
 │   ├── tool_registry.rs            # ToolRegistry for automatic dispatch
 │   ├── erased_tool.rs              # Type-erased tool wrapper for registry storage
-│   └── tool_error.rs               # ToolError and ToolResult types
+│   ├── tool_error.rs               # ToolError and ToolResult types
+│   ├── tool_call.rs                # ToolCall struct (API response type)
+│   ├── tool_call_function.rs       # ToolCallFunction struct
+│   ├── tool_definition.rs          # ToolDefinition struct (API request type)
+│   └── tool_function.rs            # ToolFunction struct
 ├── model/                          # Feature: "model" (optional, all model-related operations)
 │   ├── mod.rs                      # All model types exports
 │   ├── create_request.rs           # Model creation request
@@ -266,7 +269,7 @@ The crate follows a strict layered architecture where higher-level modules can d
 | `inference` | error, serde, std | http, tools, model |
 | `model` | error, serde, std | http, tools |
 | `http` | error, inference, model, reqwest | tools |
-| `tools` | error, inference, schemars, futures | http, model |
+| `tools` | error, serde, schemars, futures | http, model, inference |
 | `lib.rs` | all (re-exports only) | — |
 
 **Key Principle:** Inference types must remain pure data types with no knowledge of how they are transported. This ensures:
@@ -499,16 +502,16 @@ classDiagram
         Custom(String)
     }
 
-    %% Tool types (from inference module)
+    %% Tool types (API data structures)
     class ToolDefinition {
-        <<inference>>
+        <<tools>>
         +name: String
         +parameters: Value
         +description: Option~String~
     }
 
     class ToolCall {
-        <<inference>>
+        <<tools>>
         +function: ToolCallFunction
         +function_name() Option~&str~
         +arguments() Option~&Value~
@@ -607,6 +610,7 @@ Integration tests are implemented as **examples**:
 
 ## Version History
 
+- **2026-02-03**: Tool types (ToolCall, ToolDefinition) moved from inference to tools module
 - **2026-02-01**: Added feature flag architecture documentation (tools, model features)
 - **2026-01-13**: Initial architecture document
 

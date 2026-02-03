@@ -6,7 +6,7 @@ This document contains internal development notes, architectural decisions, and 
 
 **Current Version:** 0.1.0
 **Status:** Early development / Foundation phase
-**Last Updated:** 2026-02-02
+**Last Updated:** 2026-02-03
 
 ## Architecture Overview
 
@@ -23,7 +23,7 @@ ollama-oxide/
     ├── inference/       # Inference types: chat, generate, embed (default feature)
     ├── http/            # HTTP client layer (default feature)
     ├── model/           # Model management types (optional feature)
-    ├── tools/           # Ergonomic function calling (optional feature)
+    ├── tools/           # Tool types + ergonomic function calling (optional feature)
     └── conveniences/    # High-level API (optional feature)
 ```
 
@@ -66,7 +66,7 @@ model = ["http", "inference"]         # All model operations (opt-in)
 | `default` | `http`, `inference` | Standard usage - inference APIs (generate, chat, embed, version) |
 | `inference` | - | Standalone inference types for chat, generate, embed |
 | `http` | - | HTTP client implementation (async/sync) |
-| `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
+| `tools` | `schemars`, `futures` | Tool types (ToolCall, ToolDefinition) + ergonomic function calling |
 | `model` | `http`, `inference` | All model operations: list, show, copy, create, delete (opt-in) |
 | `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 

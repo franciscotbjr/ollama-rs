@@ -67,10 +67,6 @@ pub use inference::{
     VersionResponse,
 };
 
-// Tool types re-exports (requires both "inference" and "tools" features)
-#[cfg(all(feature = "inference", feature = "tools"))]
-pub use inference::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
-
 // ============================================================================
 // HTTP Client Module
 // ============================================================================
@@ -112,6 +108,15 @@ pub use model::{
 #[cfg(feature = "tools")]
 pub mod tools;
 
+// Tool types re-exports (requires both "inference" and "tools" features)
+#[cfg(feature = "tools")]
+pub use tools::{
+    ToolCall, 
+    ToolCallFunction, 
+    ToolDefinition, 
+    ToolFunction
+};
+
 // ============================================================================
 // Prelude
 // ============================================================================
@@ -146,9 +151,14 @@ pub mod prelude {
         VersionResponse,
     };
 
-    // Tool types (requires both "inference" and "tools" features)
-    #[cfg(all(feature = "inference", feature = "tools"))]
-    pub use crate::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
+    // Tool types (requires "tools" features)
+    #[cfg(feature = "tools")]
+    pub use crate::{
+        ToolCall, 
+        ToolCallFunction, 
+        ToolDefinition, 
+        ToolFunction
+    };
 
     // Model types (requires "model" feature)
     #[cfg(feature = "model")]

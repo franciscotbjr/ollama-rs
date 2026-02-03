@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.6
-**Last Updated:** 2026-02-02
+**Document Version:** 1.7
+**Last Updated:** 2026-02-03
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -90,9 +90,11 @@ Each module follows single-concern file structure:
 **Status:** Implementation in progress
 
 #### 3. tools (Module)
-**Purpose:** Ergonomic function calling with auto-generated JSON schemas.
+**Purpose:** Tool types and ergonomic function calling with auto-generated JSON schemas.
 
 **Key Responsibilities:**
+- `ToolCall`, `ToolCallFunction` - API response types for tool invocations
+- `ToolDefinition`, `ToolFunction` - API request types for tool definitions
 - `Tool` trait for type-safe tool definitions
 - `ToolRegistry` for automatic dispatch
 - Auto-generated JSON schemas from Rust types via `schemars`
@@ -100,6 +102,7 @@ Each module follows single-concern file structure:
 
 **Feature:** `tools` (optional, requires `schemars` and `futures`)
 **Status:** Implementation complete
+**Note:** All tool-related types consolidated here. Simplifies feature gating (only requires `tools` feature).
 
 #### 4. model (Module)
 **Purpose:** Model management operations and types.
@@ -149,7 +152,7 @@ model = ["http", "inference"]         # Model management (opt-in)
 | `default` | `http`, `inference` | Standard usage - HTTP client + all inference types |
 | `inference` | - | Standalone inference types (chat, generate, embed) |
 | `http` | - | HTTP client implementation (async/sync) |
-| `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
+| `tools` | `schemars`, `futures` | Tool types (ToolCall, ToolDefinition) + ergonomic function calling |
 | `model` | `http`, `inference` | Model management API - all model-related types and operations (list, show, copy, create, delete) |
 | `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 

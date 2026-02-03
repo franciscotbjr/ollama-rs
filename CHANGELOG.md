@@ -92,6 +92,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `list_models_sync.rs` - Sync list models example
 
 ### Changed
+- **Tool types consolidated in `src/tools/` module**: Moved `ToolCall`, `ToolCallFunction`, `ToolDefinition`, `ToolFunction` from `src/inference/` to `src/tools/`
+  - Simplified feature gating: Tool types now require only `tools` feature, not `all(feature = "inference", feature = "tools")`
+  - Updated imports in chat types to use `crate::tools::` instead of `super::`
+  - Cleaner module separation: API data structures (inference) vs Rust abstractions (tools)
 - **Renamed feature**: `primitives` → `inference` for better semantic clarity
   - Feature flag `primitives` renamed to `inference` in Cargo.toml
   - Module `src/primitives/` renamed to `src/inference/`

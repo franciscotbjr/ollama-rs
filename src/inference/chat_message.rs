@@ -3,8 +3,9 @@
 use serde::{Deserialize, Serialize};
 
 use super::ChatRole;
+
 #[cfg(feature = "tools")]
-use super::ToolCall;
+use crate::tools::ToolCall;
 
 /// A message in a chat conversation.
 ///
