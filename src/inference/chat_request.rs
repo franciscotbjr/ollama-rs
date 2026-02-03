@@ -2,9 +2,9 @@
 
 use serde::{Deserialize, Serialize};
 
+use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting};
 #[cfg(feature = "tools")]
 use crate::tools::ToolDefinition;
-use super::{ChatMessage, FormatSetting, KeepAliveSetting, ModelOptions, ThinkSetting};
 
 /// Request body for POST /api/chat endpoint.
 ///

@@ -71,8 +71,8 @@ model = ["http", "inference"]         # All model operations (opt-in)
 | `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 
 **Model Feature Contents:**
-- Types: `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `CopyRequest`, `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting`
-- Methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()`, `create_model()`, `delete_model()`
+- Types: `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `CopyRequest`, `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting`, `PullRequest`, `PullResponse`
+- Methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()`, `create_model()`, `delete_model()`, `pull_model()`, `pull_model_blocking()`
 
 ## Current State
 
@@ -94,9 +94,9 @@ model = ["http", "inference"]         # All model operations (opt-in)
 - HTTP client with retry logic and exponential backoff
 - POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`, `post_with_retry`, `post_blocking_with_retry`)
 - DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
-- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`, `GenerateRequest`, `GenerateResponse`, `ThinkSetting`, `FormatSetting`, `KeepAliveSetting`, `StopSetting`, `TokenLogprob`, `Logprob`
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`, `GenerateRequest`, `GenerateResponse`, `ThinkSetting`, `FormatSetting`, `KeepAliveSetting`, `StopSetting`, `TokenLogprob`, `Logprob`, `PullRequest`, `PullResponse`
 - 316+ unit and integration tests
-- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, generate, chat, and tools endpoints
+- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, generate, chat, pull, and tools endpoints
 - `chat_with_tools_async` example: Complete tool calling flow with mock weather service
 
 ### In Progress
@@ -108,7 +108,7 @@ model = ["http", "inference"]         # All model operations (opt-in)
 - [x] Implement POST /api/generate endpoint (non-streaming only)
 - [ ] Implement POST /api/chat endpoint (non-streaming only)
 - [ ] Implement POST /api/create endpoint (non-streaming only)
-- [ ] Implement POST /api/pull endpoint (non-streaming only)
+- [x] Implement POST /api/pull endpoint (non-streaming only)
 - [ ] Implement POST /api/push endpoint (non-streaming only)
 
 ### TODO (v0.2.0)

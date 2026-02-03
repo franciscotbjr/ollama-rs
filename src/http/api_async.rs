@@ -1,14 +1,14 @@
 //! Async API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, EmbedRequest, EmbedResponse, GenerateRequest,
-    GenerateResponse, Result, VersionResponse,
+    ChatRequest, ChatResponse, EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse,
+    Result, VersionResponse,
 };
 
 #[cfg(feature = "model")]
 use crate::{
     CopyRequest, CreateRequest, CreateResponse, DeleteRequest, ListResponse, PsResponse,
-    ShowRequest, ShowResponse,
+    PullRequest, PullResponse, ShowRequest, ShowResponse,
 };
 
 use async_trait::async_trait;
@@ -418,6 +418,42 @@ pub trait OllamaApiAsync: Send + Sync {
     /// ```
     #[cfg(feature = "model")]
     async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse>;
+
+    /// Pull (download) a model from the Ollama registry.
+    ///
+    /// Downloads the specified model from the remote registry to the local
+    /// Ollama server. This operation may take several minutes depending on
+    /// model size and network speed.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - The pull request containing the model name and options
+    ///
+    /// # Returns
+    ///
+    /// A `PullResponse` indicating the success or failure of the operation.
+    ///
+    /// # Errors
+    ///
+    /// * `HttpStatusError(404)` - Model not found in registry
+    /// * `HttpError` - Network or HTTP errors
+    /// * `MaxRetriesExceededError` - Server errors after all retries
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, PullRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = PullRequest::new("all-minilm:33m");
+    /// let response = client.pull_model(&request).await?;
+    /// println!("Status: {:?}", response.status());
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "model")]
+    async fn pull_model(&self, request: &PullRequest) -> Result<PullResponse>;
 }
 
 #[async_trait]
@@ -475,6 +511,12 @@ impl OllamaApiAsync for OllamaClient {
     #[cfg(feature = "model")]
     async fn create_model(&self, request: &CreateRequest) -> Result<CreateResponse> {
         let url = self.config.url(Endpoints::CREATE);
+        self.post_with_retry(&url, request).await
+    }
+
+    #[cfg(feature = "model")]
+    async fn pull_model(&self, request: &PullRequest) -> Result<PullResponse> {
+        let url = self.config.url(Endpoints::PULL);
         self.post_with_retry(&url, request).await
     }
 }

@@ -79,6 +79,8 @@ src/
 │   ├── create_response.rs          # Model creation response
 │   ├── delete_request.rs           # Model deletion request
 │   ├── license_setting.rs          # License configuration
+│   ├── pull_request.rs             # Model pull/download request
+│   ├── pull_response.rs            # Model pull/download response
 │   ├── copy_request.rs             # Model copy request
 │   ├── list_response.rs            # List models response
 │   ├── model_details.rs            # Model details shared type
@@ -132,7 +134,7 @@ model = ["http", "inference"]         # All model operations (list, show, copy, 
         │                                     │
         ▼                                     ▼
   Model management                      dep:schemars
-  (list/show/copy/create/delete)        dep:futures
+  (list/show/copy/create/delete/pull)   dep:futures
 ```
 
 ### Conditional Compilation Patterns
