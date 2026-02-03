@@ -1,14 +1,14 @@
 //! Sync (blocking) API trait and implementations
 
 use crate::{
-    ChatRequest, ChatResponse, EmbedRequest, EmbedResponse, GenerateRequest,
-    GenerateResponse, Result, VersionResponse,
+    ChatRequest, ChatResponse, EmbedRequest, EmbedResponse, GenerateRequest, GenerateResponse,
+    Result, VersionResponse,
 };
 
 #[cfg(feature = "model")]
 use crate::{
     CopyRequest, CreateRequest, CreateResponse, DeleteRequest, ListResponse, PsResponse,
-    ShowRequest, ShowResponse,
+    PullRequest, PullResponse, ShowRequest, ShowResponse,
 };
 
 use super::OllamaClient;
@@ -357,6 +357,42 @@ pub trait OllamaApiSync: Send + Sync {
     /// ```
     #[cfg(feature = "model")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse>;
+
+    /// Pull (download) a model from the Ollama registry (blocking).
+    ///
+    /// Downloads the specified model from the remote registry to the local
+    /// Ollama server. This operation may take several minutes depending on
+    /// model size and network speed.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - The pull request containing the model name and options
+    ///
+    /// # Returns
+    ///
+    /// A `PullResponse` indicating the success or failure of the operation.
+    ///
+    /// # Errors
+    ///
+    /// * `HttpStatusError(404)` - Model not found in registry
+    /// * `HttpError` - Network or HTTP errors
+    /// * `MaxRetriesExceededError` - Server errors after all retries
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiSync, PullRequest};
+    ///
+    /// # fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = PullRequest::new("all-minilm:33m");
+    /// let response = client.pull_model_blocking(&request)?;
+    /// println!("Status: {:?}", response.status());
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "model")]
+    fn pull_model_blocking(&self, request: &PullRequest) -> Result<PullResponse>;
 }
 
 impl OllamaApiSync for OllamaClient {
@@ -413,6 +449,12 @@ impl OllamaApiSync for OllamaClient {
     #[cfg(feature = "model")]
     fn create_model_blocking(&self, request: &CreateRequest) -> Result<CreateResponse> {
         let url = self.config.url(Endpoints::CREATE);
+        self.post_blocking_with_retry(&url, request)
+    }
+
+    #[cfg(feature = "model")]
+    fn pull_model_blocking(&self, request: &PullRequest) -> Result<PullResponse> {
+        let url = self.config.url(Endpoints::PULL);
         self.post_blocking_with_retry(&url, request)
     }
 }

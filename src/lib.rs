@@ -86,19 +86,9 @@ pub mod model;
 
 #[cfg(feature = "model")]
 pub use model::{
-    CopyRequest,
-    CreateRequest,
-    CreateResponse,
-    DeleteRequest,
-    LicenseSetting,
-    ListResponse,
-    ModelDetails,
-    ModelSummary,
-    PsResponse,
-    RunningModel,
-    ShowModelDetails,
-    ShowRequest,
-    ShowResponse,
+    CopyRequest, CreateRequest, CreateResponse, DeleteRequest, LicenseSetting, ListResponse,
+    ModelDetails, ModelSummary, PsResponse, PullRequest, PullResponse, RunningModel,
+    ShowModelDetails, ShowRequest, ShowResponse,
 };
 
 // ============================================================================
@@ -110,12 +100,7 @@ pub mod tools;
 
 // Tool types re-exports (requires both "inference" and "tools" features)
 #[cfg(feature = "tools")]
-pub use tools::{
-    ToolCall, 
-    ToolCallFunction, 
-    ToolDefinition, 
-    ToolFunction
-};
+pub use tools::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 
 // ============================================================================
 // Prelude
@@ -153,28 +138,13 @@ pub mod prelude {
 
     // Tool types (requires "tools" features)
     #[cfg(feature = "tools")]
-    pub use crate::{
-        ToolCall, 
-        ToolCallFunction, 
-        ToolDefinition, 
-        ToolFunction
-    };
+    pub use crate::{ToolCall, ToolCallFunction, ToolDefinition, ToolFunction};
 
     // Model types (requires "model" feature)
     #[cfg(feature = "model")]
     pub use crate::{
-        CopyRequest,
-        CreateRequest,
-        CreateResponse,
-        DeleteRequest,
-        LicenseSetting,
-        ListResponse,
-        ModelDetails,
-        ModelSummary,
-        PsResponse,
-        RunningModel,
-        ShowModelDetails,
-        ShowRequest,
+        CopyRequest, CreateRequest, CreateResponse, DeleteRequest, LicenseSetting, ListResponse,
+        ModelDetails, ModelSummary, PsResponse, RunningModel, ShowModelDetails, ShowRequest,
         ShowResponse,
     };
 }

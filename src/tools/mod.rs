@@ -101,19 +101,18 @@
 //! ```
 
 mod erased_tool;
-mod tool_error;
-mod tool_registry;
-mod tool_trait;
 mod tool_call;
 mod tool_call_function;
 mod tool_definition;
+mod tool_error;
 mod tool_function;
+mod tool_registry;
+mod tool_trait;
 
-
-pub use tool_error::{ToolError, ToolResult};
-pub use tool_registry::ToolRegistry;
-pub use tool_trait::Tool;
 pub use tool_call::ToolCall;
 pub use tool_call_function::ToolCallFunction;
 pub use tool_definition::ToolDefinition;
+pub use tool_error::{ToolError, ToolResult};
 pub use tool_function::ToolFunction;
+pub use tool_registry::ToolRegistry;
+pub use tool_trait::Tool;

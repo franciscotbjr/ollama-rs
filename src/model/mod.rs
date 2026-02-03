@@ -2,6 +2,8 @@ mod create_request;
 mod create_response;
 mod delete_request;
 mod license_setting;
+mod pull_request;
+mod pull_response;
 
 mod copy_request;
 mod list_response;
@@ -17,6 +19,8 @@ pub use create_request::CreateRequest;
 pub use create_response::CreateResponse;
 pub use delete_request::DeleteRequest;
 pub use license_setting::LicenseSetting;
+pub use pull_request::PullRequest;
+pub use pull_response::PullResponse;
 
 pub use copy_request::CopyRequest;
 pub use list_response::ListResponse;

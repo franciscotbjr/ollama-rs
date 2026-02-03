@@ -108,6 +108,14 @@ required-features = ["model"]
 name = "show_model_sync"
 required-features = ["model"]
 
+[[example]]
+name = "pull_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "pull_model_sync"
+required-features = ["model"]
+
 [[test]]
 name = "client_delete_model_tests"
 required-features = ["model"]
@@ -134,5 +142,9 @@ required-features = ["model"]
 
 [[test]]
 name = "client_show_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_pull_tests"
 required-features = ["model"]
 

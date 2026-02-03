@@ -115,6 +115,7 @@ Each module follows single-concern file structure:
 - `ListResponse` / `ModelSummary` / `ModelDetails` for listing models
 - `PsResponse` / `RunningModel` for running model info
 - `ShowRequest` / `ShowResponse` / `ShowModelDetails` for model details
+- `PullRequest` / `PullResponse` for model downloading
 
 **Feature:** `model` (optional, requires `http` and `inference`)
 **Status:** Implementation complete
@@ -711,7 +712,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] `POST /api/generate` - Text generation (non-streaming only)
 - [x] `POST /api/chat` - Chat completions (non-streaming only)
 - [x] `POST /api/create` - Model creation (non-streaming only)
-- [ ] `POST /api/pull` - Model download (non-streaming only)
+- [x] `POST /api/pull` - Model download (non-streaming only)
 - [ ] `POST /api/push` - Model upload (non-streaming only)
 
 **Examples:**

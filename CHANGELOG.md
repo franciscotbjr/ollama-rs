@@ -72,6 +72,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - POST helper methods: `post_empty_with_retry()`, `post_empty_blocking_with_retry()`
   - 16 new unit tests with mocking
   - Examples: `copy_model_async.rs`, `copy_model_sync.rs`
+- **POST /api/pull endpoint**: Download models from registry (non-streaming)
+  - `PullRequest` type with builder pattern (model, insecure option)
+  - `PullResponse` type with helper methods (`status()`, `is_success()`)
+  - `pull_model()` async method
+  - `pull_model_blocking()` sync method
+  - 8 new unit tests with mocking
+  - Examples: `pull_model_async.rs`, `pull_model_sync.rs`
 - **GET /api/ps endpoint**: List currently running models
   - `PsResponse`, `RunningModel` primitive types
   - `list_running_models()` async method
@@ -126,7 +133,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Planned for v0.1.0
 - POST /api/chat - Chat completions (non-streaming only)
 - POST /api/create - Model creation (non-streaming only)
-- POST /api/pull - Model download (non-streaming only)
 - POST /api/push - Model upload (non-streaming only)
 
 ### Planned for v0.2.0
