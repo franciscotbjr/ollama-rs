@@ -81,6 +81,8 @@ src/
 │   ├── license_setting.rs          # License configuration
 │   ├── pull_request.rs             # Model pull/download request
 │   ├── pull_response.rs            # Model pull/download response
+│   ├── push_request.rs             # Model push/upload request
+│   ├── push_response.rs            # Model push/upload response
 │   ├── copy_request.rs             # Model copy request
 │   ├── list_response.rs            # List models response
 │   ├── model_details.rs            # Model details shared type
@@ -134,7 +136,8 @@ model = ["http", "inference"]         # All model operations (list, show, copy, 
         │                                     │
         ▼                                     ▼
   Model management                      dep:schemars
-  (list/show/copy/create/delete/pull)   dep:futures
+  (list/show/copy/create/delete/        dep:futures
+   pull/push)
 ```
 
 ### Conditional Compilation Patterns
@@ -324,17 +327,26 @@ classDiagram
         +show_model(request)* Result~ShowResponse~
         +embed(request)* Result~EmbedResponse~
         +generate(request)* Result~GenerateResponse~
+        +chat(request)* Result~ChatResponse~
+        +create_model(request)* Result~CreateResponse~
+        +pull_model(request)* Result~PullResponse~
+        +push_model(request)* Result~PushResponse~
     }
 
     class OllamaApiSync {
         <<trait>>
         +version_blocking()* Result~VersionResponse~
         +list_models_blocking()* Result~ListResponse~
+        +list_running_models_blocking()* Result~PsResponse~
         +copy_model_blocking(request)* Result~unit~
         +delete_model_blocking(request)* Result~unit~
         +show_model_blocking(request)* Result~ShowResponse~
         +embed_blocking(request)* Result~EmbedResponse~
         +generate_blocking(request)* Result~GenerateResponse~
+        +chat_blocking(request)* Result~ChatResponse~
+        +create_model_blocking(request)* Result~CreateResponse~
+        +pull_model_blocking(request)* Result~PullResponse~
+        +push_model_blocking(request)* Result~PushResponse~
     }
 
     %% Internal Helpers
@@ -364,6 +376,10 @@ classDiagram
         +SHOW: /api/show
         +EMBED: /api/embed
         +GENERATE: /api/generate
+        +CHAT: /api/chat
+        +CREATE: /api/create
+        +PULL: /api/pull
+        +PUSH: /api/push
     }
 
     %% Relationships
@@ -612,6 +628,7 @@ Integration tests are implemented as **examples**:
 
 ## Version History
 
+- **2026-02-04**: Phase 1 complete - all 12 API endpoints documented (push_request, push_response added)
 - **2026-02-03**: Tool types (ToolCall, ToolDefinition) moved from inference to tools module
 - **2026-02-01**: Added feature flag architecture documentation (tools, model features)
 - **2026-01-13**: Initial architecture document
