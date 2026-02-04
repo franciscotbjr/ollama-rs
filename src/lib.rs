@@ -87,8 +87,8 @@ pub mod model;
 #[cfg(feature = "model")]
 pub use model::{
     CopyRequest, CreateRequest, CreateResponse, DeleteRequest, LicenseSetting, ListResponse,
-    ModelDetails, ModelSummary, PsResponse, PullRequest, PullResponse, RunningModel,
-    ShowModelDetails, ShowRequest, ShowResponse,
+    ModelDetails, ModelSummary, PsResponse, PullRequest, PullResponse, PushRequest, PushResponse,
+    RunningModel, ShowModelDetails, ShowRequest, ShowResponse,
 };
 
 // ============================================================================

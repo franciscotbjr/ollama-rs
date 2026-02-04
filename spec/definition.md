@@ -713,7 +713,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] `POST /api/chat` - Chat completions (non-streaming only)
 - [x] `POST /api/create` - Model creation (non-streaming only)
 - [x] `POST /api/pull` - Model download (non-streaming only)
-- [ ] `POST /api/push` - Model upload (non-streaming only)
+- [x] `POST /api/push` - Model upload (non-streaming only)
 
 **Examples:**
 - [x] `chat_with_tools_async` - Complete tool call flow with mock weather service

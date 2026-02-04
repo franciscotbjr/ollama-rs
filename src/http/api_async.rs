@@ -8,7 +8,7 @@ use crate::{
 #[cfg(feature = "model")]
 use crate::{
     CopyRequest, CreateRequest, CreateResponse, DeleteRequest, ListResponse, PsResponse,
-    PullRequest, PullResponse, ShowRequest, ShowResponse,
+    PullRequest, PullResponse, PushRequest, PushResponse, ShowRequest, ShowResponse,
 };
 
 use async_trait::async_trait;
@@ -454,6 +454,42 @@ pub trait OllamaApiAsync: Send + Sync {
     /// ```
     #[cfg(feature = "model")]
     async fn pull_model(&self, request: &PullRequest) -> Result<PullResponse>;
+
+    /// Push (upload) a model to the Ollama registry.
+    ///
+    /// Uploads the specified model to a remote registry. Requires proper
+    /// authentication and namespace permissions.
+    ///
+    /// # Arguments
+    ///
+    /// * `request` - The push request containing the model name and options
+    ///
+    /// # Returns
+    ///
+    /// A `PushResponse` indicating the success or failure of the operation.
+    ///
+    /// # Errors
+    ///
+    /// * `HttpStatusError(404)` - Model not found locally
+    /// * `HttpStatusError(401)` - Unauthorized (invalid credentials)
+    /// * `HttpError` - Network or HTTP errors
+    /// * `MaxRetriesExceededError` - Server errors after all retries
+    ///
+    /// # Examples
+    ///
+    /// ```no_run
+    /// use ollama_oxide::{OllamaClient, OllamaApiAsync, PushRequest};
+    ///
+    /// # async fn example() -> Result<(), Box<dyn std::error::Error>> {
+    /// let client = OllamaClient::default()?;
+    /// let request = PushRequest::new("myuser/mymodel:latest");
+    /// let response = client.push_model(&request).await?;
+    /// println!("Status: {:?}", response.status());
+    /// # Ok(())
+    /// # }
+    /// ```
+    #[cfg(feature = "model")]
+    async fn push_model(&self, request: &PushRequest) -> Result<PushResponse>;
 }
 
 #[async_trait]
@@ -517,6 +553,12 @@ impl OllamaApiAsync for OllamaClient {
     #[cfg(feature = "model")]
     async fn pull_model(&self, request: &PullRequest) -> Result<PullResponse> {
         let url = self.config.url(Endpoints::PULL);
+        self.post_with_retry(&url, request).await
+    }
+
+    #[cfg(feature = "model")]
+    async fn push_model(&self, request: &PushRequest) -> Result<PushResponse> {
+        let url = self.config.url(Endpoints::PUSH);
         self.post_with_retry(&url, request).await
     }
 }
