@@ -10,7 +10,16 @@
       "WebFetch(domain:docs.rs)",
       "Bash(dir:*)",
       "Bash(test:*)",
-      "Bash(rust-script:*)"
+      "Bash(rust-script:*)",
+      "Bash(if not exist impl mkdir impl)",
+      "Bash(PWD=\"d:\\\\development\\\\public\\\\ollama-oxide\" rust-script \"d:\\\\development\\\\public\\\\ollama-oxide\\\\.claude\\\\scripts\\\\save_cache.rs\")",
+      "Bash(PWD=\"d:\\\\development\\\\public\\\\ollama-oxide\" rust-script:*)",
+      "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" status --short)",
+      "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" diff --stat)",
+      "Bash(git -C \"d:\\\\development\\\\public\\\\ollama-oxide\" diff src/http/)",
+      "Bash(ls:*)",
+      "Bash(git mv:*)",
+      "Bash(git status:*)"
     ],
     "deny": []
   }

@@ -2,6 +2,18 @@
 
 I'll save the current session context for the ollama-oxide project by reading critical project files and creating a cache for future session continuity.
 
+## Session Context (CRITICAL)
+
+Before running the cache script, you MUST execute `/compact` command. 
+
+### `task` attribute
+- Must contain the current/last task being developed in the project
+- Example: "Rename feature 'create' to 'model' - refactoring complete, pending git commit"
+
+### `summary` attribute
+- **MUST have content equivalent to the result of `/compact` command execution**
+The content of `session_context.summary` is the result obtained from `/compact` previously executed.
+
 ## What Gets Cached
 
 The cache script will automatically gather information from:

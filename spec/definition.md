@@ -1,7 +1,7 @@
 # ollama-oxide Project Definition
 
-**Document Version:** 1.0
-**Last Updated:** 2025-01-11
+**Document Version:** 1.7
+**Last Updated:** 2026-02-03
 **Project Version:** 0.1.0
 
 ## Executive Summary
@@ -39,27 +39,36 @@ The project is organized as a **single crate** with modular structure and featur
 ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
-    ├── primitives/      # Low-level API primitives module
+    ├── inference/       # Inference types module (default)
     │   └── mod.rs
-    ├── http/            # HTTP client module
+    ├── http/            # HTTP client module (default)
     │   └── mod.rs
-    └── conveniences/    # High-level convenience APIs module (optional feature)
+    ├── tools/           # Ergonomic function calling (optional, "tools" feature)
+    │   └── mod.rs
+    ├── model/           # Model creation/deletion (optional, "model" feature)
+    │   └── mod.rs
+    └── conveniences/    # High-level convenience APIs module (optional)
         └── mod.rs
 ```
 
 ### Module Organization
 
-#### 1. primitives (Module)
-**Purpose:** Low-level data structures matching Ollama's API specification.
+Each module follows single-concern file structure:
+- One primary type per file with its implementations
+- `mod.rs` serves as re-export facade
+- Example: `error.rs` contains Error enum + implementations; `lib.rs` imports from error module
+
+#### 1. inference (Module)
+**Purpose:** Data structures for inference operations (chat, generate, embed).
 
 **Key Responsibilities:**
-- Request/response type definitions
+- Request/response type definitions for inference APIs
 - Serialization/deserialization implementations
 - API model validation
 - Type-safe enum representations
 
-**Feature:** `primitives` (default)
-**Status:** Implementation in progress
+**Feature:** `inference` (default)
+**Status:** Implementation complete
 
 #### 2. http (Module)
 **Purpose:** HTTP client layer for API communication.
@@ -68,13 +77,51 @@ ollama-oxide/
 - Connection management
 - Request/response handling
 - Error mapping and propagation
-- Retry logic (if applicable)
+- Generic retry helpers (`get_with_retry`, `get_blocking_with_retry`)
 - Stream handling
+
+**HTTP Client Design:**
+- Type-safe generic methods with `serde::de::DeserializeOwned` bounds
+- Automatic retry logic with exponential backoff
+- Separate async (`tokio::time::sleep`) and sync (`std::thread::sleep`) helpers
+- Marked `pub(super)` for module-internal use
 
 **Feature:** `http` (default)
 **Status:** Implementation in progress
 
-#### 3. conveniences (Module)
+#### 3. tools (Module)
+**Purpose:** Tool types and ergonomic function calling with auto-generated JSON schemas.
+
+**Key Responsibilities:**
+- `ToolCall`, `ToolCallFunction` - API response types for tool invocations
+- `ToolDefinition`, `ToolFunction` - API request types for tool definitions
+- `Tool` trait for type-safe tool definitions
+- `ToolRegistry` for automatic dispatch
+- Auto-generated JSON schemas from Rust types via `schemars`
+- Type-erased tool storage for heterogeneous collections
+
+**Feature:** `tools` (optional, requires `schemars` and `futures`)
+**Status:** Implementation complete
+**Note:** All tool-related types consolidated here. Simplifies feature gating (only requires `tools` feature).
+
+#### 4. model (Module)
+**Purpose:** Model management operations and types.
+
+**Key Responsibilities:**
+- `CreateRequest` / `CreateResponse` for model creation
+- `DeleteRequest` for model deletion
+- `LicenseSetting` for license configuration
+- `CopyRequest` for model copying
+- `ListResponse` / `ModelSummary` / `ModelDetails` for listing models
+- `PsResponse` / `RunningModel` for running model info
+- `ShowRequest` / `ShowResponse` / `ShowModelDetails` for model details
+- `PullRequest` / `PullResponse` for model downloading
+
+**Feature:** `model` (optional, requires `http` and `inference`)
+**Status:** Implementation complete
+**Note:** Opt-in feature consolidating all model-related operations and types. Includes destructive operations (create/delete).
+
+#### 5. conveniences (Module)
 **Purpose:** High-level, ergonomic APIs for common workflows.
 
 **Key Responsibilities:**
@@ -84,29 +131,48 @@ ollama-oxide/
 - Streaming abstractions
 - Response post-processing
 
-**Feature:** `conveniences` (optional, requires `http` and `primitives`)
+**Feature:** `conveniences` (optional, requires `http` and `inference`)
 **Status:** Implementation pending
 
 ### Feature Flags
 
 ```toml
 [features]
-default = ["http", "primitives"]           # Default features
-conveniences = ["http", "primitives"]      # High-level API (optional)
-http = []                                  # HTTP client layer
-primitives = []                            # Low-level primitives
+default = ["http", "inference"]       # Standard usage
+conveniences = ["http", "inference"]  # High-level APIs
+http = []                             # HTTP client layer
+inference = []                        # Inference types
+tools = ["dep:schemars", "dep:futures"] # Ergonomic function calling
+model = ["http", "inference"]         # Model management (opt-in)
 ```
+
+**Feature Matrix:**
+
+| Feature | Dependencies | Purpose |
+|---------|-------------|---------|
+| `default` | `http`, `inference` | Standard usage - HTTP client + all inference types |
+| `inference` | - | Standalone inference types (chat, generate, embed) |
+| `http` | - | HTTP client implementation (async/sync) |
+| `tools` | `schemars`, `futures` | Tool types (ToolCall, ToolDefinition) + ergonomic function calling |
+| `model` | `http`, `inference` | Model management API - all model-related types and operations (list, show, copy, create, delete) |
+| `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 
 **Usage Examples:**
 ```toml
-# Full featured (default)
+# Default features (inference + http)
 ollama-oxide = "0.1.0"
 
-# With conveniences
-ollama-oxide = { version = "0.1.0", features = ["conveniences"] }
+# With function calling support
+ollama-oxide = { version = "0.1.0", features = ["tools"] }
 
-# Minimal (only primitives and http)
-ollama-oxide = { version = "0.1.0", default-features = true }
+# With model management
+ollama-oxide = { version = "0.1.0", features = ["model"] }
+
+# Full featured
+ollama-oxide = { version = "0.1.0", features = ["tools", "model"] }
+
+# Inference types only (no HTTP client)
+ollama-oxide = { version = "0.1.0", default-features = false, features = ["inference"] }
 ```
 
 ## Technical Stack
@@ -124,8 +190,9 @@ ollama-oxide = { version = "0.1.0", default-features = true }
 **Build Configuration:**
 - Single crate architecture
 - Feature-based module organization
-- Default features: `http` + `primitives`
-- Optional feature: `conveniences`
+- Default features: `http` + `inference`
+- Optional features: `tools`, `model`, `conveniences`
+- Optional dependencies: `schemars`, `futures` (for `tools` feature)
 
 ### Dependency Rationale
 
@@ -168,60 +235,74 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 **Total Endpoints:** 12 (across all phases)
 
-#### Phase 1 (v0.1.0): Foundation + HTTP Module
-**Focus:** Primitives module structure and HTTP module implementation
+#### Phase 1 (v0.1.0): Foundation + All Endpoints (Non-Streaming Mode)
+**Focus:** Primitives module structure, HTTP module implementation, and all 12 endpoints in non-streaming mode
 
 **Scope:**
-- Set up `primitives` module with shared types (ModelOptions, Logprob, etc.)
+- Set up `inference` module with shared types (ModelOptions, Logprob, etc.)
 - Implement `http` module with connection management
 - Build error handling infrastructure
 - Create serialization/deserialization framework
 - Establish testing foundation
+- Implement all 12 endpoints (streaming endpoints work in non-streaming mode only)
+
+**GET Endpoints (3):**
+1. `GET /api/version` - Get Ollama version
+2. `GET /api/tags` - List available models
+3. `GET /api/ps` - List running models
+
+**Simple POST/DELETE Endpoints (2):**
+4. `POST /api/copy` - Copy a model
+5. `DELETE /api/delete` - Delete a model
+
+**Medium Complexity POST Endpoints (2):**
+6. `POST /api/show` - Show detailed model information ✅
+7. `POST /api/embed` - Generate text embeddings ✅
+
+**Complex POST Endpoints (5) - Non-Streaming Mode:**
+8. `POST /api/generate` - Generate text completions (non-streaming only)
+9. `POST /api/chat` - Chat completions (non-streaming only)
+10. `POST /api/create` - Create custom models (non-streaming only)
+11. `POST /api/pull` - Download models (non-streaming only)
+12. `POST /api/push` - Upload models (non-streaming only)
 
 **Deliverables:**
-- `GET /api/version` - First endpoint implementation
-- Functional HTTP client in `http` module
-- Error types and handling in `primitives` module
+- All 12 endpoints fully implemented (streaming endpoints in non-streaming mode)
+- Functional HTTP client in `http` module (GET, POST, DELETE)
+- Error types and handling in error module
 - Basic integration test framework
 - Module structure with feature flags working
 
-#### Phase 2 (v0.1.1): All Primitives Implementation
-**Focus:** Complete implementation of all 12 API endpoints in primitives module
+#### Phase 2 (v0.2.0): Streaming Implementation
+**Focus:** Add streaming support to endpoints that support it
 
-**Endpoints by Complexity:**
+**Streaming Endpoints (5):**
+1. `POST /api/generate` - Generate text completions with streaming
+2. `POST /api/chat` - Chat completions with streaming
+3. `POST /api/create` - Create custom models with progress streaming
+4. `POST /api/pull` - Download models with progress streaming
+5. `POST /api/push` - Upload models with progress streaming
 
-**Simple Endpoints (4):**
-1. `GET /api/tags` - List available models
-2. `GET /api/ps` - List running models
-3. `POST /api/copy` - Copy a model
-4. `DELETE /api/delete` - Delete a model
-
-**Medium Complexity (2):**
-5. `POST /api/show` - Show detailed model information
-6. `POST /api/embed` - Generate text embeddings
-
-**High Complexity with Streaming (5):**
-7. `POST /api/generate` - Generate text completions (streaming/non-streaming)
-8. `POST /api/chat` - Chat completions with conversation history (streaming/non-streaming)
-9. `POST /api/create` - Create custom models (streaming progress)
-10. `POST /api/pull` - Download models from registry (streaming progress)
-11. `POST /api/push` - Upload models to registry (streaming progress)
+**Scope:**
+- Streaming infrastructure and abstractions
+- Stream helper utilities and iterators
+- Progress callback system for model operations
+- Async stream implementations
 
 **Deliverables:**
-- All 11 remaining endpoints fully implemented in `primitives` module
-- Request/response types for each endpoint
-- Streaming support for applicable endpoints
-- Comprehensive unit tests
-- Integration tests for all endpoints
+- Streaming support for all 5 streaming-capable endpoints
+- Stream abstraction utilities
+- Progress tracking for long-running operations
+- Comprehensive streaming tests
+- Documentation for streaming usage
 
-#### Phase 3 (v0.2.0): Conveniences Module
-**Focus:** High-level ergonomic APIs built on primitives module
+#### Phase 3 (v0.3.0): Conveniences Module
+**Focus:** High-level ergonomic APIs built on inference module
 
 **Scope:**
 - Implement `conveniences` module as optional feature
 - Client builder pattern for easy initialization
 - Simplified method signatures for common operations
-- Stream helper utilities and iterators
 - Response post-processing and formatting
 - Error recovery patterns
 - Convenience methods for chaining operations
@@ -230,11 +311,10 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Complete `conveniences` module implementation
 - `conveniences` feature flag working correctly
 - Builder patterns for complex requests
-- Stream abstraction utilities
 - High-level client interface
 - Comprehensive documentation
 
-#### Phase 4 (v0.3.0): Examples & Production Readiness
+#### Phase 4 (v0.4.0): Examples & Production Readiness
 **Focus:** Examples, documentation, and polish
 
 **Scope:**
@@ -253,21 +333,22 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - Streaming responses with progress
 - Error handling patterns
 - Batch processing
-- Custom tool/function calling
+- Custom tool/function calling (✅ `chat_with_tools_async` with mock weather API)
+- Type-safe tool registry (✅ `chat_with_tools_registry_async`)
 
 **Deliverables:**
 - 10+ comprehensive examples in `/examples`
 - Performance benchmarks and optimization
 - Production-ready documentation
 - Stable API (v1.0.0 target)
-- Migration guide (primitives → conveniences)
+- Migration guide (inference → conveniences)
 
 ## Design Philosophy
 
 ### Core Principles
 
 1. **Layered Architecture**
-   - Clear separation between primitives and conveniences
+   - Clear separation between inference types and conveniences
    - Users can choose their abstraction level
    - Internal flexibility for future changes
 
@@ -329,42 +410,60 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ## Testing Strategy
 
-### Unit Tests
+### Unit Tests (`tests/` folder)
+
+**Location:** `tests/*.rs`
 
 **Scope:**
 - Individual function validation
 - Data structure serialization/deserialization
 - Error handling paths
 - Edge cases
+- HTTP interactions via mocking
+
+**Requirements:**
+- Must NOT require external services (Ollama server)
+- Use `mockito` crate for HTTP mocking
+- Must pass with `cargo test` without additional setup
 
 **Tools:**
 - Standard Rust test framework
 - serde_json for JSON validation
+- mockito for HTTP mocking
 
-### Integration Tests
+### Integration Tests (`examples/` folder)
+
+**Location:** `examples/*.rs`
 
 **Scope:**
-- Full API interactions
+- Full API interactions with real Ollama server
 - End-to-end workflows
 - Error scenarios
 - Streaming behavior
+- Serve as usage documentation
 
 **Requirements:**
 - Running Ollama instance
 - Network connectivity
-- Sufficient system resources
+- Run manually: `cargo run --example <name>`
+
+**Rationale:**
+- `cargo test` always succeeds without external dependencies
+- Examples serve dual purpose: documentation + integration testing
+- CI/CD pipelines run reliably
 
 ### Mocking Strategy
 
 **Approach:**
-- Mock HTTP responses for unit tests
-- Real Ollama instance for integration tests
-- Consider wiremock or mockito for HTTP mocking
+- All tests in `tests/` folder use HTTP mocking
+- `mockito` crate for simulating Ollama API responses
+- Real Ollama instance only used via examples
 
 **Benefits:**
 - Fast unit test execution
-- No external dependencies for unit tests
-- Realistic integration testing
+- No external dependencies for `cargo test`
+- CI/CD always passes
+- Integration testing available when needed via examples
 
 ## Quality Standards
 
@@ -580,7 +679,7 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 
 ## Success Criteria
 
-### Version 0.1.0: Foundation + HTTP Core (Current)
+### Version 0.1.0: Foundation + All Endpoints (Non-Streaming Mode) (Current)
 **Status:** In Progress
 
 **Completed:**
@@ -590,71 +689,93 @@ The library's implementation is driven by Ollama's official OpenAPI specificatio
 - [x] OpenAPI specifications (12 endpoints documented)
 - [x] Git repository initialized
 - [x] Workspace configuration
+- [x] `inference` module structure with shared types
+- [x] `http` module implementation
+- [x] Error type hierarchy in error module
+- [x] Testing infrastructure
+- [x] Feature flags configuration
 
-**In Progress:**
-- [ ] Simple endpoints (1): GET /api/version
-- [ ] `primitives` module structure with shared types
-- [ ] `http` module implementation
-- [ ] Error type hierarchy in `primitives`
-- [ ] Testing infrastructure
-- [ ] Feature flags configuration
+**GET Endpoints (3):**
+- [x] `GET /api/version` - Get Ollama version
+- [x] `GET /api/tags` - List available models
+- [x] `GET /api/ps` - List running models
+
+**Simple POST/DELETE Endpoints (2):**
+- [x] `POST /api/copy` - Copy a model
+- [x] `DELETE /api/delete` - Delete a model
+
+**Medium Complexity POST Endpoints (2):**
+- [x] `POST /api/show` - Show detailed model information
+- [x] `POST /api/embed` - Generate text embeddings
+
+**Complex POST Endpoints (5) - Non-Streaming Mode:**
+- [x] `POST /api/generate` - Text generation (non-streaming only)
+- [x] `POST /api/chat` - Chat completions (non-streaming only)
+- [x] `POST /api/create` - Model creation (non-streaming only)
+- [x] `POST /api/pull` - Model download (non-streaming only)
+- [x] `POST /api/push` - Model upload (non-streaming only)
+
+**Examples:**
+- [x] `chat_with_tools_async` - Complete tool call flow with mock weather service
+- [x] `chat_with_tools_registry_async` - ToolRegistry pattern with type erasure (renamed from `tool_registry_async`)
 
 **Definition of Done:**
 - All shared types (ModelOptions, Logprob, enums) compile
-- First simple endpoint: GET /api/version working
-- HTTP client in `http` module can make GET/POST requests
-- Error handling system in place
-- Feature flags (`http`, `primitives`) working correctly
+- All 12 endpoints working (streaming endpoints in non-streaming mode)
+- HTTP client in `http` module can make GET, POST, DELETE requests
+- POST helper methods with retry logic implemented (`post_empty_with_retry`, `post_with_retry`)
+- DELETE helper methods with retry logic implemented
+- Error handling system in place (including HttpStatusError)
+- Feature flags (`http`, `inference`) working correctly
 - Unit test framework operational
 - Integration test setup complete
 
 ---
 
-### Version 0.1.1: All Primitives Implementation (Planned)
+### Version 0.2.0: Streaming Implementation (Planned)
 **Status:** Not Started
 
 **Checklist:**
-- [ ] Simple endpoints (4): tags, ps, copy, delete
-- [ ] Medium endpoints (2): show, embed
-- [ ] Complex endpoints (5): generate, chat, create, pull, push
-- [ ] Streaming support for 5 endpoints
-- [ ] Request/response types for all 12 endpoints
-- [ ] Unit test coverage >80%
-- [ ] Integration tests for all endpoints
-- [ ] Complete API documentation
+- [ ] `POST /api/generate` - Streaming support
+- [ ] `POST /api/chat` - Streaming support
+- [ ] `POST /api/create` - Progress streaming support
+- [ ] `POST /api/pull` - Progress streaming support
+- [ ] `POST /api/push` - Progress streaming support
+- [ ] Streaming infrastructure and abstractions
+- [ ] Stream helper utilities and async iterators
+- [ ] Progress callback system
+- [ ] Comprehensive streaming tests
+- [ ] Streaming documentation
 
 **Definition of Done:**
-- All 11 remaining endpoints functional with real Ollama
-- Streaming endpoints handle progress correctly
-- Comprehensive test suite passes
-- API documentation complete
-- Code reviewed and optimized
+- All 5 streaming endpoints support streaming mode
+- Stream utilities work with async iterators
+- Progress tracking functional for long operations
+- Documentation includes streaming examples
+- Tests cover both streaming and non-streaming modes
 
 ---
 
-### Version 0.2.0: Conveniences Layer (Planned)
+### Version 0.3.0: Conveniences Layer (Planned)
 **Status:** Not Started
 
 **Checklist:**
 - [ ] OllamaClient with builder pattern
 - [ ] Convenience methods for all endpoints
 - [ ] Builder patterns for complex requests
-- [ ] Stream helper utilities
-- [ ] Progress callback system
 - [ ] Response formatters
-- [ ] Retry logic implementation
+- [ ] Error recovery patterns
 - [ ] High-level documentation with examples
 
 **Definition of Done:**
 - All convenience APIs ergonomic and intuitive
 - Complex operations reduced to 3-5 calls
-- Stream utilities work with async iterators
 - Documentation includes real-world examples
 - User feedback incorporated
 
 ---
 
-### Version 0.3.0: Samples & Production Readiness (Planned)
+### Version 0.4.0: Samples & Production Readiness (Planned)
 **Status:** Not Started
 
 **Checklist:**

@@ -19,33 +19,56 @@ The Llama in the Crate is a Rust library providing low-level primitives and high
 
 ## Architecture
 
-Single-crate design with modular structure:
+Single-crate design with modular structure and feature flags:
 
 ```
 ollama-oxide/
 └── src/
     ├── lib.rs           # Main library entry point
-    ├── primitives/      # Low-level API primitives (default)
+    ├── inference/       # Inference types: chat, generate, embed (default)
     ├── http/            # HTTP client layer (default)
+    ├── tools/           # Ergonomic function calling (optional)
+    ├── model/           # Model management (optional)
     └── conveniences/    # High-level APIs (optional)
 ```
 
-**Feature Flags:**
-- `default` = `["http", "primitives"]` - Core functionality
-- `conveniences` - Optional ergonomic high-level APIs
+## Feature Flags
+
+The library uses feature flags to let you include only what you need:
+
+| Feature | Dependencies | Purpose |
+|---------|-------------|---------|
+| `default` | `http`, `inference` | Standard usage - HTTP client + all inference types |
+| `inference` | - | Standalone inference types (chat, generate, embed) |
+| `http` | - | HTTP client implementation (async/sync) |
+| `tools` | `schemars`, `futures` | Ergonomic function calling with auto-generated JSON schemas |
+| `model` | `http`, `inference` | Model management API (list, show, copy, create, delete) |
+| `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 
 ## Installation
 
 Add this to your `Cargo.toml`:
 
 ```toml
-# Default features (primitives + http)
+# Default features (inference + http)
 [dependencies]
 ollama-oxide = "0.1.0"
 
-# With high-level conveniences
+# With function calling support
 [dependencies]
-ollama-oxide = { version = "0.1.0", features = ["conveniences"] }
+ollama-oxide = { version = "0.1.0", features = ["tools"] }
+
+# With model management
+[dependencies]
+ollama-oxide = { version = "0.1.0", features = ["model"] }
+
+# Full featured
+[dependencies]
+ollama-oxide = { version = "0.1.0", features = ["tools", "model"] }
+
+# Inference types only (no HTTP client)
+[dependencies]
+ollama-oxide = { version = "0.1.0", default-features = false, features = ["inference"] }
 ```
 
 ## Quick Start

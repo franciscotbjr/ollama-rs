@@ -1,3 +1,3 @@
 # Updates DOCS
 
-I'll update CHANGELOG.MD and DEV_NOTES.md according to these last modifications i've made
+I'll update CHANGELOG.MD, DEV_NOTES.md, DECISIONS.md, ARCHITECTURE.md and definition.md according to these last modifications i've made

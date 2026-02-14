@@ -24,3 +24,9 @@ target
 # Added by cargo
 
 /target
+/impl
+/tmp
+impl.md
+
+Cargo.lock
+.github/copilot-instructions.md

@@ -2,7 +2,7 @@
 name = "ollama-oxide"
 version = "0.1.0"
 edition = "2024"
-description = "A Rust library for integrating with Ollama's native API, providing low-level primitives and high-level conveniences."
+description = "A Rust library for integrating with Ollama's native API, providing low-level inference and high-level conveniences."
 keywords = ["ollama", "ai", "llm", "api", "client"]
 categories = ["api-bindings", "asynchronous"]
 license = "MIT"
@@ -12,20 +12,151 @@ exclude = [
     ".claude/*",
     ".github/*",
     "assets/*",
+    "examples/*",
     "spec/*",
-    "DEV_NOTES.md",
+    "impl/*",
+    "tmp/*",
+    "ARCHITECTURE.md",
+    "BLOCKERS.md",
     "CONTRIBUTING.md",
+    "DECISIONS.md",
+    "DEV_NOTES.md",
+    "impl.md",
 ]
 
 [features]
-default = ["http", "primitives"]
-conveniences = ["http", "primitives"]
+default = ["http", "inference"]
+conveniences = ["http", "inference"]
 http = []
-primitives = []
+inference = []
+tools = ["dep:schemars", "dep:futures"]
+model = ["http", "inference"]
 
 [dependencies]
-tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread"] }
+tokio = { version = "1.49.0", features = ["macros", "rt-multi-thread", "time"] }
 serde = { version = "1.0.228", features = ["derive"] }
 serde_json = "1.0.149"
 reqwest = { version = "0.13.1", default-features = false, features = ["blocking", "cookies", "http2", "json", "native-tls"] }
 async-trait = "0.1.89"
+thiserror = "2.0.18"
+url = "2.5.8"
+
+# Optional dependencies for ergonomic tools API (Phase B)
+schemars = { version = "1.2.0", optional = true }
+futures = { version = "0.3.31", optional = true }
+
+[dev-dependencies]
+mockito = "1.7.1"
+
+[[example]]
+name = "tools_async"
+required-features = ["tools"]
+
+[[example]]
+name = "chat_with_tools_registry_async"
+required-features = ["tools"]
+
+[[example]]
+name = "chat_with_tools_async"
+required-features = ["tools"]
+
+[[example]]
+name = "model_create_async"
+required-features = ["model"]
+
+[[example]]
+name = "model_cleanup_async"
+required-features = ["model"]
+
+[[example]]
+name = "model_delete_async"
+required-features = ["model"]
+
+[[example]]
+name = "model_delete_sync"
+required-features = ["model"]
+
+[[example]]
+name = "list_models_async"
+required-features = ["model"]
+
+[[example]]
+name = "list_models_sync"
+required-features = ["model"]
+
+[[example]]
+name = "list_running_models_async"
+required-features = ["model"]
+
+[[example]]
+name = "list_running_models_sync"
+required-features = ["model"]
+
+[[example]]
+name = "copy_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "copy_model_sync"
+required-features = ["model"]
+
+[[example]]
+name = "show_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "show_model_sync"
+required-features = ["model"]
+
+[[example]]
+name = "pull_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "pull_model_sync"
+required-features = ["model"]
+
+[[test]]
+name = "client_delete_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_create_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_list_models_tests"
+required-features = ["model"]
+
+[[test]]
+name = "model_list_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_list_running_models_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_copy_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_show_model_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_pull_tests"
+required-features = ["model"]
+
+[[test]]
+name = "client_push_tests"
+required-features = ["model"]
+
+[[example]]
+name = "push_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "push_model_sync"
+required-features = ["model"]
+

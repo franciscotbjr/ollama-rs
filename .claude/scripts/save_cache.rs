@@ -13,6 +13,12 @@ use std::env;
 use std::fs;
 use std::path::PathBuf;
 
+#[derive(Serialize, Deserialize, Debug, Default)]
+struct SessionContext {
+    task: String,
+    summary: String,
+}
+
 #[derive(Serialize, Deserialize, Debug)]
 struct ProjectContext {
     // Project identification (from Cargo.toml)
@@ -32,7 +38,8 @@ struct ProjectContext {
 
     // Critical files inventory
     critical_files: Vec<String>,
-    spec_files: Vec<String>,
+    apis_spec_files: Vec<String>,
+    impl_files: Vec<String>,
 
     // Session tracking
     session_count: u32,
@@ -47,6 +54,10 @@ struct ProjectContext {
     // Metadata
     cache_version: String,
     project_hash: String,
+
+    // Session context (what was done)
+    #[serde(default)]
+    session_context: SessionContext,
 }
 
 #[derive(Deserialize)]
@@ -112,6 +123,9 @@ fn find_critical_files() -> Vec<String> {
         "CHANGELOG.md",
         "README.md",
         "CONTRIBUTING.md",
+        "ARCHITECTURE.md",
+        "DECISIONS.md",
+        "BLOCKERS.md",
         "Cargo.toml",
     ];
 
@@ -123,16 +137,35 @@ fn find_critical_files() -> Vec<String> {
     files
 }
 
-fn find_spec_files() -> Vec<String> {
+fn find_apis_spec_files() -> Vec<String> {
     let mut files = Vec::new();
-    let spec_dir = PathBuf::from("spec/primitives");
+    let spec_dir = PathBuf::from("spec/apis");
 
     if spec_dir.exists() {
         if let Ok(entries) = fs::read_dir(&spec_dir) {
             for entry in entries.flatten() {
                 if let Some(name) = entry.file_name().to_str() {
                     if name.ends_with(".yaml") {
-                        files.push(format!("spec/primitives/{}", name));
+                        files.push(format!("spec/apis/{}", name));
+                    }
+                }
+            }
+        }
+    }
+    files.sort();
+    files
+}
+
+fn find_impl_files() -> Vec<String> {
+    let mut files = Vec::new();
+    let impl_dir = PathBuf::from("impl");
+
+    if impl_dir.exists() {
+        if let Ok(entries) = fs::read_dir(&impl_dir) {
+            for entry in entries.flatten() {
+                if let Some(name) = entry.file_name().to_str() {
+                    if name.ends_with(".md") {
+                        files.push(format!("impl/{}", name));
                     }
                 }
             }
@@ -152,6 +185,34 @@ fn check_build_status() -> String {
     } else {
         "No Cargo.toml found".to_string()
     }
+}
+
+fn parse_cli_args() -> SessionContext {
+    let args: Vec<String> = env::args().collect();
+    let mut task = String::new();
+    let mut summary = String::new();
+
+    let mut i = 1;
+    while i < args.len() {
+        match args[i].as_str() {
+            "--task" => {
+                if i + 1 < args.len() {
+                    task = args[i + 1].clone();
+                    i += 1;
+                }
+            }
+            "--summary" => {
+                if i + 1 < args.len() {
+                    summary = args[i + 1].clone();
+                    i += 1;
+                }
+            }
+            _ => {}
+        }
+        i += 1;
+    }
+
+    SessionContext { task, summary }
 }
 
 fn main() {
@@ -203,9 +264,13 @@ fn main() {
     let workspace_crates = vec![project_name.clone()];
     let total_crates = 1;
 
-    // Find critical and spec files
+    // Find critical, spec, and impl files
     let critical_files = find_critical_files();
-    let spec_files = find_spec_files();
+    let apis_spec_files = find_apis_spec_files();
+    let impl_files = find_impl_files();
+
+    // Parse CLI args for session context
+    let session_context = parse_cli_args();
 
     // Build context object
     let context = ProjectContext {
@@ -226,7 +291,8 @@ fn main() {
 
         // Critical files inventory
         critical_files,
-        spec_files: spec_files.clone(),
+        apis_spec_files: apis_spec_files.clone(),
+        impl_files: impl_files.clone(),
 
         // Session tracking
         session_count: existing_sessions,
@@ -239,8 +305,11 @@ fn main() {
         build_status: check_build_status(),
 
         // Metadata
-        cache_version: "1.0".to_string(),
+        cache_version: "1.1".to_string(),
         project_hash: project_hash.clone(),
+
+        // Session context
+        session_context,
     };
 
     // Save to cache file
@@ -253,11 +322,24 @@ fn main() {
     println!("  Project: {} v{}", context.project_name, context.version);
     println!("  Session: #{}", context.session_count);
     println!("  Architecture: Single crate with {} modules", context.total_crates);
-    println!("  API Specs: {} endpoints", spec_files.len());
+    println!("  API Specs: {} endpoints", apis_spec_files.len());
+    println!("  Impl Plans: {} files", impl_files.len());
     println!("  Build: {}", context.build_status);
     println!("\n📁 Critical Files Tracked:");
     for file in &context.critical_files {
         println!("  ✓ {}", file);
     }
+
+    // Display session context if provided
+    if !context.session_context.task.is_empty() || !context.session_context.summary.is_empty() {
+        println!("\n📝 Session Context Saved:");
+        if !context.session_context.task.is_empty() {
+            println!("  Task: {}", context.session_context.task);
+        }
+        if !context.session_context.summary.is_empty() {
+            println!("  Summary: {}", context.session_context.summary);
+        }
+    }
+
     println!("\nReady to continue in next session with /continue-session");
 }
