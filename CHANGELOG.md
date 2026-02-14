@@ -79,6 +79,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - `pull_model_blocking()` sync method
   - 8 new unit tests with mocking
   - Examples: `pull_model_async.rs`, `pull_model_sync.rs`
+- **POST /api/push endpoint**: Upload models to registry (non-streaming)
+  - `PushRequest` type with builder pattern (model, insecure option)
+  - `PushResponse` type with helper methods (`status()`, `is_success()`)
+  - `push_model()` async method
+  - `push_model_blocking()` sync method
+  - 10 new unit tests with mocking
+  - Examples: `push_model_async.rs`, `push_model_sync.rs`
 - **GET /api/ps endpoint**: List currently running models
   - `PsResponse`, `RunningModel` primitive types
   - `list_running_models()` async method
@@ -129,11 +136,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - Streaming features moved to v0.2.0
   - v0.3.0 will focus on conveniences module
   - v0.4.0 will focus on examples and production readiness
-
-### Planned for v0.1.0
-- POST /api/chat - Chat completions (non-streaming only)
-- POST /api/create - Model creation (non-streaming only)
-- POST /api/push - Model upload (non-streaming only)
 
 ### Planned for v0.2.0
 - Streaming support for generate, chat, create, pull, push endpoints

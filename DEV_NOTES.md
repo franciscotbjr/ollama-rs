@@ -5,8 +5,8 @@ This document contains internal development notes, architectural decisions, and 
 ## Project Status
 
 **Current Version:** 0.1.0
-**Status:** Early development / Foundation phase
-**Last Updated:** 2026-02-03
+**Status:** Phase 1 Complete - All 12 endpoints implemented (non-streaming)
+**Last Updated:** 2026-02-04
 
 ## Architecture Overview
 
@@ -71,45 +71,50 @@ model = ["http", "inference"]         # All model operations (opt-in)
 | `conveniences` | `http`, `inference` | High-level ergonomic APIs |
 
 **Model Feature Contents:**
-- Types: `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `CopyRequest`, `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting`, `PullRequest`, `PullResponse`
-- Methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()`, `create_model()`, `delete_model()`, `pull_model()`, `pull_model_blocking()`
+- Types: `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `CopyRequest`, `CreateRequest`, `CreateResponse`, `DeleteRequest`, `LicenseSetting`, `PullRequest`, `PullResponse`, `PushRequest`, `PushResponse`
+- Methods: `list_models()`, `list_running_models()`, `show_model()`, `copy_model()`, `create_model()`, `delete_model()`, `pull_model()`, `push_model()` (async and sync variants)
 
 ## Current State
 
-### Implemented
+### Implemented (Phase 1 Complete)
 - Single-crate configuration with feature flags
 - Module structure (inference, http, model, tools, conveniences)
 - Dependency setup (tokio, serde, reqwest, async-trait)
 - 12 OpenAPI specifications documented
 - Comprehensive documentation foundation
-- **GET /api/version endpoint** (async + sync)
-- **GET /api/tags endpoint** (async + sync)
-- **GET /api/ps endpoint** (async + sync)
-- **POST /api/copy endpoint** (async + sync)
-- **DELETE /api/delete endpoint** (async + sync)
-- **POST /api/show endpoint** (async + sync)
-- **POST /api/embed endpoint** (async + sync)
-- **POST /api/generate endpoint** (async + sync, non-streaming)
+- **All 12 API endpoints** (async + sync, non-streaming mode):
+  - GET /api/version
+  - GET /api/tags
+  - GET /api/ps
+  - POST /api/copy
+  - DELETE /api/delete
+  - POST /api/show
+  - POST /api/embed
+  - POST /api/generate
+  - POST /api/chat
+  - POST /api/create
+  - POST /api/pull
+  - POST /api/push
 - Error handling with `thiserror`
 - HTTP client with retry logic and exponential backoff
 - POST helper methods (`post_empty_with_retry`, `post_empty_blocking_with_retry`, `post_with_retry`, `post_blocking_with_retry`)
 - DELETE helper methods (`delete_empty_with_retry`, `delete_empty_blocking_with_retry`)
-- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`, `GenerateRequest`, `GenerateResponse`, `ThinkSetting`, `FormatSetting`, `KeepAliveSetting`, `StopSetting`, `TokenLogprob`, `Logprob`, `PullRequest`, `PullResponse`
-- 316+ unit and integration tests
-- Examples for version, list_models, list_running_models, copy_model, delete_model, show_model, embed, generate, chat, pull, and tools endpoints
+- Primitive types: `VersionResponse`, `ListResponse`, `ModelSummary`, `ModelDetails`, `PsResponse`, `RunningModel`, `CopyRequest`, `DeleteRequest`, `ShowRequest`, `ShowResponse`, `ShowModelDetails`, `EmbedRequest`, `EmbedResponse`, `EmbedInput`, `ModelOptions`, `GenerateRequest`, `GenerateResponse`, `ThinkSetting`, `FormatSetting`, `KeepAliveSetting`, `StopSetting`, `TokenLogprob`, `Logprob`, `ChatRequest`, `ChatResponse`, `ChatMessage`, `ChatRole`, `ResponseMessage`, `CreateRequest`, `CreateResponse`, `LicenseSetting`, `PullRequest`, `PullResponse`, `PushRequest`, `PushResponse`
+- 330+ unit and integration tests
+- Examples for all endpoints including tools
 - `chat_with_tools_async` example: Complete tool calling flow with mock weather service
 
 ### In Progress
-- Complex endpoints in non-streaming mode (generate, chat, create, pull, push)
+- v0.1.0 release preparation
 
-### TODO (v0.1.0)
+### Completed (v0.1.0)
 - [x] Implement POST /api/show endpoint
 - [x] Implement POST /api/embed endpoint
 - [x] Implement POST /api/generate endpoint (non-streaming only)
-- [ ] Implement POST /api/chat endpoint (non-streaming only)
-- [ ] Implement POST /api/create endpoint (non-streaming only)
+- [x] Implement POST /api/chat endpoint (non-streaming only)
+- [x] Implement POST /api/create endpoint (non-streaming only)
 - [x] Implement POST /api/pull endpoint (non-streaming only)
-- [ ] Implement POST /api/push endpoint (non-streaming only)
+- [x] Implement POST /api/push endpoint (non-streaming only)
 
 ### TODO (v0.2.0)
 - [ ] Implement streaming support for generate, chat, create, pull, push endpoints
@@ -292,13 +297,13 @@ The library uses Cargo features to provide a modular, opt-in design where develo
 - Allows users to use all endpoints immediately with `stream: false`
 - Clear separation between functionality (v0.1.0) and streaming (v0.2.0)
 
-### Phase 1 (v0.1.0): Foundation + All Endpoints (Current)
-Implement all 12 endpoints in non-streaming mode:
+### Phase 1 (v0.1.0): Foundation + All Endpoints ✅ COMPLETE
+All 12 endpoints implemented in non-streaming mode:
 - 3 GET endpoints (version, tags, ps) ✅
 - 2 Simple POST/DELETE endpoints (copy, delete) ✅
-- 2 Medium complexity endpoints (show ✅, embed ✅)
-- 5 Complex endpoints in non-streaming mode (generate ✅, chat, create, pull, push)
-- Full test coverage
+- 2 Medium complexity endpoints (show, embed) ✅
+- 5 Complex endpoints in non-streaming mode (generate, chat, create, pull, push) ✅
+- Full test coverage (330+ tests)
 
 ### Phase 2 (v0.2.0): Streaming Implementation
 Add streaming support to applicable endpoints:

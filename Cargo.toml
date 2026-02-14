@@ -148,3 +148,15 @@ required-features = ["model"]
 name = "client_pull_tests"
 required-features = ["model"]
 
+[[test]]
+name = "client_push_tests"
+required-features = ["model"]
+
+[[example]]
+name = "push_model_async"
+required-features = ["model"]
+
+[[example]]
+name = "push_model_sync"
+required-features = ["model"]
+
