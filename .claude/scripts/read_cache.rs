@@ -37,7 +37,7 @@ struct ProjectContext {
     workspace_crates: Vec<String>,
     total_crates: u32,
     critical_files: Vec<String>,
-    spec_files: Vec<String>,
+    apis_spec_files: Vec<String>,
     #[serde(default)]
     impl_files: Vec<String>,
     session_count: u32,
@@ -293,13 +293,13 @@ fn main() {
     }
     println!();
 
-    println!("📄 API Specifications ({} endpoints):", context.spec_files.len());
+    println!("📄 API Specifications ({} endpoints):", context.apis_spec_files.len());
     // Group by type
     let mut simple = Vec::new();
     let mut medium = Vec::new();
     let mut complex = Vec::new();
 
-    for spec in &context.spec_files {
+    for spec in &context.apis_spec_files {
         let filename = spec.split('/').last().unwrap_or(spec);
         if filename.contains("version") {
             simple.push(filename);
